@@ -14,6 +14,7 @@ for (const tool of tools) {
 
 if (errors.length > 0) {
     console.warn("WARNING: Tool input schema field without description detected. LLMs use tool descriptions to provide better tool suggestions and more consistent tool behavior. It is recommended to add descriptions to all tool input fields.");
+    console.warn("This warning comes from the prebuild script. To disable it, remove the prebuild script from package.json.");
 }
 for (const error of errors) {
     console.warn(error);
