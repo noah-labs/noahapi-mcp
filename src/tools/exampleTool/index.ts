@@ -1,6 +1,5 @@
 import type { ToolRegistration } from "@/types";
 import { makeJsonSchema } from "@/utils/makeJsonSchema";
-import zodToJsonSchema from "zod-to-json-schema";
 import { type SomeFunctionSchema, someFunctionSchema } from "./schema";
 
 // Simulate an async operation

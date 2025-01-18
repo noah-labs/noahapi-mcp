@@ -32,7 +32,8 @@
     "release:minor": "standard-version --release-as minor && bun run update-version",
     "release:major": "standard-version --release-as major && bun run update-version",
     "release:patch": "standard-version --release-as patch && bun run update-version",
-    "update-version": "sed -i '' -e 's/export const VERSION = .*/export const VERSION = '\"'$(node -p 'require(\"./package.json\").version')'\"';/' src/main.ts"
+    "update-version": "sed -i '' -e 's/export const VERSION = .*/export const VERSION = '\"'$(node -p 'require(\"./package.json\").version')'\"';/' src/main.ts",
+    "create-tool": "bun create-tool.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
