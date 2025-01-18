@@ -13,8 +13,8 @@ export function validateSchemaDescriptions(
 ): string[] {
   const errors: string[] = [];
 
-  // Check if the current schema has a description
-  if (!schema.description) {
+  // Check if the current schema has a description (skip root)
+  if (path !== "root" && !schema.description) {
     errors.push(`Missing description at: ${path}`);
   }
 
@@ -120,36 +120,7 @@ export function validateSchemaDescriptions(
   return errors;
 }
 
-// Example usage
-const exampleSchema: JSONSchema7 = {
-  type: "object",
-  description: "Example top-level description",
-  properties: {
-    name: {
-      type: "string" // no description here - should be flagged
-    },
-    address: {
-      type: "object",
-      description: "Address object",
-      properties: {
-        street: {
-          type: "string",
-          description: "Street address"
-        },
-        zip: {
-          type: "string" // no description
-        }
-      }
-    }
-  }
-};
 
-const errors = validateSchemaDescriptions(exampleSchema);
-
-for (const error of errors) {
-  console.warn("Tool input schema field without description detected. LLMs use tool descriptions to provide better tool suggestions. It is recommended to add descriptions to all tool input fields.");
-  console.warn(error);
-}
 // [
 //   'Missing description at: root.properties.name',
 //   'Missing description at: root.properties.address.properties.zip'
