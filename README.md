@@ -90,7 +90,7 @@ This project uses [standard-version](https://github.com/conventional-changelog/s
    ```
 Remember to update the version number using `bun run release` before publishing new versions.
 
-## Installing from npm
+## Installing from npm (after publishing)
 
 Add to your Claude Desktop config:
 ```json
