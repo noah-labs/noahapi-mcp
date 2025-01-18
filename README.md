@@ -37,7 +37,27 @@ mcp-starter/
 ```
 
 ## ⚙️ Configuration
-Coming soon...
+
+### Creating New Tools
+
+The project includes a script to help create new MCP tools:
+
+```bash
+bun run scripts/create-tool.ts <tool-name>
+```
+
+This will:
+1. Create a new tool directory under `src/tools/<tool-name>`
+2. Generate the basic tool structure including:
+   - index.ts (main implementation)
+   - schema.ts (JSON schema for tool parameters)
+   - test.ts (test file)
+3. Update the tools index file to export the new tool
+
+Example:
+```bash
+bun run scripts/create-tool.ts weather
+```
 
 ## 🛠️ Development
 
