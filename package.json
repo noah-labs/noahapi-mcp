@@ -19,7 +19,7 @@
   },
   "files": ["dist"],
   "scripts": {
-    "prebuild": "bun prebuild.ts",
+    "prebuild": "bun scripts/prebuild.ts",
     "build": "bun build ./src/main.ts --outdir dist --target node && chmod +x dist/main.js",
     "start": "bun run dist/main.ts",
     "test": "bun test",
@@ -33,7 +33,7 @@
     "release:major": "standard-version --release-as major && bun run update-version",
     "release:patch": "standard-version --release-as patch && bun run update-version",
     "update-version": "sed -i '' -e 's/export const VERSION = .*/export const VERSION = '\"'$(node -p 'require(\"./package.json\").version')'\"';/' src/main.ts",
-    "create-tool": "bun create-tool.ts"
+    "create-tool": "bun scripts/create-tool.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
