@@ -16,12 +16,10 @@ A production-ready starter template for building Model Context Protocol (MCP) se
 
 ## ✨ Key Features
 
-- **TypeScript First**: Built with modern TypeScript practices
-- **Tool Development Framework**: Easy-to-use structure for creating MCP tools
-- **Built-in Testing**: Comes with Jest testing setup
-- **Modern Tooling**: Uses Bun for fast development
-- **Code Quality**: Integrated with Biome for linting and formatting
-- **Version Management**: Automated versioning with standard-version
+- Bun for fast testing and development
+- Biome for linting and formatting
+- Automated version management with standard-version
+- Clean, maintainable project structure
 
 ## 📂 Project Structure
 
@@ -105,4 +103,3 @@ Add to your Claude Desktop config:
     }
   }
 }
-   
