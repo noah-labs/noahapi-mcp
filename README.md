@@ -9,10 +9,6 @@ A production-ready starter template for building Model Context Protocol (MCP) se
    ```bash
    bun install
    ```
-3. Start development:
-   ```bash
-   bun run dev
-   ```
 
 ## ✨ Key Features
 
