@@ -1,6 +1,111 @@
-# MCP Server Starter
+# Flow MCP
 
-A production-ready starter template for building Model Context Protocol (MCP) servers with TypeScript.
+Flow blockchain tools for Model Context Protocol (MCP). This MCP server provides tools for interacting with the Flow blockchain, including:
+
+- Flow balance checking
+- Token balance querying
+- COA (Cadence Owned Account) information retrieval
+
+## Features
+
+- Real-time Flow blockchain interaction
+- Support for both mainnet and testnet
+- Type-safe tool definitions using Zod
+- Comprehensive test coverage
+- Built with Bun for optimal performance
+
+## Installation
+
+```bash
+# Using bun
+bun install flow-mcp
+
+# Using npm
+npm install flow-mcp
+
+# Using yarn
+yarn add flow-mcp
+```
+
+## Usage
+
+```typescript
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp';
+import { flowBalanceTool, tokenBalanceTool, coaAccountTool } from 'flow-mcp';
+
+const server = new McpServer({
+  name: "flow-mcp",
+  version: "1.0.0"
+}, {
+  capabilities: {
+    tools: {
+      flowBalanceTool,
+      tokenBalanceTool,
+      coaAccountTool
+    }
+  }
+});
+
+server.start();
+```
+
+## Available Tools
+
+### Flow Balance Tool
+Get the FLOW token balance for any Flow address:
+
+```typescript
+const result = await flowBalanceTool.handler({
+  address: "0x1234...",
+  network: "mainnet"
+});
+```
+
+### Token Balance Tool
+Get the balance of any fungible token for a Flow address:
+
+```typescript
+const result = await tokenBalanceTool.handler({
+  address: "0x1234...",
+  network: "mainnet",
+  tokenIdentifier: "A.1654653399040a61.FlowToken.Vault"
+});
+```
+
+### COA Account Tool
+Get Cadence Owned Account information for a Flow address:
+
+```typescript
+const result = await coaAccountTool.handler({
+  address: "0x1234...",
+  network: "mainnet",
+  include_evm_address: true
+});
+```
+
+## Development
+
+```bash
+# Install dependencies
+bun install
+
+# Run tests
+bun test
+
+# Build the project
+bun run build
+
+# Start the server
+bun start
+```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+MIT License
 
 ## 🚀 Quick Start
 

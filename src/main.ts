@@ -29,7 +29,7 @@ if (args.length < expectedArgs.length) {
 // Initialize server
 const server = new Server(
 	{
-		name: "MCP SERVER NAME",
+		name: "Flow MCP",
 		version: VERSION,
 	},
 	{
@@ -74,7 +74,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 async function runServer() {
 	const transport = new StdioServerTransport();
 	await server.connect(transport);
-	console.error("Todoist MCP Server running on stdio");
+	console.error("Flow MCP Server running on stdio");
 }
 
 runServer().catch((error) => {

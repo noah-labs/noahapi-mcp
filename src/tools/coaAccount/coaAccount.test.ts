@@ -1,0 +1,47 @@
+import { describe, test, expect } from 'bun:test';
+import { getCoaAccount } from './index';
+
+describe('getCoaAccount', () => {
+  // Use a known Flow account for testing
+  const testAddress = '0x1654653399040a61'; // Flow Token account on mainnet
+  
+  test('should return COA account info for a valid address on mainnet', async () => {
+    const result = await getCoaAccount({
+      address: testAddress,
+      network: 'mainnet',
+      include_evm_address: true
+    });
+
+    expect(result).toBeDefined();
+    // The result will be an empty string if no COA account is found
+    expect(typeof result).toBe('string');
+  });
+
+  test('should return COA account info for a valid address on testnet', async () => {
+    const result = await getCoaAccount({
+      address: '0x7e60df042a9c0868', // Flow Token account on testnet
+      network: 'testnet',
+      include_evm_address: true
+    });
+
+    expect(result).toBeDefined();
+    // The result will be an empty string if no COA account is found
+    expect(typeof result).toBe('string');
+  });
+
+  test('should throw error for invalid network', async () => {
+    await expect(getCoaAccount({
+      address: testAddress,
+      network: 'invalid' as any,
+      include_evm_address: true
+    })).rejects.toThrow('Unsupported network');
+  });
+
+  test('should throw error for invalid address', async () => {
+    await expect(getCoaAccount({
+      address: 'invalid-address',
+      network: 'mainnet',
+      include_evm_address: true
+    })).rejects.toThrow();
+  });
+}); 
