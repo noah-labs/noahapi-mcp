@@ -1,32 +1,22 @@
-import { FastMCP } from 'fastmcp';
-import { createTools } from './tools';
-import { z } from 'zod';
+import { FastMCP } from "fastmcp";
+import { createTools } from "./tools";
 
 // Initialize server
 const server = new FastMCP({
-  name: 'flow-mcp',
-  version: '0.1.0',
+  name: "flow-mcp",
+  version: "0.1.0",
 });
 
 // Register all tools
 const tools = createTools();
 for (const tool of tools) {
-  const schema = z.object(
-    Object.fromEntries(
-      Object.entries(tool.inputSchema.properties || {}).map(([key, value]) => [
-        key,
-        z.any().describe((value as any).description || ''),
-      ])
-    )
-  );
-
   server.addTool({
     name: tool.name,
     description: tool.description,
-    parameters: schema,
+    parameters: tool.zodSchema,
     execute: async (args, context) => {
       const result = await tool.handler(args);
-      if (typeof result.content[0].text === 'string') {
+      if (typeof result.content[0].text === "string") {
         return result.content[0].text;
       }
       return JSON.stringify(result.content[0].text);
@@ -36,20 +26,20 @@ for (const tool of tools) {
 
 // Get command line arguments
 const args = process.argv.slice(2);
-const useSSE = args.includes('--sse');
+const useSSE = args.includes("--sse");
 
 // Start server with appropriate transport
 if (useSSE) {
   server.start({
-    transportType: 'sse',
+    transportType: "sse",
     sse: {
-      endpoint: '/sse',
+      endpoint: "/sse",
       port: 8080,
     },
   });
 } else {
   server.start({
-    transportType: 'stdio',
+    transportType: "stdio",
   });
 }
 

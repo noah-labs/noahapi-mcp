@@ -33,6 +33,7 @@ export const flowBalanceTool: ToolRegistration<FlowBalanceSchema> = {
   name: "get_flow_balance",
   description: "Get the FLOW balance for a Flow address",
   inputSchema: makeJsonSchema(flowBalanceSchema),
+  zodSchema: flowBalanceSchema,
   handler: async (args: FlowBalanceSchema) => {
     try {
       const parsedArgs = flowBalanceSchema.parse(args);

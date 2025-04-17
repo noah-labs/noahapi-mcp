@@ -36,6 +36,7 @@ export const tokenBalanceTool: ToolRegistration<TokenBalanceSchema> = {
   name: "get_token_balances",
   description: "Get the balances of all fungible tokens for a Flow address",
   inputSchema: makeJsonSchema(tokenBalanceSchema),
+  zodSchema: tokenBalanceSchema,
   handler: async (args: TokenBalanceSchema) => {
     try {
       const parsedArgs = tokenBalanceSchema.parse(args);

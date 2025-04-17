@@ -39,6 +39,7 @@ export const getContractTool: ToolRegistration<GetContractSchema> = {
   name: "get_contract",
   description: "Get the source code of a contract deployed at a specific address",
   inputSchema: makeJsonSchema(getContractSchema),
+  zodSchema: getContractSchema,
   handler: async (args: GetContractSchema) => {
     try {
       const parsedArgs = getContractSchema.parse(args);
