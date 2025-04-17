@@ -46,7 +46,7 @@ describe('getContract', () => {
   });
 
   test('should have correct tool registration', () => {
-    expect(getContractTool.name).toBe('mcp_flow_mcp_get_contract');
+    expect(getContractTool.name).toBe('get_contract');
     expect(getContractTool.description).toBeDefined();
     expect(getContractTool.inputSchema).toBeDefined();
     expect(getContractTool.handler).toBeDefined();

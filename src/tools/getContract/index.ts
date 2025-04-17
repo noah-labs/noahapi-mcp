@@ -36,7 +36,7 @@ export const getContract = async (args: GetContractSchema): Promise<string> => {
 };
 
 export const getContractTool: ToolRegistration<GetContractSchema> = {
-  name: "mcp_flow_mcp_get_contract",
+  name: "get_contract",
   description: "Get the source code of a contract deployed at a specific address",
   inputSchema: makeJsonSchema(getContractSchema),
   handler: async (args: GetContractSchema) => {

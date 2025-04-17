@@ -42,7 +42,7 @@ describe('accountInfo', () => {
   });
 
   test('should have correct tool registration', () => {
-    expect(accountInfoTool.name).toBe('mcp_flow_mcp_get_account_info');
+    expect(accountInfoTool.name).toBe('get_account_info');
     expect(accountInfoTool.description).toBeDefined();
     expect(accountInfoTool.inputSchema).toBeDefined();
     expect(accountInfoTool.handler).toBeDefined();

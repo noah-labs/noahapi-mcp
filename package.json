@@ -1,6 +1,6 @@
 {
   "name": "@outblock/flow-mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Flow blockchain tools for Model Context Protocol (MCP)",
   "author": {
     "name": "Outblock",
@@ -12,12 +12,14 @@
     "type": "git",
     "url": "https://github.com/outblock/flow-mcp.git"
   },
-  "module": "dist/main.js",
+  "main": "dist/index.js",
   "type": "module",
   "bin": {
-    "flow-mcp": "dist/main.js"
+    "flow-mcp": "dist/bin/flow-mcp.js"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "engines": {
     "node": ">=20.0.0",
     "bun": ">=1.0.0"
@@ -30,37 +32,40 @@
     "cli"
   ],
   "scripts": {
-    "prebuild": "bun scripts/prebuild.ts",
-    "build": "bun build ./src/main.ts --outdir dist --target node && chmod +x dist/main.js",
-    "start": "bun run dist/main.ts",
+    "build": "tsup",
     "test": "bun test",
-    "clean": "rm -rf dist",
-    "prepublishOnly": "npm run build",
-    "lint": "bunx biome lint --write src",
-    "format": "bunx biome format --write src",
-    "check": "bunx biome check --write src",
-    "release": "standard-version && bun run update-version",
-    "release:minor": "standard-version --release-as minor && bun run update-version",
-    "release:major": "standard-version --release-as major && bun run update-version",
-    "release:patch": "standard-version --release-as patch && bun run update-version",
-    "update-version": "sed -i '' -e 's/export const VERSION = .*/export const VERSION = '\"'$(node -p 'require(\"./package.json\").version')'\"';/' src/main.ts",
-    "create-tool": "bun scripts/create-tool.ts"
+    "format": "biome format . --write",
+    "start": "bun dist/index.js",
+    "dev": "fastmcp dev src/index.ts",
+    "inspect": "fastmcp inspect src/index.ts"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.9.4",
-    "@types/bun": "latest",
-    "standard-version": "^9.5.0"
-  },
-  "peerDependencies": {
-    "typescript": "^5.0.0"
+    "@types/node": "^22.13.5",
+    "@types/yargs": "^17.0.33",
+    "bun-types": "^1.2.9",
+    "tsup": "^8.4.0",
+    "typescript": "^5.7.3"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.9.0",
     "@onflow/fcl": "^1.4.0",
     "@onflow/types": "^1.1.0",
-    "@types/json-schema": "^7.0.15",
-    "pretty-js-log": "^1.1.1",
+    "fastmcp": "^1.21.0",
+    "yargs": "^17.7.2",
     "zod": "^3.24.1",
     "zod-to-json-schema": "^3.24.1"
+  },
+  "tsup": {
+    "entry": [
+      "src/index.ts",
+      "src/bin/flow-mcp.ts"
+    ],
+    "format": [
+      "esm"
+    ],
+    "dts": true,
+    "splitting": true,
+    "sourcemap": true,
+    "clean": true
   }
 }

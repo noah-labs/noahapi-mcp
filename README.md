@@ -42,60 +42,105 @@ You can find your MCP configuration at:
 
 After adding the configuration, restart Claude to load the new MCP server.
 
-## Usage
-
-This package provides a CLI tool and can be used as a library:
-
-### As CLI
-
-```bash
-# Get FLOW balance
-flow-mcp mcp_flow_mcp_get_flow_balance --address 0xf233dcee88fe0abe
-
-# Get account info
-flow-mcp mcp_flow_mcp_get_account_info --address 0xf233dcee88fe0abe
-
-# Get contract source
-flow-mcp mcp_flow_mcp_get_contract --address 0xf233dcee88fe0abe --contractName FungibleToken
-```
-
-### As Library
-
-```typescript
-import { createTools } from '@outblock/flow-mcp';
-
-const tools = createTools();
-
-// Get FLOW balance
-const flowBalanceTool = tools.find(t => t.name === 'mcp_flow_mcp_get_flow_balance');
-const balance = await flowBalanceTool.handler({ address: '0xf233dcee88fe0abe' });
-
-// Get account info
-const accountInfoTool = tools.find(t => t.name === 'mcp_flow_mcp_get_account_info');
-const info = await accountInfoTool.handler({ address: '0xf233dcee88fe0abe' });
-
-// Get contract source
-const getContractTool = tools.find(t => t.name === 'mcp_flow_mcp_get_contract');
-const contract = await getContractTool.handler({
-  address: '0xf233dcee88fe0abe',
-  contractName: 'FungibleToken'
-});
-```
-
 ## Development
+
+This project uses FastMCP for development and testing. FastMCP provides a streamlined development experience for MCP servers.
 
 ```bash
 # Install dependencies
 bun install
+
+# Run development server
+bun run dev
 
 # Run tests
 bun test
 
 # Build
 bun run build
+```
 
-# Lint
-bun run lint
+## 📂 Project Structure
+
+```
+flow-mcp/
+├── src/
+│   ├── tools/          # MCP tools implementation
+│   │   ├── flowBalance/    # Flow balance tool
+│   │   ├── accountInfo/    # Account info tool
+│   │   ├── tokenBalance/   # Token balance tool
+│   │   ├── coaAccount/     # COA account tool
+│   │   └── getContract/    # Contract source tool
+│   ├── utils/          # Shared utilities
+│   ├── prompts/        # MCP prompts
+│   ├── types/          # Type definitions
+│   └── bin/           # CLI implementation
+├── biome.json         # Linting configuration
+├── tsconfig.json      # TypeScript configuration
+└── package.json       # Project dependencies
+```
+
+## Tools
+
+### Flow Balance
+Get the FLOW balance for any address:
+```typescript
+{
+  name: 'get_flow_balance',
+  input: {
+    address: string,
+    network?: 'mainnet' | 'testnet'
+  }
+}
+```
+
+### Account Info
+Get detailed account information:
+```typescript
+{
+  name: 'get_account_info',
+  input: {
+    address: string,
+    network?: 'mainnet' | 'testnet'
+  }
+}
+```
+
+### Token Balance
+Get balance for any Flow token:
+```typescript
+{
+  name: 'get_token_balance',
+  input: {
+    address: string,
+    network?: 'mainnet' | 'testnet'
+  }
+}
+```
+
+### COA Account
+Get COA account information:
+```typescript
+{
+  name: 'get_coa_account',
+  input: {
+    address: string,
+    network?: 'mainnet' | 'testnet'
+  }
+}
+```
+
+### Get Contract
+Get contract source code:
+```typescript
+{
+  name: 'get_contract',
+  input: {
+    address: string,
+    contractName: string,
+    network?: 'mainnet' | 'testnet'
+  }
+}
 ```
 
 ## License

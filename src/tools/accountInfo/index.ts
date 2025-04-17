@@ -54,13 +54,10 @@ export const getAccountInfo = async (args: AccountInfoSchema): Promise<AccountIn
   configureFCL(network);
 
   try {
-    // Format address to remove 0x prefix if present
-    const formattedAddress = address.replace("0x", "");
-    
     // Execute the Cadence script
     const response = await fcl.query({
       cadence: accountInfoScript,
-      args: (arg, t) => [arg(formattedAddress, t.Address)],
+      args: (arg, t) => [arg(address, t.Address)],
     });
 
     return {
@@ -77,7 +74,7 @@ export const getAccountInfo = async (args: AccountInfoSchema): Promise<AccountIn
 };
 
 export const accountInfoTool: ToolRegistration<AccountInfoSchema> = {
-  name: "mcp_flow_mcp_get_account_info",
+  name: "get_account_info",
   description: "Get detailed account information including balance and storage stats for a Flow address",
   inputSchema: makeJsonSchema(accountInfoSchema),
   handler: async (args: AccountInfoSchema) => {
