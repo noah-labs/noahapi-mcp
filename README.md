@@ -1,85 +1,84 @@
-# Flow MCP
+# @outblock/flow-mcp
 
-Flow blockchain tools for Model Context Protocol (MCP). This MCP server provides tools for interacting with the Flow blockchain, including:
-
-- Flow balance checking
-- Token balance querying
-- COA (Cadence Owned Account) information retrieval
+Flow blockchain tools for Model Context Protocol (MCP). This package provides a set of tools for interacting with the Flow blockchain through the Model Context Protocol.
 
 ## Features
 
-- Real-time Flow blockchain interaction
-- Support for both mainnet and testnet
-- Type-safe tool definitions using Zod
-- Comprehensive test coverage
-- Built with Bun for optimal performance
+- Get FLOW balance for any address
+- Get token balance for any Flow token
+- Get COA account information
+- Get contract source code
+- Get detailed account information including storage stats
 
 ## Installation
 
 ```bash
-# Using bun
-bun install flow-mcp
-
 # Using npm
-npm install flow-mcp
+npm install @outblock/flow-mcp
 
-# Using yarn
-yarn add flow-mcp
+# Using bun
+bun add @outblock/flow-mcp
 ```
+
+## MCP Configuration
+
+To use this tool with Claude, add the following to your MCP configuration:
+
+```json
+{
+  "mcpServers": {
+    "flow": {
+      "command": "npx",
+      "args": ["-y", "@outblock/flow-mcp"]
+    }
+  }
+}
+```
+
+You can find your MCP configuration at:
+- macOS: `~/Library/Application Support/Claude/mcp.json`
+- Windows: `%APPDATA%/Claude/mcp.json`
+- Linux: `~/.config/Claude/mcp.json`
+
+After adding the configuration, restart Claude to load the new MCP server.
 
 ## Usage
 
-```typescript
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp';
-import { flowBalanceTool, tokenBalanceTool, coaAccountTool } from 'flow-mcp';
+This package provides a CLI tool and can be used as a library:
 
-const server = new McpServer({
-  name: "flow-mcp",
-  version: "1.0.0"
-}, {
-  capabilities: {
-    tools: {
-      flowBalanceTool,
-      tokenBalanceTool,
-      coaAccountTool
-    }
-  }
-});
+### As CLI
 
-server.start();
+```bash
+# Get FLOW balance
+flow-mcp mcp_flow_mcp_get_flow_balance --address 0xf233dcee88fe0abe
+
+# Get account info
+flow-mcp mcp_flow_mcp_get_account_info --address 0xf233dcee88fe0abe
+
+# Get contract source
+flow-mcp mcp_flow_mcp_get_contract --address 0xf233dcee88fe0abe --contractName FungibleToken
 ```
 
-## Available Tools
-
-### Flow Balance Tool
-Get the FLOW token balance for any Flow address:
+### As Library
 
 ```typescript
-const result = await flowBalanceTool.handler({
-  address: "0x1234...",
-  network: "mainnet"
-});
-```
+import { createTools } from '@outblock/flow-mcp';
 
-### Token Balance Tool
-Get the balance of any fungible token for a Flow address:
+const tools = createTools();
 
-```typescript
-const result = await tokenBalanceTool.handler({
-  address: "0x1234...",
-  network: "mainnet",
-  tokenIdentifier: "A.1654653399040a61.FlowToken.Vault"
-});
-```
+// Get FLOW balance
+const flowBalanceTool = tools.find(t => t.name === 'mcp_flow_mcp_get_flow_balance');
+const balance = await flowBalanceTool.handler({ address: '0xf233dcee88fe0abe' });
 
-### COA Account Tool
-Get Cadence Owned Account information for a Flow address:
+// Get account info
+const accountInfoTool = tools.find(t => t.name === 'mcp_flow_mcp_get_account_info');
+const info = await accountInfoTool.handler({ address: '0xf233dcee88fe0abe' });
 
-```typescript
-const result = await coaAccountTool.handler({
-  address: "0x1234...",
-  network: "mainnet",
-  include_evm_address: true
+// Get contract source
+const getContractTool = tools.find(t => t.name === 'mcp_flow_mcp_get_contract');
+const contract = await getContractTool.handler({
+  address: '0xf233dcee88fe0abe',
+  contractName: 'FungibleToken'
 });
 ```
 
@@ -92,20 +91,20 @@ bun install
 # Run tests
 bun test
 
-# Build the project
+# Build
 bun run build
 
-# Start the server
-bun start
+# Lint
+bun run lint
 ```
+
+## License
+
+MIT License - see LICENSE for details.
 
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-MIT License
 
 ## 🚀 Quick Start
 
@@ -210,17 +209,3 @@ This project uses [standard-version](https://github.com/conventional-changelog/s
    npm publish
    ```
 Remember to update the version number using `bun run release` before publishing new versions.
-
-## Installing from npm (after publishing)
-
-Add to your Claude Desktop config:
-```json
-// You only need the argument if you need to pass arguments to your server
-{
-  "mcpServers": {
-    "your-server-name": {
-      "command": "npx",
-      "args": ["-y", "your-package-name", "some_argument"]
-    }
-  }
-}
