@@ -1,47 +1,30 @@
 import type { ToolRegistration } from "@/types";
 import { makeJsonSchema } from "@/utils/makeJsonSchema";
 import { type FlowBalanceSchema, flowBalanceSchema } from "./schema";
-import * as fcl from '@onflow/fcl';
-import { configureFCL } from '@/utils/fclConfig';
+import { buildBlockchainContext } from "@/utils/context";
+
+import cdcGetBalanceScript from "@cadence/scripts/standard/get-balance.cdc?raw";
 
 /**
  * Get the FLOW balance for a Flow address
  * @param args - The arguments for the function
  * @returns The FLOW balance
  */
-export const getFlowBalance = async (args: FlowBalanceSchema): Promise<any> => {
-  const { address, network = 'mainnet' } = args;
-  
-  // Configure network
-  configureFCL(network);
-  
-  const script = `
-    import FungibleToken from 0xFungibleToken
-    import FlowToken from 0xFlowToken
+export const getFlowBalance = async (args: FlowBalanceSchema): Promise<string> => {
+  const { address, network = "mainnet" } = args;
 
-    access(all) fun checkFlowTokenBalance(address: Address) : UFix64 {
-        let account = getAccount(address)
-        let vaultRef = account.capabilities.borrow<&{FungibleToken.Balance}>(/public/flowTokenBalance)
-            ?? nil
-    
-        if vaultRef != nil {
-            return vaultRef!.balance
-        }
-    
-        return 0.0
-    }
+  // Build the blockchain context
+  const ctx = await buildBlockchainContext(network);
 
-    access(all) fun main(address: Address): UFix64 {
-        return checkFlowTokenBalance(address: address)
-    }
-  `;
+  const result = await ctx.connector.executeScript<string | undefined>(
+    cdcGetBalanceScript,
+    (arg, t) => [arg(address, t.Address)],
+    undefined,
+  );
 
-  const result = await fcl.query({
-    cadence: script,
-    args: (arg: any, t: any) => [
-      arg(address, t.Address)
-    ]
-  });
+  if (!result) {
+    throw new Error("Failed to get FLOW balance");
+  }
 
   return result;
 };

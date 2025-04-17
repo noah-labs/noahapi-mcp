@@ -1,8 +1,7 @@
 import type { ToolRegistration } from "@/types";
 import { makeJsonSchema } from "@/utils/makeJsonSchema";
 import { type GetContractSchema, getContractSchema } from "./schema.js";
-import * as fcl from '@onflow/fcl';
-import { configureFCL } from '@/utils/fclConfig';
+import { buildBlockchainContext } from "@/utils/context.js";
 
 /**
  * Get the source code of a contract deployed at a specific address
@@ -12,8 +11,9 @@ import { configureFCL } from '@/utils/fclConfig';
 export const getContract = async (args: GetContractSchema): Promise<string> => {
   const { address, contractName, network = 'mainnet' } = args;
 
-  // Configure FCL for the specified network
-  configureFCL(network);
+  const ctx = await buildBlockchainContext(network);
+  await ctx.connector.onModuleInit();
+  const fcl = ctx.connector.fcl;
 
   try {
     // Format address to remove 0x prefix if present
