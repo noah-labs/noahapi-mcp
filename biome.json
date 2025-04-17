@@ -7,14 +7,18 @@
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"ignore": ["node_modules"]
+		"ignore": [
+			"node_modules"
+		]
 	},
 	"formatter": {
 		"enabled": true,
-		"indentStyle": "tab"
+		"indentStyle": "space",
+		"indentWidth": 2,
+		"lineWidth": 120
 	},
 	"organizeImports": {
-		"enabled": true
+		"enabled": false
 	},
 	"linter": {
 		"enabled": true,

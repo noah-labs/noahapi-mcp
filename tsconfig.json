@@ -23,7 +23,12 @@
 		"noUnusedParameters": false,
 		"noPropertyAccessFromIndexSignature": false,
 		"paths": {
-			"@/*": ["./src/*"]
+			"@/*": [
+				"./src/*"
+			],
+			"@cadence/*": [
+				"./src/cadence/*"
+			]
 		},
 		"esModuleInterop": true,
 		"forceConsistentCasingInFileNames": true,
