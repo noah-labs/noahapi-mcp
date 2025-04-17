@@ -17,6 +17,7 @@
   "bin": {
     "flow-mcp": "dist/bin/flow-mcp.js"
   },
+  "module": "dist/index.js",
   "files": [
     "dist"
   ],
@@ -35,9 +36,9 @@
     "build": "tsup",
     "test": "bun test",
     "format": "biome format . --write",
-    "start": "bun dist/index.js",
-    "dev": "fastmcp dev src/index.ts",
-    "inspect": "fastmcp inspect src/index.ts"
+    "start": "node dist/index.js --format esm",
+    "dev": "bun src/bin/flow-mcp.ts dev src/index.ts",
+    "inspect": "bun src/bin/flow-mcp.ts inspect src/index.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
@@ -53,24 +54,12 @@
     "@modelcontextprotocol/sdk": "^1.9.0",
     "@onflow/fcl": "^1.15.0",
     "@onflow/types": "^1.4.1",
+    "execa": "^9.5.2",
     "elliptic": "^6.6.1",
     "fastmcp": "^1.21.0",
     "sha3": "^2.1.4",
     "yargs": "^17.7.2",
     "zod": "^3.24.1",
     "zod-to-json-schema": "^3.24.1"
-  },
-  "tsup": {
-    "entry": [
-      "src/index.ts",
-      "src/bin/flow-mcp.ts"
-    ],
-    "format": [
-      "esm"
-    ],
-    "dts": true,
-    "splitting": true,
-    "sourcemap": true,
-    "clean": true
   }
 }

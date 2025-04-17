@@ -34,6 +34,7 @@ export const coaAccountTool: ToolRegistration<CoaAccountSchema> = {
   name: "get_coa_account",
   description: "Get the COA account information for a Flow address",
   inputSchema: makeJsonSchema(coaAccountSchema),
+  zodSchema: coaAccountSchema,
   handler: async (args: CoaAccountSchema) => {
     try {
       const parsedArgs = coaAccountSchema.parse(args);

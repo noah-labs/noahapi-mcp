@@ -9,5 +9,6 @@ const ToolInputSchema = ToolSchema.shape.inputSchema;
 export type ToolInput = z.infer<typeof ToolInputSchema>;
 
 export type ToolRegistration<T> = Tool & {
-	handler: (args: T) => CallToolResult | Promise<CallToolResult>;
+  zodSchema: z.ZodSchema;
+  handler: (args: T) => CallToolResult | Promise<CallToolResult>;
 };

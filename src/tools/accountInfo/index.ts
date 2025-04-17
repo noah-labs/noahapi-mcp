@@ -45,6 +45,7 @@ export const accountInfoTool: ToolRegistration<AccountInfoSchema> = {
   name: "get_account_info",
   description: "Get detailed account information including balance and storage stats for a Flow address",
   inputSchema: makeJsonSchema(accountInfoSchema),
+  zodSchema: accountInfoSchema,
   handler: async (args: AccountInfoSchema) => {
     try {
       const parsedArgs = accountInfoSchema.parse(args);
