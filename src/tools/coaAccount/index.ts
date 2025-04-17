@@ -1,51 +1,31 @@
 import type { ToolRegistration } from "@/types";
 import { makeJsonSchema } from "@/utils/makeJsonSchema";
+import { buildBlockchainContext } from "@/utils/context";
 import { type CoaAccountSchema, coaAccountSchema } from "./schema";
-import * as fcl from '@onflow/fcl';
-import * as t from '@onflow/types';
-import { configureFCL } from '@/utils/fclConfig';
+
+import cdcCoaAccountScript from "@cadence/scripts/standard/get-coa-account.cdc?raw";
 
 /**
  * Get the COA account information for a Flow address
  * @param args - The arguments for the function
  * @returns The COA account information
  */
-export const getCoaAccount = async (args: CoaAccountSchema): Promise<any> => {
-  const { address, network = 'mainnet' } = args;
-  
-  // Configure network
-  configureFCL(network);
-  
-  const script = `
-      import EVM from 0xEVM
+export const getCoaAccount = async (args: CoaAccountSchema): Promise<string> => {
+  const { address, network = "mainnet" } = args;
 
-      access(all) fun main(address: Address): String {
-        let account = getAuthAccount<auth(Storage) &Account>(address)
+  // Build the blockchain context
+  const ctx = await buildBlockchainContext(network);
 
-        let coa = account.storage.borrow<&EVM.CadenceOwnedAccount>(
-          from: /storage/evm
-        )
+  // Execute the Cadence script
+  const result = await ctx.connector.executeScript<string | undefined>(
+    cdcCoaAccountScript,
+    (arg, t) => [arg(address, t.Address)],
+    undefined,
+  );
 
-        if coa == nil { 
-          return ""
-        } else {
-          let coaAddr = coa?.address() 
-
-          let addrByte: [UInt8] = []
-
-          for byte in coaAddr?.bytes! {
-            addrByte.append(byte)
-          }
-
-          return String.encodeHex(addrByte)
-        }
-      }
-  `;
-
-  const result = await fcl.query({
-    cadence: script,
-    args: (arg: any, t: any) => [arg(address, t.Address)]
-  });
+  if (!result) {
+    throw new Error("COA account not found");
+  }
 
   return result;
 };

@@ -1,46 +1,9 @@
 import type { ToolRegistration } from "@/types";
+import { type AccountInfoResult, type AccountInfoSchema, accountInfoSchema } from "./schema.js";
 import { makeJsonSchema } from "@/utils/makeJsonSchema";
-import { type AccountInfoSchema, type AccountInfoResult, accountInfoSchema } from "./schema.js";
-import * as fcl from '@onflow/fcl';
-import { configureFCL } from '@/utils/fclConfig';
+import { buildBlockchainContext } from "@/utils/context";
 
-const accountInfoScript = `
-access(all) struct Result {
-  access(all) let address: Address
-  access(all) let balance: UFix64
-  access(all) let availableBalance: UFix64
-  access(all) let storageUsed: UInt64
-  access(all) let storageCapacity: UInt64
-  access(all) let storageFlow: UFix64
-
-  init(
-    address: Address,
-    balance: UFix64,
-    availableBalance: UFix64,
-    storageUsed: UInt64,
-    storageCapacity: UInt64,
-    storageFlow: UFix64,
-  ) {
-    self.address = address
-    self.balance = balance
-    self.availableBalance = availableBalance
-    self.storageUsed = storageUsed
-    self.storageCapacity = storageCapacity
-    self.storageFlow = storageFlow
-  }
-}
-
-access(all) fun main(address: Address): Result {
-  let account = getAccount(address)
-  return Result(
-    address: account.address,
-    balance: account.balance,
-    availableBalance: account.availableBalance,
-    storageUsed: account.storage.used,
-    storageCapacity: account.storage.capacity,
-    storageFlow: account.balance - account.availableBalance
-  )
-}`;
+import cdcAccountInfoScript from "@cadence/scripts/standard/get-account-info.cdc?raw";
 
 /**
  * Get detailed account information including balance and storage stats
@@ -48,17 +11,22 @@ access(all) fun main(address: Address): Result {
  * @returns Account information including balances and storage stats
  */
 export const getAccountInfo = async (args: AccountInfoSchema): Promise<AccountInfoResult> => {
-  const { address, network = 'mainnet' } = args;
+  const { address, network = "mainnet" } = args;
 
-  // Configure FCL for the specified network
-  configureFCL(network);
+  // Build the blockchain context
+  const ctx = await buildBlockchainContext(network);
 
   try {
     // Execute the Cadence script
-    const response = await fcl.query({
-      cadence: accountInfoScript,
-      args: (arg, t) => [arg(address, t.Address)],
-    });
+    const response = await ctx.connector.executeScript<AccountInfoResult | undefined>(
+      cdcAccountInfoScript,
+      (arg, t) => [arg(address, t.Address)],
+      undefined,
+    );
+
+    if (!response) {
+      throw new Error("Not found");
+    }
 
     return {
       address: response.address,
@@ -102,4 +70,4 @@ export const accountInfoTool: ToolRegistration<AccountInfoSchema> = {
       };
     }
   },
-}; 
+};
