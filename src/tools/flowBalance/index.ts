@@ -58,7 +58,7 @@ export const flowBalanceTool: ToolRegistration<FlowBalanceSchema> = {
         content: [
           {
             type: "text",
-            text: JSON.stringify(result, null, 2),
+            text: result,
           },
         ],
       };

@@ -1,25 +1,19 @@
-import type { ToolRegistration } from "@/types";
-import { flowBalanceTool } from "./flowBalance";
-import { tokenBalanceTool } from "./tokenBalance";
-import { coaAccountTool } from "./coaAccount";
+import { flowBalanceTool } from "./flowBalance/index.js";
+import { tokenBalanceTool } from "./tokenBalance/index.js";
+import { coaAccountTool } from "./coaAccount/index.js";
+import { getContractTool } from "./getContract/index.js";
+import { accountInfoTool } from "./accountInfo/index.js";
+import type { ToolRegistration } from "../types.js";
 
 // biome-ignore lint/suspicious/noExplicitAny: Any is fine here because all tools validate their input schemas.
 export const createTools = (): ToolRegistration<any>[] => {
 	return [
-		{
-			...flowBalanceTool,
-			// biome-ignore lint/suspicious/noExplicitAny: All tools validate their input schemas, so any is fine.
-			handler: (args: any) => flowBalanceTool.handler(args),
-		},
-		{
-			...tokenBalanceTool,
-			// biome-ignore lint/suspicious/noExplicitAny: All tools validate their input schemas, so any is fine.
-			handler: (args: any) => tokenBalanceTool.handler(args),
-		},
-		{
-			...coaAccountTool,
-			// biome-ignore lint/suspicious/noExplicitAny: All tools validate their input schemas, so any is fine.
-			handler: (args: any) => coaAccountTool.handler(args),
-		},
+		flowBalanceTool,
+		tokenBalanceTool,
+		coaAccountTool,
+		getContractTool,
+		accountInfoTool,
 	];
 };
+
+export default createTools;

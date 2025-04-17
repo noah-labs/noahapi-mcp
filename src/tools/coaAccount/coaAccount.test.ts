@@ -8,8 +8,7 @@ describe('getCoaAccount', () => {
   test('should return COA account info for a valid address on mainnet', async () => {
     const result = await getCoaAccount({
       address: testAddress,
-      network: 'mainnet',
-      include_evm_address: true
+      network: 'mainnet'
     });
 
     expect(result).toBeDefined();
@@ -20,8 +19,7 @@ describe('getCoaAccount', () => {
   test('should return COA account info for a valid address on testnet', async () => {
     const result = await getCoaAccount({
       address: '0x7e60df042a9c0868', // Flow Token account on testnet
-      network: 'testnet',
-      include_evm_address: true
+      network: 'testnet'
     });
 
     expect(result).toBeDefined();
@@ -32,16 +30,14 @@ describe('getCoaAccount', () => {
   test('should throw error for invalid network', async () => {
     await expect(getCoaAccount({
       address: testAddress,
-      network: 'invalid' as any,
-      include_evm_address: true
+      network: 'invalid' as any
     })).rejects.toThrow('Unsupported network');
   });
 
   test('should throw error for invalid address', async () => {
     await expect(getCoaAccount({
       address: 'invalid-address',
-      network: 'mainnet',
-      include_evm_address: true
+      network: 'mainnet'
     })).rejects.toThrow();
   });
 }); 
