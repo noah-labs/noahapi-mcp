@@ -2,6 +2,10 @@
 
 Flow blockchain tools for Model Context Protocol (MCP). This package provides a set of tools for interacting with the Flow blockchain through the Model Context Protocol.
 
+<a href="https://glama.ai/mcp/servers/@Outblock/flow-mcp">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/@Outblock/flow-mcp/badge" alt="Flow MCP server" />
+</a>
+
 ## Features
 
 - Get FLOW balance for any address
