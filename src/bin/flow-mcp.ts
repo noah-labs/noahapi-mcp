@@ -94,7 +94,7 @@ const startCommand: CommandModule<{}, StartArgs> = {
 };
 
 const cli = yargs(process.argv.slice(2))
-  .usage("Usage: $0 [command] [options]")
+  .usage("Usage: $0 <command> [options]")
   .command(devCommand)
   .command(inspectCommand)
   .command(startCommand)
