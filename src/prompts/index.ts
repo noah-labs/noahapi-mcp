@@ -1,5 +1,12 @@
 import { z } from 'zod';
-import { getFlowBalancePrompt, getAccountInfoPrompt, getCoaAccountPrompt } from './flow/index.js';
+import { 
+  getFlowBalancePrompt, 
+  getAccountInfoPrompt, 
+  getCoaAccountPrompt, 
+  getChildAccountPrompt, 
+  getContractPrompt, 
+  getTokenBalancePrompt 
+} from './flow/index.js';
 import type { ToolRegistration } from "../types/tools.js";
 
 // Define the schema for prompts
@@ -22,6 +29,9 @@ export const createPrompts = (): PromptSchema[] => {
     getFlowBalancePrompt,
     getAccountInfoPrompt,
     getCoaAccountPrompt,
+    getChildAccountPrompt,
+    getContractPrompt,
+    getTokenBalancePrompt,
   ];
 };
 
