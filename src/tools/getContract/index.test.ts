@@ -43,18 +43,16 @@ describe("getContract", () => {
         expect(result.data.network).toBe("mainnet");
       }
     });
+
+    test("should reject missing fields", () => {
+      const schema = getContractTool.inputSchema;
+      const result = schema.safeParse({});
+      expect(result.success).toBe(false);
+    });
   });
 
   test("should have correct tool registration", () => {
     expect(getContractTool.name).toBe("get_contract");
-    expect(getContractTool.description).toBeDefined();
-    expect(getContractTool.inputSchema).toBeDefined();
-    expect(getContractTool.handler).toBeDefined();
-
-    const schema = getContractTool.inputSchema;
-    expect(schema.type).toBe("object");
-    expect(schema.properties).toBeDefined();
-    expect(schema.required).toContain("address");
-    expect(schema.required).toContain("contractName");
+    expect(getContractTool.inputSchema).toBe(getContractSchema);
   });
 });

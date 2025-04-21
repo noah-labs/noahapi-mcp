@@ -1,6 +1,5 @@
-import type { ToolRegistration } from "@/types";
+import type { ToolRegistration } from "@/types/tools.js";
 import { type AccountInfoResult, type AccountInfoSchema, accountInfoSchema } from "./schema.js";
-import { makeJsonSchema } from "@/utils/makeJsonSchema";
 import { buildBlockchainContext } from "@/utils/context";
 
 import cdcAccountInfoScript from "@cadence/scripts/standard/get-account-info.cdc?raw";
@@ -44,8 +43,7 @@ export const getAccountInfo = async (args: AccountInfoSchema): Promise<AccountIn
 export const accountInfoTool: ToolRegistration<AccountInfoSchema> = {
   name: "get_account_info",
   description: "Get detailed account information including balance and storage stats for a Flow address",
-  inputSchema: makeJsonSchema(accountInfoSchema),
-  zodSchema: accountInfoSchema,
+  inputSchema: accountInfoSchema,
   handler: async (args: AccountInfoSchema) => {
     try {
       const parsedArgs = accountInfoSchema.parse(args);

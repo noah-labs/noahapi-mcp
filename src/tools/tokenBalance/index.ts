@@ -1,5 +1,4 @@
-import type { ToolRegistration } from "@/types";
-import { makeJsonSchema } from "@/utils/makeJsonSchema";
+import type { ToolRegistration } from "@/types/tools";
 import { type TokenBalanceSchema, tokenBalanceSchema } from "./schema";
 import { buildBlockchainContext } from "@/utils/context";
 
@@ -35,8 +34,7 @@ export const getTokenBalances = async (args: TokenBalanceSchema) => {
 export const tokenBalanceTool: ToolRegistration<TokenBalanceSchema> = {
   name: "get_token_balances",
   description: "Get the balances of all fungible tokens for a Flow address",
-  inputSchema: makeJsonSchema(tokenBalanceSchema),
-  zodSchema: tokenBalanceSchema,
+  inputSchema: tokenBalanceSchema,
   handler: async (args: TokenBalanceSchema) => {
     try {
       const parsedArgs = tokenBalanceSchema.parse(args);

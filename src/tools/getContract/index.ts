@@ -1,5 +1,4 @@
-import type { ToolRegistration } from "@/types";
-import { makeJsonSchema } from "@/utils/makeJsonSchema";
+import type { ToolRegistration } from "@/types/tools.js";
 import { type GetContractSchema, getContractSchema } from "./schema.js";
 import { buildBlockchainContext } from "@/utils/context.js";
 
@@ -38,8 +37,7 @@ export const getContract = async (args: GetContractSchema): Promise<string> => {
 export const getContractTool: ToolRegistration<GetContractSchema> = {
   name: "get_contract",
   description: "Get the source code of a contract deployed at a specific address",
-  inputSchema: makeJsonSchema(getContractSchema),
-  zodSchema: getContractSchema,
+  inputSchema: getContractSchema,
   handler: async (args: GetContractSchema) => {
     try {
       const parsedArgs = getContractSchema.parse(args);

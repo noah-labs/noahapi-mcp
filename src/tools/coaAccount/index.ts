@@ -1,5 +1,4 @@
-import type { ToolRegistration } from "@/types";
-import { makeJsonSchema } from "@/utils/makeJsonSchema";
+import type { ToolRegistration } from "@/types/tools";
 import { buildBlockchainContext } from "@/utils/context";
 import { type CoaAccountSchema, coaAccountSchema } from "./schema";
 
@@ -33,8 +32,7 @@ export const getCoaAccount = async (args: CoaAccountSchema): Promise<string> => 
 export const coaAccountTool: ToolRegistration<CoaAccountSchema> = {
   name: "get_coa_account",
   description: "Get the COA account information for a Flow address",
-  inputSchema: makeJsonSchema(coaAccountSchema),
-  zodSchema: coaAccountSchema,
+  inputSchema: coaAccountSchema,
   handler: async (args: CoaAccountSchema) => {
     try {
       const parsedArgs = coaAccountSchema.parse(args);
@@ -43,7 +41,7 @@ export const coaAccountTool: ToolRegistration<CoaAccountSchema> = {
         content: [
           {
             type: "text",
-            text: JSON.stringify(result, null, 2),
+            text: `0x${result}`,
           },
         ],
       };

@@ -47,9 +47,7 @@ describe("accountInfo", () => {
     expect(accountInfoTool.inputSchema).toBeDefined();
     expect(accountInfoTool.handler).toBeDefined();
 
-    const schema = accountInfoTool.inputSchema;
-    expect(schema.type).toBe("object");
-    expect(schema.properties).toBeDefined();
-    expect(schema.required).toContain("address");
+    // Verify schema matches the accountInfoSchema
+    expect(accountInfoTool.inputSchema).toBe(accountInfoSchema);
   });
 });

@@ -14,7 +14,7 @@ export function createServer() {
     server.addTool({
       name: tool.name,
       description: tool.description,
-      parameters: tool.zodSchema,
+      parameters: tool.inputSchema,
       execute: async (args, context) => {
         const result = await tool.handler(args);
         if (typeof result.content[0].text === "string") {
