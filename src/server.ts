@@ -1,5 +1,6 @@
 import { FastMCP } from "fastmcp";
 import { createTools } from "./tools";
+import { createPrompts } from "./prompts";
 
 export function createServer() {
   // Initialize server
@@ -24,6 +25,21 @@ export function createServer() {
       },
     });
   }
+
+  // Register all prompts
+  const prompts = createPrompts();
+  for (const prompt of prompts) {
+    server.addPrompt({
+      name: prompt.name,
+      description: prompt.description,
+      arguments: prompt.arguments,
+      load: async (args) => {
+        const result = await prompt.handler(args);
+        return result.messages[0].content.text;
+      },
+    });
+  }
+
   return server;
 }
 
