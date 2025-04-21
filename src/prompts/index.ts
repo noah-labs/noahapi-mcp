@@ -10,7 +10,8 @@ export const promptSchema = z.object({
     name: z.string(),
     description: z.string().optional(),
     required: z.boolean().optional()
-  })).optional()
+  })).optional(),
+  handler: z.function().args(z.any()).returns(z.any())
 });
 
 export type PromptSchema = z.infer<typeof promptSchema>;
