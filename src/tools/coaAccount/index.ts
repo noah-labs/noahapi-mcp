@@ -41,7 +41,7 @@ export const coaAccountTool: ToolRegistration<CoaAccountSchema> = {
         content: [
           {
             type: "text",
-            text: JSON.stringify(result, null, 2),
+            text: `0x${result}`,
           },
         ],
       };

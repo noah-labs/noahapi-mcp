@@ -5,20 +5,6 @@ import { hideBin } from "yargs/helpers";
 import { execa } from "execa";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { z } from "zod";
-
-// Command schemas
-const devSchema = z.object({
-  file: z.string().min(1, "Server file path is required"),
-});
-
-const inspectSchema = z.object({
-  file: z.string().min(1, "Server file path is required"),
-});
-
-const startSchema = z.object({
-  sse: z.boolean().default(false),
-});
 
 yargs(hideBin(process.argv))
   .scriptName("flow-mcp")
@@ -34,18 +20,16 @@ yargs(hideBin(process.argv))
     },
     async (argv) => {
       try {
-        const args = devSchema.parse({ file: argv.file });
+        if (!argv.file) {
+          throw new Error("Server file path is required");
+        }
         await execa({
           stdin: "inherit",
           stdout: "inherit",
           stderr: "inherit",
-        })`npx @wong2/mcp-cli bun ${args.file}`;
+        })`npx @wong2/mcp-cli bun ${argv.file}`;
       } catch (error) {
-        if (error instanceof z.ZodError) {
-          console.error("Invalid arguments:", error.errors);
-        } else {
-          console.error("Error starting development server:", error);
-        }
+        console.error("Error starting development server:", error);
         process.exit(1);
       }
     },
@@ -62,17 +46,15 @@ yargs(hideBin(process.argv))
     },
     async (argv) => {
       try {
-        const args = inspectSchema.parse({ file: argv.file });
+        if (!argv.file) {
+          throw new Error("Server file path is required");
+        }
         await execa({
           stdout: "inherit",
           stderr: "inherit",
-        })`npx @modelcontextprotocol/inspector bun ${args.file}`;
+        })`npx @modelcontextprotocol/inspector bun ${argv.file}`;
       } catch (error) {
-        if (error instanceof z.ZodError) {
-          console.error("Invalid arguments:", error.errors);
-        } else {
-          console.error("Error inspecting server file:", error);
-        }
+        console.error("Error inspecting server file:", error);
         process.exit(1);
       }
     },
@@ -89,23 +71,18 @@ yargs(hideBin(process.argv))
     },
     async (argv) => {
       try {
-        const args = startSchema.parse({ sse: argv.sse });
         const __filename = fileURLToPath(import.meta.url);
         const __dirname = path.dirname(__filename);
         const serverPath = path.join(__dirname, "..", "index.js");
         
-        await execa("node", [serverPath, ...(args.sse ? ["--sse"] : [])], {
+        await execa("node", [serverPath, ...(argv.sse ? ["--sse"] : [])], {
           stdio: "inherit",
         });
       } catch (error) {
-        if (error instanceof z.ZodError) {
-          console.error("Invalid arguments:", error.errors);
-        } else {
-          console.error("Error starting MCP server:", error);
-        }
+        console.error("Error starting MCP server:", error);
         process.exit(1);
       }
     },
   )
   .help()
-  .parseAsync();
+  .parseAsync();  
