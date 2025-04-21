@@ -33,7 +33,7 @@ To use this tool with Claude, add the following to your MCP configuration:
   "mcpServers": {
     "flow": {
       "command": "npx",
-      "args": ["-y", "@outblock/flow-mcp", "start"]
+      "args": ["-y", "@outblock/flow-mcp"]
     }
   }
 }

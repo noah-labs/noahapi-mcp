@@ -69,7 +69,7 @@ const inspectCommand: CommandModule<{}, InspectArgs> = {
 
 // biome-ignore lint/complexity/noBannedTypes: <explanation>
 const startCommand: CommandModule<{}, StartArgs> = {
-  command: "start",
+  command: ["start", "$0"],
   describe: "Start MCP server",
   builder: {
     sse: {
@@ -94,7 +94,7 @@ const startCommand: CommandModule<{}, StartArgs> = {
 };
 
 const cli = yargs(process.argv.slice(2))
-  .usage("Usage: $0 <command> [options]")
+  .usage("Usage: $0 [command] [options]")
   .command(devCommand)
   .command(inspectCommand)
   .command(startCommand)
