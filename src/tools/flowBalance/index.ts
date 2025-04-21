@@ -1,5 +1,4 @@
-import type { ToolRegistration } from "@/types";
-import { makeJsonSchema } from "@/utils/makeJsonSchema";
+import type { ToolRegistration } from "../../../types/tools";
 import { type FlowBalanceSchema, flowBalanceSchema } from "./schema";
 import { buildBlockchainContext } from "@/utils/context";
 
@@ -32,8 +31,7 @@ export const getFlowBalance = async (args: FlowBalanceSchema): Promise<string> =
 export const flowBalanceTool: ToolRegistration<FlowBalanceSchema> = {
   name: "get_flow_balance",
   description: "Get the FLOW balance for a Flow address",
-  inputSchema: makeJsonSchema(flowBalanceSchema),
-  zodSchema: flowBalanceSchema,
+  inputSchema: flowBalanceSchema,
   handler: async (args: FlowBalanceSchema) => {
     try {
       const parsedArgs = flowBalanceSchema.parse(args);

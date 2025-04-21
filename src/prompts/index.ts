@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { getFlowBalancePrompt, getAccountInfoPrompt, getCoaAccountPrompt } from './flow/index.js';
-import type { ToolRegistration } from "../types.js";
+import type { ToolRegistration } from "../../types/tools.js";
 
 // Define the schema for prompts
 export const promptSchema = z.object({
