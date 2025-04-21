@@ -1,4 +1,4 @@
-import type { ToolRegistration } from "../../../types/tools";
+import type { ToolRegistration } from "@/types/tools";
 import { type FlowBalanceSchema, flowBalanceSchema } from "./schema";
 import { buildBlockchainContext } from "@/utils/context";
 

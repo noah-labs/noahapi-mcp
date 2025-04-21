@@ -1,4 +1,4 @@
-import type { ToolRegistration } from "../../../types/tools.js";
+import type { ToolRegistration } from "@/types/tools.js";
 import { type AccountInfoResult, type AccountInfoSchema, accountInfoSchema } from "./schema.js";
 import { buildBlockchainContext } from "@/utils/context";
 

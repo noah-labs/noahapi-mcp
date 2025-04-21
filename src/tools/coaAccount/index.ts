@@ -1,4 +1,4 @@
-import type { ToolRegistration } from "../../../types/tools";
+import type { ToolRegistration } from "@/types/tools";
 import { buildBlockchainContext } from "@/utils/context";
 import { type CoaAccountSchema, coaAccountSchema } from "./schema";
 
