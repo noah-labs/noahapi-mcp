@@ -5,6 +5,7 @@ import { getContractTool } from "./getContract/index.js";
 import { accountInfoTool } from "./accountInfo/index.js";
 import { childAccountTool } from "./childAccount/index.js";
 import type { ToolRegistration } from "../types/tools.js";
+import { queryTool } from "./query/index.js";
 
 // biome-ignore lint/suspicious/noExplicitAny: Any is fine here because all tools validate their input schemas.
 export const createTools = (): ToolRegistration<any>[] => {
@@ -15,6 +16,7 @@ export const createTools = (): ToolRegistration<any>[] => {
 		getContractTool,
 		accountInfoTool,
 		childAccountTool,
+		queryTool,
 	];
 };
 
