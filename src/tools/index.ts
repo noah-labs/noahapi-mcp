@@ -6,6 +6,11 @@ import { accountInfoTool } from "./accountInfo/index.js";
 import { childAccountTool } from "./childAccount/index.js";
 import type { ToolRegistration } from "../types/tools.js";
 import { queryTool } from "./query/index.js";
+import { getTokenPriceTool } from "./getTokenPrice/index.js";
+import { getTrendingPoolsTool } from "./getTrendingPools/index.js";
+import { getPoolsByTokenTool } from "./getPoolsByToken/index.js";
+import { getTokenInfoTool } from "./getTokenInfo/index.js";
+import { getTokenPriceHistoryTool } from "./getTokenPriceHistory/index.js";
 
 // biome-ignore lint/suspicious/noExplicitAny: Any is fine here because all tools validate their input schemas.
 export const createTools = (): ToolRegistration<any>[] => {
@@ -17,6 +22,11 @@ export const createTools = (): ToolRegistration<any>[] => {
 		accountInfoTool,
 		childAccountTool,
 		queryTool,
+		getTokenPriceTool,
+		getTrendingPoolsTool,
+		getPoolsByTokenTool,
+		getTokenInfoTool,
+		getTokenPriceHistoryTool
 	];
 };
 

@@ -1,0 +1,56 @@
+import type { ToolRegistration } from "@/types/tools.js";
+import { type GetTrendingPoolsSchema, getTrendingPoolsSchema } from "./schema.js";
+import axios from 'axios'
+
+export const getTrendingPools = async (): Promise<any> => {
+  try {
+
+    let url = `https://api.geckoterminal.com/api/v2/networks/flow-evm/trending_pools`
+
+    const res = await axios.get(url, {
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json;version=20230302',
+      },
+    })
+    const { data = {} } = res && res.data ? res.data : {}
+
+    return data
+
+  } catch (error) {
+    throw new Error(`Error fetching contract: ${error instanceof Error ? error.message : String(error)}`);
+  }
+};
+
+
+export const getTrendingPoolsTool: ToolRegistration<GetTrendingPoolsSchema> = {
+  name: "get_trending_pools",
+  description: "Get trenidng pools info on kittypunch dex",
+  inputSchema: getTrendingPoolsSchema,
+  handler: async () => {
+    try {
+      const result = await getTrendingPools();
+      return {
+        content: [
+          {
+            type: "text",
+            text: result,
+          },
+        ],
+      };
+    } catch (error) {
+      console.error("Error in getTokenPriceTool handler:", error);
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Error: ${(error as Error).message}`,
+          },
+        ],
+        isError: true,
+      };
+    }
+  },
+};
+
+
