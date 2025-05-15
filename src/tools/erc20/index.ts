@@ -1,4 +1,4 @@
-import { type Address, isAddress, encodeFunctionData, parseEther, formatEther, erc20Abi } from 'viem';
+import { type Address, isAddress, encodeFunctionData, parseEther, formatEther, erc20Abi, parseUnits } from 'viem';
 import type { ToolRegistration } from "@/types/tools.js";
 import { bigint, z } from 'zod';
 import { createTextResponse } from "@/types/tools.js";
@@ -160,7 +160,7 @@ export const transferErc20TokenTool = {
                 data: encodeFunctionData({
                     abi: erc20Abi,
                     functionName: 'transfer',
-                    args: [to as `0x${string}`, BigInt(amount)]
+                    args: [to as `0x${string}`, parseUnits(amount, tokenInfo.decimals)]
                 })
             };
 
