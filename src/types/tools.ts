@@ -13,3 +13,13 @@ export type ToolRegistration<T> = {
   inputSchema: z.ZodSchema;
   handler: (args: T) => CallToolResult | Promise<CallToolResult>;
 };
+
+
+export function createTextResponse(text: string): CallToolResult {
+  return {
+    content: [{
+      type: 'text',
+      text
+    }]
+  };
+}
