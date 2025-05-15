@@ -22,9 +22,9 @@ export const getTransaction = async (args: GetTransactionSchema): Promise<any> =
   }
 };
 
-export const getTransactionTool: ToolRegistration<GetTransactionSchema> = {
-  name: "get_transaction_info",
-  description: "Get transaction info with trxid on flowscan.io",
+export const getEVMTransactionTool: ToolRegistration<GetTransactionSchema> = {
+  name: "get_evm_transaction_info",
+  description: "Get EVM transaction info with transaction hash on flowscan.io",
   inputSchema: getTransactionInfoSchema,
   handler: async (args: GetTransactionSchema) => {
     try {

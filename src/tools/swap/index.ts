@@ -233,7 +233,7 @@ export const punchswapQuoteTool = {
   name: 'punchswap_quote',
   description: `
   Get a price quote from Punchswap V2 for swapping between two tokens.
-  Supported tokens: Wrapped Monad(WMON), Moyaki(YAKI), Chog(CHOG), Molandak(DAK), USDT, USDC, WBTC.
+  Supported tokens: Wrapped Flow(WFLOW), Trump(TRUMP), HotCocoa, Gwendolion, Pawderick, Catseye.
   You can specify tokens by name, symbol, or contract address.
   The tool will check if a liquidity pair exists and return the current exchange rate.`,
   inputSchema: quoteSchema,
@@ -479,7 +479,7 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
   name: 'punchswap_swap',
   description: `
   Create a transaction to swap tokens on Punchswap V2.
-  Supported tokens: Monad(MON, the native token), Wrapped Monad(WMON), Moyaki(YAKI), Chog(CHOG), Molandak(DAK), USDT, USDC, WBTC.
+  Supported tokens: Wrapped Flow(WFLOW), Trump(TRUMP), HotCocoa, Gwendolion, Pawderick, Catseye.
   You can specify tokens by name, symbol, or contract address.
   The tool will check if a liquidity pair exists and create the appropriate transaction.
   If approval is needed, it will return the approval transaction first.`,
