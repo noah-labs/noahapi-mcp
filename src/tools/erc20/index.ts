@@ -155,15 +155,6 @@ export const transferErc20TokenTool = {
                 return createTextResponse('Invalid token');
             }
 
-            // const transactionRequest = {
-            //     to: allnadsAccount,
-            //     data: encodeFunctionData({
-            //         abi: AllNadsAccountABI,
-            //         functionName: 'transferERC20',
-            //         args: [tokenInfo.contractAddress, to, amount]
-            //     })
-            // };
-
             const transactionRequest = {
                 to: tokenInfo.contractAddress,
                 data: encodeFunctionData({
@@ -173,7 +164,12 @@ export const transferErc20TokenTool = {
                 })
             };
 
-            return createTextResponse(`<<TransactionRequest>>\n${JSON.stringify(transactionRequest, null, 2)}`);
+            const response = {
+                tokenInfo,
+                transactionRequest,
+                type: 'transfer_erc20_token',
+            }
+            return createTextResponse(JSON.stringify(response));
         } catch (error) {
             return createTextResponse(`Error sending erc20 token: ${error instanceof Error ? error.message : String(error)}`);
         }
