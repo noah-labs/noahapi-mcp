@@ -135,7 +135,7 @@ export const transferErc20TokenTool = {
             .describe('The amount of tokens to send')
     }),
 
-    handler: async (params: { allnadsAccount: string, token: string, to: string, amount: string }) => {
+    handler: async (params: { token: string, to: string, amount: string }) => {
         try {
             const { token, to, amount } = params;
 
