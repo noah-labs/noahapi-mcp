@@ -163,10 +163,10 @@ export const swapSchema = z.object({
     .describe('Slippage tolerance in percentage (default: 2%)'),
   allNadsAccount: z.string()
     .refine(addr => isAddress(addr), {
-      message: 'Invalid allnads account address format',
+      message: 'Invalid account address format',
       path: ['allNadsAccount']
     })
-    .describe('The allnads account that will execute the swap'),
+    .describe('The account that will execute the swap'),
   deadline: z.number()
     .default(Math.floor(Date.now() / 1000) + 60 * 20) // 20 minutes from now
     .describe('Transaction deadline in seconds (default: 20 minutes from now)')
