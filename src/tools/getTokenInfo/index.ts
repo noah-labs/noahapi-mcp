@@ -25,7 +25,7 @@ export const getTokenInfo = async (args: GetTokenInfoSchema): Promise<any> => {
 
 export const getTokenInfoTool: ToolRegistration<GetTokenInfoSchema> = {
   name: "get_token_info",
-  description: "Get token info on Flow evm chain with token contract address",
+  description: "Get token info on Flow EVM chain with token contract address",
   inputSchema: getTokenInfoSchema,
   handler: async (args: GetTokenInfoSchema) => {
     try {

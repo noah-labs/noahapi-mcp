@@ -49,7 +49,7 @@ export type GetErc20TokenSchema = z.infer<typeof getErc20TokenSchema>;
 export const getErc20TokensTool = {
     name: 'get_erc20_tokens',
     description: `
-  Get all erc20 tokens for an address, the information includes the token name, symbol, contract address, decimals and balance.
+  Get all erc20 tokens for an EVM address, the information includes the token name, symbol, contract address, decimals and balance.
   Only Wrapped Flow(WFLOW), Trump(TRUMP), HotCocoa, Gwendolion, Pawderick, Catseye are supported.
   Note: MON is not ERC20 token, you should use evm_tool to get the balance of MON`,
     inputSchema: getErc20TokenSchema,

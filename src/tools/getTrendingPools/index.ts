@@ -25,7 +25,7 @@ export const getTrendingPools = async (): Promise<any> => {
 
 export const getTrendingPoolsTool: ToolRegistration<GetTrendingPoolsSchema> = {
   name: "get_trending_pools",
-  description: "Get trenidng pools info on kittypunch dex",
+  description: "Get trenidng pools info on kittypunch dex in flow EVM mainnet",
   inputSchema: getTrendingPoolsSchema,
   handler: async () => {
     try {
