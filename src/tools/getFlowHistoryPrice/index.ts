@@ -6,7 +6,7 @@ export const getFlowHistoryPrice = async (): Promise<any> => {
   try {
 
     const baseUrl = 'https://data-api.coindesk.com/spot/v1/historical/days';
-    const params = { "market": "binance", "limit": 50, "aggregate": 1, "fill": "true", "apply_mapping": "true", "response_format": "JSON", "instrument": "FLOW-USDT" };
+    const params = { "market": "binance", "limit": 180, "aggregate": 1, "fill": "true", "apply_mapping": "true", "response_format": "JSON", "instrument": "FLOW-USDT" };
     const url = new URL(baseUrl);
     url.search = new URLSearchParams({
       market: params.market,
