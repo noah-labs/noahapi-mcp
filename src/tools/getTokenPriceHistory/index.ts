@@ -25,7 +25,7 @@ export const getTokenPriceHistory = async (args: GetTokenPriceHistorySchema): Pr
 
 export const getTokenPriceHistoryTool: ToolRegistration<GetTokenPriceHistorySchema> = {
   name: "get_flow_token_price_history",
-  description: "Get token price history on Flow evm chain with pool address and time frame",
+  description: "Get token price history on Flow EVM chain with pool address and time frame",
   inputSchema: getTokenPriceHistorySchema,
   handler: async (args: GetTokenPriceHistorySchema) => {
     try {

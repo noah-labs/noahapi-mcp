@@ -5,7 +5,7 @@ import { getContractTool } from "./getContract/index.js";
 import { accountInfoTool } from "./accountInfo/index.js";
 import { childAccountTool } from "./childAccount/index.js";
 import type { ToolRegistration } from "../types/tools.js";
-import { queryTool } from "./query/index.js";
+// import { queryTool } from "./query/index.js";
 import { getTokenPriceTool } from "./getTokenPrice/index.js";
 import { getTrendingPoolsTool } from "./getTrendingPools/index.js";
 import { getPoolsByTokenTool } from "./getPoolsByToken/index.js";
@@ -25,7 +25,7 @@ export const createTools = (): ToolRegistration<any>[] => {
 		getContractTool,
 		accountInfoTool,
 		childAccountTool,
-		queryTool,
+		// queryTool,
 		getTokenPriceTool,
 		getTrendingPoolsTool,
 		getPoolsByTokenTool,

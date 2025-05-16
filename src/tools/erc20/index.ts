@@ -44,14 +44,14 @@ export type GetErc20TokenSchema = z.infer<typeof getErc20TokenSchema>;
 
 
 /**
- * Tool for creating a serialized transaction to send MON tokens
+ * Tool for creating a serialized transaction to send FLOW tokens
  */
 export const getErc20TokensTool = {
     name: 'get_erc20_tokens',
     description: `
   Get all erc20 tokens for an EVM address, the information includes the token name, symbol, contract address, decimals and balance.
   Only Wrapped Flow(WFLOW), Trump(TRUMP), HotCocoa, Gwendolion, Pawderick, Catseye are supported.
-  Note: MON is not ERC20 token, you should use evm_tool to get the balance of MON`,
+  Note: FLOW is not ERC20 token, you should use evm_tool to get the balance of FLOW`,
     inputSchema: getErc20TokenSchema,
 
     handler: async (params: GetErc20TokenSchema) => {

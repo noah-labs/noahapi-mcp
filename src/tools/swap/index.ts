@@ -658,19 +658,7 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
             functionName: 'approve',
             args: [UNISWAP_V2_ROUTER_ADDRESS, MAX_ALLOWANCE]
           });
-
-          // Create executeCall data to execute the approval through flowEVMAccount
-          // const executeCallData = encodeFunctionData({
-          //   abi: ExecuteCallABI,
-          //   functionName: 'executeCall',
-          //   args: [tokenInAddressForPair, '0', approveData]
-          // });
-
-          // const approveTransaction = {
-          //   to: flowEVMAccount as Address,
-          //   data: executeCallData,
-          //   value: '0'
-          // };
+          
           const approveTransaction = {
             to: tokenInAddressForPair as Address,
             data: approveData,
@@ -700,19 +688,6 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
             BigInt(deadline)
           ]
         });
-
-        // Create executeCall data to execute the swap through flowEVMAccount
-        // const executeCallData = encodeFunctionData({
-        //   abi: ExecuteCallABI,
-        //   functionName: 'executeCall',
-        //   args: [UNISWAP_V2_ROUTER_ADDRESS, '0', swapData]
-        // });
-
-        // const swapTransaction = {
-        //   to: flowEVMAccount as Address,
-        //   data: swapData,
-        //   value: '0'
-        // };
 
         const swapTransaction = {
           to: UNISWAP_V2_ROUTER_ADDRESS,
@@ -752,19 +727,6 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
             BigInt(deadline)
           ]
         });
-
-        // Create executeCall data to execute the swap through flowEVMAccount
-        // const executeCallData = encodeFunctionData({
-        //   abi: ExecuteCallABI,
-        //   functionName: 'executeCall',
-        //   args: [UNISWAP_V2_ROUTER_ADDRESS, '0', swapData]
-        // });
-
-        // const swapTransaction = {
-        //   to: flowEVMAccount as Address,
-        //   data: executeCallData,
-        //   value: '0'
-        // };
 
         const swapTransaction = {
           to: UNISWAP_V2_ROUTER_ADDRESS as Address,

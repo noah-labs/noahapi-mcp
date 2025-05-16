@@ -36,7 +36,7 @@ export const getContract = async (args: GetContractSchema): Promise<string> => {
 
 export const getContractTool: ToolRegistration<GetContractSchema> = {
   name: "get_contract",
-  description: "Get the source code of a contract deployed at a specific address",
+  description: "Get the source code of a contract deployed at a specific address on flow blockchain",
   inputSchema: getContractSchema,
   handler: async (args: GetContractSchema) => {
     try {

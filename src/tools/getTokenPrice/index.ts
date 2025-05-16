@@ -27,7 +27,7 @@ export const getTokenPrice = async (args: GetTokenPriceSchema): Promise<any> => 
 
 export const getTokenPriceTool: ToolRegistration<GetTokenPriceSchema> = {
   name: "get_token_price",
-  description: "Get token price on Flow evm chain with token contract addresses",
+  description: "Get token price on Flow EVM chain with token contract addresses",
   inputSchema: getTokenPriceSchema,
   handler: async (args: GetTokenPriceSchema) => {
     try {
