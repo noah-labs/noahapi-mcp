@@ -637,9 +637,26 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
           data: swapData,
           value: '0'
         };
-        return createTextResponse(
-          `<<TransactionRequest>>\n${JSON.stringify(transactionRequest, null, 2)}`
-        );
+        
+        const response = {
+          transactionRequest: transactionRequest,
+          tokenInInfos: {
+            functionName: 'swapExactETHForTokens',
+            in: tokenInInfo,
+            out: tokenOutInfo,
+            amountIn: amountIn,
+            amountOut: amountOut,
+            amountInWei: amountInWei,
+            amountOutMin: amountOutMin,
+            path: path,
+            deadline: deadline,
+            isETHIn: isETHIn,
+            isETHOut: isETHOut,
+          },
+          type: 'punchswap_swap',
+        }
+
+        return createTextResponse(JSON.stringify(response));
       }
 
       // For token to token or token to ETH swaps, we need to check allowance first
@@ -665,9 +682,25 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
             value: '0'
           };
 
-          return createTextResponse(
-            `<<TransactionRequest>>\n${JSON.stringify(approveTransaction, null, 2)}\n\n`
-          );
+          const response = {
+            transactionRequest: approveTransaction,
+            tokenInInfos: {
+              functionName: 'approve',
+              in: tokenInInfo,
+              out: tokenOutInfo,
+              amountIn: amountIn,
+              amountOut: amountOut,
+              amountInWei: amountInWei,
+              amountOutMin: amountOutMin,
+              path: path,
+              deadline: deadline,
+              isETHIn: isETHIn,
+              isETHOut: isETHOut,
+            },
+            type: 'punchswap_swap',
+          }
+
+          return createTextResponse(JSON.stringify(response));
         }
       } catch (error) {
         return createTextResponse(`Error checking token allowance: ${error instanceof Error ? error.message : String(error)}`);
