@@ -17,11 +17,16 @@ export function createServer() {
       description: tool.description,
       parameters: tool.inputSchema,
       execute: async (args, context) => {
-        const result = await tool.handler(args);
-        if (typeof result.content[0].text === "string") {
-          return result.content[0].text;
+        try {
+          const result = await tool.handler(args);
+          if (typeof result.content[0].text === "string") {
+            return result.content[0].text;
+          }
+          return JSON.stringify(result.content[0].text);
+        } catch (err) {
+          console.error('Error in tool execution:', err);
+          return 'Internal server error in tool execution.';
         }
-        return JSON.stringify(result.content[0].text);
       },
     });
   }

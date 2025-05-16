@@ -4,7 +4,7 @@ import { bigint, z } from 'zod';
 import { createTextResponse } from "@/types/tools.js";
 import { getPublicClient } from '../../utils/evm/viem';
 import { ERC20_TOKENS } from '../../utils/evm/supportedErc20Tokens';
-// import { AllNadsAccountABI } from '../abis/AllNadsAccount';
+// import { flowEVMAccountABI } from '../abis/flowEVMAccount';
 
 /**
  * Formats a token balance according to its decimals

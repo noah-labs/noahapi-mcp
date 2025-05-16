@@ -1,4 +1,4 @@
-import { type Address, isAddress, encodeFunctionData, parseEther, formatEther } from 'viem';
+import { type Address, isAddress, encodeFunctionData, parseEther, formatEther, parseUnits } from 'viem';
 import type { ToolRegistration } from "@/types/tools.js";
 import { bigint, z } from 'zod';
 import { createTextResponse } from "@/types/tools.js";
@@ -51,7 +51,7 @@ const UniswapV2PairABI = [
 // Punchswap V2 Factory address
 const UNISWAP_V2_FACTORY_ADDRESS = '0x29372c22459a4e373851798bFd6808e71EA34A71' as Address;
 
-// ExecuteCall ABI for using allNadsAccount to execute transactions
+// ExecuteCall ABI for using flowEVMAccount to execute transactions
 const ExecuteCallABI = [
   {
     "inputs": [
@@ -122,8 +122,8 @@ export type QuoteSchema = z.infer<typeof quoteSchema>;
 export const swapSchema = z.object({
   tokenIn: z.string()
     .refine(input => {
-      // Check if the input is MON (native token)
-      if (input === 'MON') return true;
+      // Check if the input is FLOW (native token)
+      if (input === 'FLOW') return true;
 
       // Check if the input matches any token's name, symbol, or contract address
       return Object.entries(ERC20_TOKENS).some(([key, token]) =>
@@ -139,8 +139,8 @@ export const swapSchema = z.object({
     .describe('The input token (name, symbol, or contract address)'),
   tokenOut: z.string()
     .refine(input => {
-      // Check if the input is MON (native token)
-      if (input === 'MON') return true;
+      // Check if the input is FLOW (native token)
+      if (input === 'FLOW') return true;
 
       // Check if the input matches any token's name, symbol, or contract address
       return Object.entries(ERC20_TOKENS).some(([key, token]) =>
@@ -161,10 +161,10 @@ export const swapSchema = z.object({
     .max(50)
     .default(2)
     .describe('Slippage tolerance in percentage (default: 2%)'),
-  allNadsAccount: z.string()
+  flowEVMAccount: z.string()
     .refine(addr => isAddress(addr), {
       message: 'Invalid account address format',
-      path: ['allNadsAccount']
+      path: ['flowEVMAccount']
     })
     .describe('The account that will execute the swap'),
   deadline: z.number()
@@ -262,12 +262,12 @@ export const punchswapQuoteTool = {
       // Find tokenOut info
       let tokenOutInfo;
 
-      // Special case for MON (native token)
-      if (tokenOut === 'MON') {
-        // For MON (native token), we don't assign a contract address
+      // Special case for FLOW (native token)
+      if (tokenOut === 'FLOW') {
+        // For FLOW (native token), we don't assign a contract address
         tokenOutInfo = {
-          symbol: 'MON',
-          name: 'Monad',
+          symbol: 'FLOW',
+          name: 'Flow',
           decimals: 18
         };
       } else {
@@ -287,26 +287,25 @@ export const punchswapQuoteTool = {
         return createTextResponse('Invalid output token');
       }
 
-      // Convert amountIn to the correct decimal representation
-      const amountInParsed = parseFloat(amountIn);
-      if (isNaN(amountInParsed)) {
+      // Convert amount to proper decimal representation using viem's parseUnits
+      let amountInWei;
+      try {
+        amountInWei = parseUnits(amountIn, tokenInInfo.decimals);
+      } catch (error) {
         return createTextResponse('Invalid amount');
       }
 
-      // Convert to wei (with proper decimals)
-      const amountInWei = BigInt(Math.floor(amountInParsed * 10 ** tokenInInfo.decimals));
-
-      // Check if we're dealing with ETH (MON in this case)
+      // Check if we're dealing with ETH (FLOW in this case)
       const isETHIn = tokenIn === 'FLOW';
       const isETHOut = tokenOut === 'FLOW';
 
-      // For MON (native token), we need to use WMON for the pair lookup
-      const WMON_ADDRESS = ERC20_TOKENS['Wrapped Flow'].contractAddress;
+      // For FLOW (native token), we need to use WFLOW for the pair lookup
+      const WFLOW_ADDRESS = ERC20_TOKENS['Wrapped Flow'].contractAddress;
 
       // For pair lookup and path creation, we need to use the actual token addresses
-      // For MON, we use WMON address
-      const tokenInAddressForPair = isETHIn ? WMON_ADDRESS : (tokenInInfo.contractAddress as Address);
-      const tokenOutAddressForPair = isETHOut ? WMON_ADDRESS : (tokenOutInfo.contractAddress as Address);
+      // For FLOW, we use WFLOW address
+      const tokenInAddressForPair = isETHIn ? WFLOW_ADDRESS : (tokenInInfo.contractAddress as Address);
+      const tokenOutAddressForPair = isETHOut ? WFLOW_ADDRESS : (tokenOutInfo.contractAddress as Address);
 
       // Get the pair address from the factory
       const pairAddress = await publicClient.readContract({
@@ -486,18 +485,18 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
   inputSchema: swapSchema,
   handler: async (params: SwapSchema) => {
     try {
-      const { allNadsAccount, tokenIn, tokenOut, amountIn, slippageTolerance, deadline } = params;
+      const { flowEVMAccount, tokenIn, tokenOut, amountIn, slippageTolerance, deadline } = params;
       const publicClient = getPublicClient();
 
       // Find tokenIn info
       let tokenInInfo;
 
-      // Special case for MON (native token)
-      if (tokenIn === 'MON') {
-        // For MON (native token), we don't assign a contract address
+      // Special case for FLOW (native token)
+      if (tokenIn === 'FLOW') {
+        // For FLOW (native token), we don't assign a contract address
         tokenInInfo = {
-          symbol: 'MON',
-          name: 'Monad',
+          symbol: 'FLOW',
+          name: 'Flow Token',
           decimals: 18
         };
       } else {
@@ -520,12 +519,12 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
       // Find tokenOut info
       let tokenOutInfo;
 
-      // Special case for MON (native token)
-      if (tokenOut === 'MON') {
-        // For MON (native token), we don't assign a contract address
+      // Special case for FLOW (native token)
+      if (tokenOut === 'FLOW') {
+        // For FLOW (native token), we don't assign a contract address
         tokenOutInfo = {
-          symbol: 'MON',
-          name: 'Monad',
+          symbol: 'FLOW',
+          name: 'Flow Token',
           decimals: 18
         };
       } else {
@@ -545,24 +544,23 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
         return createTextResponse('Invalid output token');
       }
 
-      // Convert amountIn to the correct decimal representation
-      const amountInParsed = parseFloat(amountIn);
-      if (isNaN(amountInParsed)) {
+      // Convert amountIn to wei using viem's parseUnits
+      let amountInWei;
+      try {
+        amountInWei = parseUnits(amountIn, tokenInInfo.decimals);
+      } catch (error) {
         return createTextResponse('Invalid amount');
       }
-
-      // Convert to wei (with proper decimals)
-      const amountInWei = BigInt(Math.floor(amountInParsed * 10 ** tokenInInfo.decimals));
 
       // Check if we're dealing with ETH (FLOW in this case)
       const isETHIn = tokenIn === 'FLOW';
       const isETHOut = tokenOut === 'FLOW';
 
-      // For MON (native token), we need to use WMON for the pair lookup
+      // For FLOW (native token), we need to use WFLOW for the pair lookup
       const WFLOW_ADDRESS = ERC20_TOKENS['Wrapped Flow'].contractAddress;
 
       // For pair lookup and path creation, we need to use the actual token addresses
-      // For MON, we use WMON address
+      // For FLOW, we use WFLOW address
       const tokenInAddressForPair = isETHIn ? WFLOW_ADDRESS : (tokenInInfo.contractAddress as Address);
       const tokenOutAddressForPair = isETHOut ? WFLOW_ADDRESS : (tokenOutInfo.contractAddress as Address);
 
@@ -605,7 +603,7 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
       const amountOutMin = (amountOut * slippageFactor) / 1000n;
 
       // Create the path array for the swap
-      // For MON, we use WMON in the path
+      // For FLOW, we use WFLOW in the path
       const path = [tokenInAddressForPair, tokenOutAddressForPair];
 
       // If we're swapping ETH for tokens, we only need one transaction
@@ -617,12 +615,12 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
           args: [
             amountOutMin,
             path,
-            allNadsAccount as `0x${string}`,
+            flowEVMAccount as `0x${string}`,
             BigInt(deadline)
           ]
         });
 
-        // Create executeCall data to execute the swap through allNadsAccount
+        // Create executeCall data to execute the swap through flowEVMAccount
         // const executeCallData = encodeFunctionData({
         //   abi: ExecuteCallABI,
         //   functionName: 'executeCall',
@@ -630,7 +628,7 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
         // });
 
         // const transactionRequest = {
-        //   to: allNadsAccount as Address,
+        //   to: flowEVMAccount as Address,
         //   data: executeCallData,
         //   value: '0'
         // };
@@ -650,7 +648,7 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
           address: tokenInAddressForPair,
           abi: ERC20AllowanceABI,
           functionName: 'allowance',
-          args: [allNadsAccount as `0x${string}`, UNISWAP_V2_ROUTER_ADDRESS]
+          args: [flowEVMAccount as `0x${string}`, UNISWAP_V2_ROUTER_ADDRESS]
         }) as bigint;
 
         // If allowance is insufficient, return an approval transaction
@@ -661,7 +659,7 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
             args: [UNISWAP_V2_ROUTER_ADDRESS, MAX_ALLOWANCE]
           });
 
-          // Create executeCall data to execute the approval through allNadsAccount
+          // Create executeCall data to execute the approval through flowEVMAccount
           // const executeCallData = encodeFunctionData({
           //   abi: ExecuteCallABI,
           //   functionName: 'executeCall',
@@ -669,7 +667,7 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
           // });
 
           // const approveTransaction = {
-          //   to: allNadsAccount as Address,
+          //   to: flowEVMAccount as Address,
           //   data: executeCallData,
           //   value: '0'
           // };
@@ -698,12 +696,12 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
             amountInWei,
             amountOutMin,
             path,
-            allNadsAccount as `0x${string}`,
+            flowEVMAccount as `0x${string}`,
             BigInt(deadline)
           ]
         });
 
-        // Create executeCall data to execute the swap through allNadsAccount
+        // Create executeCall data to execute the swap through flowEVMAccount
         // const executeCallData = encodeFunctionData({
         //   abi: ExecuteCallABI,
         //   functionName: 'executeCall',
@@ -711,7 +709,7 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
         // });
 
         // const swapTransaction = {
-        //   to: allNadsAccount as Address,
+        //   to: flowEVMAccount as Address,
         //   data: swapData,
         //   value: '0'
         // };
@@ -722,10 +720,25 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
           value: '0'
         };
 
+        const response = {
+          transactionRequest: swapTransaction,
+          tokenInInfos: {
+            functionName: 'swapExactTokensForETH',
+            in: tokenInInfo,
+            out: tokenOutInfo,
+            amountIn: amountIn,
+            amountOut: amountOut,
+            amountInWei: amountInWei,
+            amountOutMin: amountOutMin,
+            path: path,
+            deadline: deadline,
+            isETHIn: isETHIn,
+            isETHOut: isETHOut,
+          },
+          type: 'punchswap_swap',
+        }
 
-        return createTextResponse(
-          `<<TransactionRequest>>\n${JSON.stringify(swapTransaction, null, 2)}`
-        );
+        return createTextResponse(JSON.stringify(response));
       } else {
         // Swap Tokens for Tokens
         const swapData = encodeFunctionData({
@@ -735,12 +748,12 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
             amountInWei,
             amountOutMin,
             path,
-            allNadsAccount as `0x${string}`,
+            flowEVMAccount as `0x${string}`,
             BigInt(deadline)
           ]
         });
 
-        // Create executeCall data to execute the swap through allNadsAccount
+        // Create executeCall data to execute the swap through flowEVMAccount
         // const executeCallData = encodeFunctionData({
         //   abi: ExecuteCallABI,
         //   functionName: 'executeCall',
@@ -748,7 +761,7 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
         // });
 
         // const swapTransaction = {
-        //   to: allNadsAccount as Address,
+        //   to: flowEVMAccount as Address,
         //   data: executeCallData,
         //   value: '0'
         // };
@@ -759,9 +772,25 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
           value: '0'
         };
 
-        return createTextResponse(
-          `<<TransactionRequest>>\n${JSON.stringify(swapTransaction, null, 2)}`
-        );
+        const response = {
+          transactionRequest: swapTransaction,
+          tokenInInfos: {
+            functionName: 'swapExactTokensForTokens',
+            in: tokenInInfo,
+            out: tokenOutInfo,
+            amountIn: amountIn,
+            amountOut: amountOut,
+            amountInWei: amountInWei,
+            amountOutMin: amountOutMin,
+            path: path,
+            deadline: deadline,
+            isETHIn: isETHIn,
+            isETHOut: isETHOut,
+          },
+          type: 'punchswap_swap',
+        }
+
+        return createTextResponse(JSON.stringify(response));
       }
     } catch (error) {
       return createTextResponse(`Error creating swap transaction: ${error instanceof Error ? error.message : String(error)}`);
