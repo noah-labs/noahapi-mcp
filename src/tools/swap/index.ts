@@ -453,7 +453,7 @@ const ERC20ApproveABI = [
 ] as const;
 
 // Punchswap V2 Router address
-const UNISWAP_V2_ROUTER_ADDRESS = '0xfb8e1c3b833f9e67a71c859a132cf783b645e436' as Address;
+const UNISWAP_V2_ROUTER_ADDRESS = '0xf45AFe28fd5519d5f8C1d4787a4D5f724C0eFa4d' as Address;
 
 // ERC20 Allowance ABI
 const ERC20AllowanceABI = [
@@ -484,6 +484,18 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
   If approval is needed, it will return the approval transaction first.`,
   inputSchema: swapSchema,
   handler: async (params: SwapSchema) => {
+
+    console.log('params -->', params);
+
+    // {
+    //   tokenIn: 'HotCocoa',
+    //   tokenOut: 'WFLOW',
+    //   amountIn: '1',
+    //   slippageTolerance: 2,
+    //   flowEVMAccount: '0xA60f8a3E6586aA590a4AD9EE0F264A1473Bab7cB',
+    //   deadline: 1747478319
+    // }
+
     try {
       const { flowEVMAccount, tokenIn, tokenOut, amountIn, slippageTolerance, deadline } = params;
       const publicClient = getPublicClient();
@@ -598,6 +610,8 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
       // Calculate the amount out using the Punchswap V2 formula
       const amountOut = getAmountOut(amountInWei, reserveIn, reserveOut);
 
+      const formattedAmountOut = formatTokenAmount(amountOut, tokenOutInfo.decimals);
+
       // Apply slippage tolerance to get minimum amount out
       const slippageFactor = 1000n - BigInt(Math.floor(slippageTolerance * 10));
       const amountOutMin = (amountOut * slippageFactor) / 1000n;
@@ -645,9 +659,9 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
             in: tokenInInfo,
             out: tokenOutInfo,
             amountIn: amountIn,
-            amountOut: amountOut,
-            amountInWei: amountInWei,
-            amountOutMin: amountOutMin,
+            amountOut: formattedAmountOut,
+            amountInWei: amountInWei.toString(),
+            amountOutMin: amountOutMin.toString(),
             path: path,
             deadline: deadline,
             isETHIn: isETHIn,
@@ -689,9 +703,9 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
               in: tokenInInfo,
               out: tokenOutInfo,
               amountIn: amountIn,
-              amountOut: amountOut,
-              amountInWei: amountInWei,
-              amountOutMin: amountOutMin,
+              amountOut: formattedAmountOut,
+              amountInWei: amountInWei.toString(),
+              amountOutMin: amountOutMin.toString(),
               path: path,
               deadline: deadline,
               isETHIn: isETHIn,
@@ -735,9 +749,9 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
             in: tokenInInfo,
             out: tokenOutInfo,
             amountIn: amountIn,
-            amountOut: amountOut,
-            amountInWei: amountInWei,
-            amountOutMin: amountOutMin,
+            amountOut: formattedAmountOut,
+            amountInWei: amountInWei.toString(),
+            amountOutMin: amountOutMin.toString(),
             path: path,
             deadline: deadline,
             isETHIn: isETHIn,
@@ -774,9 +788,9 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
             in: tokenInInfo,
             out: tokenOutInfo,
             amountIn: amountIn,
-            amountOut: amountOut,
-            amountInWei: amountInWei,
-            amountOutMin: amountOutMin,
+            amountOut: formattedAmountOut,
+            amountInWei: amountInWei.toString(),
+            amountOutMin: amountOutMin.toString(),
             path: path,
             deadline: deadline,
             isETHIn: isETHIn,
