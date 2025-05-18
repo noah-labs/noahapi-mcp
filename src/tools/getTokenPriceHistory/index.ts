@@ -25,7 +25,11 @@ export const getTokenPriceHistory = async (args: GetTokenPriceHistorySchema): Pr
 
 export const getTokenPriceHistoryTool: ToolRegistration<GetTokenPriceHistorySchema> = {
   name: "get_flow_token_price_history",
-  description: "Get token price history on Flow EVM chain with pool address and time frame",
+  description: `
+  Get token price history on Flow EVM chain with pool address and time frame
+  The flow EVM address is 20 bytes long, which is 40 characters long or 42 characters long with 0x prefix.
+  NOTE: This is tool for flow EVM chain not flow blockchain.
+  `,
   inputSchema: getTokenPriceHistorySchema,
   handler: async (args: GetTokenPriceHistorySchema) => {
     try {

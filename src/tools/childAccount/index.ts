@@ -31,7 +31,7 @@ export const getChildAccount = async (args: ChildAccountSchema): Promise<ChildAc
 
 export const childAccountTool: ToolRegistration<ChildAccountSchema> = {
   name: "get_child_account",
-  description: "Get child accounts for a Flow address",
+  description: "Get child accounts for a Flow address on flow blockchain, the flow address is 16 characters long or 18 characters long with 0x prefix",
   inputSchema: childAccountSchema,
   handler: async (args: ChildAccountSchema) => {
     try {

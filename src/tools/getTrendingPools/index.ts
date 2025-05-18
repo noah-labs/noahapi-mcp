@@ -25,7 +25,10 @@ export const getTrendingPools = async (): Promise<any> => {
 
 export const getTrendingPoolsTool: ToolRegistration<GetTrendingPoolsSchema> = {
   name: "get_trending_pools",
-  description: "Get trenidng pools info on kittypunch dex in flow EVM mainnet",
+  description: `
+  Get trenidng pools info on kittypunch dex in flow EVM mainnet,
+  NOTE: This is tool for flow EVM chain not flow blockchain.
+  `,
   inputSchema: getTrendingPoolsSchema,
   handler: async () => {
     try {

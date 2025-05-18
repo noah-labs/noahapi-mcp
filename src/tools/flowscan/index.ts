@@ -24,7 +24,11 @@ export const getTransaction = async (args: GetTransactionSchema): Promise<any> =
 
 export const getEVMTransactionTool: ToolRegistration<GetTransactionSchema> = {
   name: "get_evm_transaction_info",
-  description: "Get EVM transaction info with transaction hash on flowscan.io",
+  description: `
+  Get EVM transaction info with transaction hash on flowscan.io.
+  flow EVM address is 20 bytes long, which is 40 characters long or 42 characters long with 0x prefix.
+  NOTE: This is tool for flow EVM chain not flow blockchain.
+  `,
   inputSchema: getTransactionInfoSchema,
   handler: async (args: GetTransactionSchema) => {
     try {

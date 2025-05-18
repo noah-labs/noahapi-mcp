@@ -42,7 +42,7 @@ export const getAccountInfo = async (args: AccountInfoSchema): Promise<AccountIn
 
 export const accountInfoTool: ToolRegistration<AccountInfoSchema> = {
   name: "get_account_info",
-  description: "Get detailed account information including balance and storage stats for a Flow address",
+  description: "Get detailed account information including balance and storage stats for a Flow address on flow blockchain, the flow address is 16 characters long or 18 characters long with 0x prefix",
   inputSchema: accountInfoSchema,
   handler: async (args: AccountInfoSchema) => {
     try {

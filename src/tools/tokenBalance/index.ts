@@ -33,7 +33,11 @@ export const getTokenBalances = async (args: TokenBalanceSchema) => {
 
 export const tokenBalanceTool: ToolRegistration<TokenBalanceSchema> = {
   name: "get_token_balances",
-  description: "Get the balances of all fungible tokens for a Flow address",
+  description: `
+  Get the balances of all fungible tokens for a Flow address,
+  The flow address is 16 characters long or 18 characters long with 0x prefix
+  NOTE: This is a flow blockchin tool, not for flow EVM chain.
+  `,
   inputSchema: tokenBalanceSchema,
   handler: async (args: TokenBalanceSchema) => {
     try {

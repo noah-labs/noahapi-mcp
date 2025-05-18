@@ -30,7 +30,11 @@ export const getFlowBalance = async (args: FlowBalanceSchema): Promise<string> =
 
 export const flowBalanceTool: ToolRegistration<FlowBalanceSchema> = {
   name: "get_flow_balance",
-  description: "Get the FLOW balance for a Flow address",
+  description: `
+  Get the FLOW balance for a Flow address on flow blockchain, 
+  the flow address is 16 characters long or 18 characters long with 0x prefix
+  NOTE: This is a flow blockchin tool, not for flow EVM chain.
+  `,
   inputSchema: flowBalanceSchema,
   handler: async (args: FlowBalanceSchema) => {
     try {

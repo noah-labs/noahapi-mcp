@@ -49,7 +49,7 @@ const UniswapV2PairABI = [
 ] as const;
 
 // Punchswap V2 Factory address
-const UNISWAP_V2_FACTORY_ADDRESS = '0x29372c22459a4e373851798bFd6808e71EA34A71' as Address;
+const PUNCHSWAP_V2_FACTORY_ADDRESS = '0x29372c22459a4e373851798bFd6808e71EA34A71' as Address;
 
 // ExecuteCall ABI for using flowEVMAccount to execute transactions
 const ExecuteCallABI = [
@@ -235,7 +235,9 @@ export const punchswapQuoteTool = {
   Get a price quote from Punchswap V2 for swapping between two tokens.
   Supported tokens: Wrapped Flow(WFLOW), Trump(TRUMP), HotCocoa, Gwendolion, Pawderick, Catseye.
   You can specify tokens by name, symbol, or contract address.
-  The tool will check if a liquidity pair exists and return the current exchange rate.`,
+  The tool will check if a liquidity pair exists and return the current exchange rate.
+  NOTE: This is tool for flow EVM chain not flow blockchain.
+  `,
   inputSchema: quoteSchema,
 
   handler: async (params: QuoteSchema) => {
@@ -309,7 +311,7 @@ export const punchswapQuoteTool = {
 
       // Get the pair address from the factory
       const pairAddress = await publicClient.readContract({
-        address: UNISWAP_V2_FACTORY_ADDRESS,
+        address: PUNCHSWAP_V2_FACTORY_ADDRESS,
         abi: UniswapV2FactoryABI,
         functionName: 'getPair',
         args: [tokenInAddressForPair, tokenOutAddressForPair]
@@ -481,7 +483,9 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
   Supported tokens: Wrapped Flow(WFLOW), Trump(TRUMP), HotCocoa, Gwendolion, Pawderick, Catseye.
   You can specify tokens by name, symbol, or contract address.
   The tool will check if a liquidity pair exists and create the appropriate transaction.
-  If approval is needed, it will return the approval transaction first.`,
+  If approval is needed, it will return the approval transaction first.
+  NOTE: This is tool for flow EVM chain not flow blockchain.
+  `,
   inputSchema: swapSchema,
   handler: async (params: SwapSchema) => {
 
@@ -578,7 +582,7 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
 
       // Get the pair address from the factory
       const pairAddress = await publicClient.readContract({
-        address: UNISWAP_V2_FACTORY_ADDRESS,
+        address: PUNCHSWAP_V2_FACTORY_ADDRESS,
         abi: UniswapV2FactoryABI,
         functionName: 'getPair',
         args: [tokenInAddressForPair, tokenOutAddressForPair]

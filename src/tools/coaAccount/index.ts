@@ -31,7 +31,10 @@ export const getCoaAccount = async (args: CoaAccountSchema): Promise<string> => 
 
 export const coaAccountTool: ToolRegistration<CoaAccountSchema> = {
   name: "get_coa_account",
-  description: "Get the COA account information for a Flow address",
+  description: `Get the COA account information for a Flow address on flow blockchain, 
+  the flow address is 16 characters long or 18 characters long with 0x prefix
+  NOTE: This is a flow blockchin tool, not for flow EVM chain.
+  `,
   inputSchema: coaAccountSchema,
   handler: async (args: CoaAccountSchema) => {
     try {

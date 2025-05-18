@@ -40,7 +40,7 @@ export const getFlowHistoryPrice = async (): Promise<any> => {
 
 export const getFlowHistoryPriceTool: ToolRegistration<GetTrendingPoolsSchema> = {
   name: "get_flow_history_price",
-  description: "Get flow token history price from binance",
+  description: `Get flow token history price from binance`,
   inputSchema: getTrendingPoolsSchema,
   handler: async () => {
     try {
