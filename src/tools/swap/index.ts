@@ -159,8 +159,8 @@ export const swapSchema = z.object({
   slippageTolerance: z.number()
     .min(0.1)
     .max(50)
-    .default(2)
-    .describe('Slippage tolerance in percentage (default: 2%)'),
+    .default(10)
+    .describe('Slippage tolerance in percentage (default: 10%)'),
   flowEVMAccount: z.string()
     .refine(addr => isAddress(addr), {
       message: 'Invalid account address format',
@@ -488,17 +488,6 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
   `,
   inputSchema: swapSchema,
   handler: async (params: SwapSchema) => {
-
-    console.log('params -->', params);
-
-    // {
-    //   tokenIn: 'HotCocoa',
-    //   tokenOut: 'WFLOW',
-    //   amountIn: '1',
-    //   slippageTolerance: 2,
-    //   flowEVMAccount: '0xA60f8a3E6586aA590a4AD9EE0F264A1473Bab7cB',
-    //   deadline: 1747478319
-    // }
 
     try {
       const { flowEVMAccount, tokenIn, tokenOut, amountIn, slippageTolerance, deadline } = params;
