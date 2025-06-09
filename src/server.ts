@@ -6,7 +6,7 @@ export function createServer() {
   // Initialize server
   const server = new FastMCP({
     name: "flow-mcp",
-    version: "0.1.0",
+    version: "0.1.9",
   });
 
   // Register all tools
@@ -24,8 +24,8 @@ export function createServer() {
           }
           return JSON.stringify(result.content[0].text);
         } catch (err) {
-          console.error('Error in tool execution:', err);
-          return 'Internal server error in tool execution.';
+          console.error("Error in tool execution:", err);
+          return "Internal server error in tool execution.";
         }
       },
     });
