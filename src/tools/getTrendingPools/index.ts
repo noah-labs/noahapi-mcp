@@ -1,10 +1,13 @@
 import type { ToolRegistration } from "@/types/tools.js";
-import { type GetTrendingPoolsSchema, getTrendingPoolsSchema } from "./schema.js";
+import {
+  type GetTrendingPoolsSchema,
+  getTrendingPoolsSchema,
+} from "./schema.js";
 
 export const getTrendingPools = async (): Promise<any> => {
   try {
-
-    const url = "https://api.geckoterminal.com/api/v2/networks/flow-evm/trending_pools";
+    const url =
+      "https://api.geckoterminal.com/api/v2/networks/flow-evm/trending_pools";
 
     const res = await fetch(url, {
       headers: {
@@ -12,20 +15,32 @@ export const getTrendingPools = async (): Promise<any> => {
         Accept: "application/json;version=20230302",
       },
     });
-    const { data = {} } = res.ok ? await res.json() : {};
+
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status} - ${res.statusText}`);
+    }
+
+    const { data = {} } = await res.json();
 
     return data;
-
   } catch (error) {
-    throw new Error(`Error fetching contract: ${error instanceof Error ? error.message : String(error)}`);
+    if (error instanceof TypeError && error.message.includes("fetch")) {
+      throw new Error(
+        `Network error: Unable to connect to GeckoTerminal API. Please check your internet connection.`
+      );
+    }
+    throw new Error(
+      `Error fetching trending pools: ${
+        error instanceof Error ? error.message : String(error)
+      }`
+    );
   }
 };
-
 
 export const getTrendingPoolsTool: ToolRegistration<GetTrendingPoolsSchema> = {
   name: "get_trending_pools",
   description: `
-  Get trenidng pools info on kittypunch dex in flow EVM mainnet,
+  Get trending pools info on kittypunch dex in flow EVM mainnet,
   NOTE: This is tool for flow EVM chain not flow blockchain.
   `,
   inputSchema: getTrendingPoolsSchema,
@@ -41,7 +56,7 @@ export const getTrendingPoolsTool: ToolRegistration<GetTrendingPoolsSchema> = {
         ],
       };
     } catch (error) {
-      console.error("Error in getTokenPriceTool handler:", error);
+      console.error("Error in getTrendingPoolsTool handler:", error);
       return {
         content: [
           {
@@ -54,5 +69,3 @@ export const getTrendingPoolsTool: ToolRegistration<GetTrendingPoolsSchema> = {
     }
   },
 };
-
-
