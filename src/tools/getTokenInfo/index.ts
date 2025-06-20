@@ -4,7 +4,6 @@ import { type GetTokenInfoSchema, getTokenInfoSchema } from "./schema.js";
 export const getTokenInfo = async (args: GetTokenInfoSchema): Promise<any> => {
   const { address } = args;
   try {
-
     const url = `https://api.geckoterminal.com/api/v2/networks/flow-evm/tokens/${address}/info`;
 
     const res = await fetch(url, {
@@ -13,12 +12,25 @@ export const getTokenInfo = async (args: GetTokenInfoSchema): Promise<any> => {
         Accept: "application/json;version=20230302",
       },
     });
-    const { data = {} } = res.ok ? await res.json() : {};
+
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status} - ${res.statusText}`);
+    }
+
+    const { data = {} } = await res.json();
 
     return data;
-
   } catch (error) {
-    throw new Error(`Error fetching contract: ${error instanceof Error ? error.message : String(error)}`);
+    if (error instanceof TypeError && error.message.includes("fetch")) {
+      throw new Error(
+        `Network error: Unable to connect to GeckoTerminal API. Please check your internet connection.`
+      );
+    }
+    throw new Error(
+      `Error fetching token info: ${
+        error instanceof Error ? error.message : String(error)
+      }`
+    );
   }
 };
 
@@ -52,4 +64,3 @@ export const getTokenInfoTool: ToolRegistration<GetTokenInfoSchema> = {
     }
   },
 };
-
