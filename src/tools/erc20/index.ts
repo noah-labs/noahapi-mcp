@@ -55,6 +55,14 @@ export const getErc20TokensTool = {
   handler: async (params: GetErc20TokenSchema) => {
     try {
       const { address } = params;
+
+      // Validate address format
+      if (!isAddress(address)) {
+        return createTextResponse(
+          `Invalid address format: ${address}. Must be a valid 0x format address.`
+        );
+      }
+
       const publicClient = getPublicClient();
 
       // Fetch balances for all tokens
@@ -151,6 +159,14 @@ export const transferErc20TokenTool = {
     try {
       const { token, to, amount } = params;
 
+      // Validate address format
+      const addressRegex = /^0x[a-fA-F0-9]{40}$/;
+      if (!addressRegex.test(to)) {
+        return createTextResponse(
+          `Invalid recipient address format: ${to}. Must be a valid 0x format address.`
+        );
+      }
+
       // Find token info by checking name, symbol, or contract address
       let tokenInfo;
       for (const [key, info] of Object.entries(ERC20_TOKENS)) {
@@ -166,7 +182,9 @@ export const transferErc20TokenTool = {
       }
 
       if (!tokenInfo) {
-        return createTextResponse("Invalid token");
+        return createTextResponse(
+          `Invalid token: ${token}. Supported tokens: WFLOW, TRUMP, HotCocoa, Gwendolion, Pawderick, Catseye, USDF`
+        );
       }
 
       const transactionRequest = {

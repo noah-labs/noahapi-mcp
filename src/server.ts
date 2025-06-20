@@ -6,7 +6,7 @@ export function createServer() {
   // Initialize server
   const server = new FastMCP({
     name: "flow-mcp",
-    version: "0.1.9",
+    version: "0.1.11",
   });
 
   // Register all tools

@@ -1,4 +1,4 @@
-import { type Address, encodeFunctionData, parseUnits } from "viem";
+import { type Address, encodeFunctionData, isAddress, parseUnits } from "viem";
 import type { ToolRegistration } from "@/types/tools.js";
 import { createTextResponse } from "@/types/tools.js";
 import { getPublicClient } from "../../utils/evm/viem";
@@ -9,6 +9,45 @@ import {
   swapSchema,
   type SwapSchema,
 } from "./schema";
+
+function isValidToken(token: string): boolean {
+  // Check if it's FLOW (native token)
+  if (token === "FLOW") return true;
+
+  // Check if it matches any token's name, symbol, or contract address
+  return Object.entries(ERC20_TOKENS).some(
+    ([key, tokenInfo]) =>
+      key === token ||
+      tokenInfo.symbol === token ||
+      tokenInfo.name === token ||
+      tokenInfo.contractAddress === token
+  );
+}
+
+function getTokenInfo(token: string) {
+  // Special case for FLOW (native token)
+  if (token === "FLOW") {
+    return {
+      symbol: "FLOW",
+      name: "Flow",
+      decimals: 18,
+    };
+  }
+
+  // Regular ERC20 token lookup
+  for (const [key, info] of Object.entries(ERC20_TOKENS)) {
+    if (
+      key === token ||
+      info.symbol === token ||
+      info.name === token ||
+      info.contractAddress === token
+    ) {
+      return info;
+    }
+  }
+
+  return null;
+}
 
 // Punchswap V2 Factory ABI (minimal for getPair)
 const UniswapV2FactoryABI = [
@@ -165,52 +204,29 @@ export const punchswapQuoteTool = {
       const { tokenIn, tokenOut, amountIn } = params;
       const publicClient = getPublicClient();
 
-      // Find tokenIn info
-      let tokenInInfo;
-      for (const [key, info] of Object.entries(ERC20_TOKENS)) {
-        if (
-          key === tokenIn ||
-          info.symbol === tokenIn ||
-          info.name === tokenIn ||
-          info.contractAddress === tokenIn
-        ) {
-          tokenInInfo = info;
-          break;
-        }
+      // Validate tokens using the new validation functions
+      if (!isValidToken(tokenIn)) {
+        return createTextResponse(
+          `Invalid input token: ${tokenIn}. Supported tokens: FLOW, WFLOW, TRUMP, HotCocoa, Gwendolion, Pawderick, Catseye, USDF`
+        );
       }
+
+      if (!isValidToken(tokenOut)) {
+        return createTextResponse(
+          `Invalid output token: ${tokenOut}. Supported tokens: FLOW, WFLOW, TRUMP, HotCocoa, Gwendolion, Pawderick, Catseye, USDF`
+        );
+      }
+
+      // Get token info using the new function
+      const tokenInInfo = getTokenInfo(tokenIn);
+      const tokenOutInfo = getTokenInfo(tokenOut);
 
       if (!tokenInInfo) {
-        return createTextResponse("Invalid input token");
-      }
-
-      // Find tokenOut info
-      let tokenOutInfo;
-
-      // Special case for FLOW (native token)
-      if (tokenOut === "FLOW") {
-        // For FLOW (native token), we don't assign a contract address
-        tokenOutInfo = {
-          symbol: "FLOW",
-          name: "Flow",
-          decimals: 18,
-        };
-      } else {
-        // Regular ERC20 token lookup
-        for (const [key, info] of Object.entries(ERC20_TOKENS)) {
-          if (
-            key === tokenOut ||
-            info.symbol === tokenOut ||
-            info.name === tokenOut ||
-            info.contractAddress === tokenOut
-          ) {
-            tokenOutInfo = info;
-            break;
-          }
-        }
+        return createTextResponse(`Invalid input token: ${tokenIn}`);
       }
 
       if (!tokenOutInfo) {
-        return createTextResponse("Invalid output token");
+        return createTextResponse(`Invalid output token: ${tokenOut}`);
       }
 
       // Convert amount to proper decimal representation using viem's parseUnits
@@ -232,10 +248,10 @@ export const punchswapQuoteTool = {
       // For FLOW, we use WFLOW address
       const tokenInAddressForPair = isETHIn
         ? WFLOW_ADDRESS
-        : (tokenInInfo.contractAddress as Address);
+        : ((tokenInInfo as any).contractAddress as Address);
       const tokenOutAddressForPair = isETHOut
         ? WFLOW_ADDRESS
-        : (tokenOutInfo.contractAddress as Address);
+        : ((tokenOutInfo as any).contractAddress as Address);
 
       // Get the pair address from the factory
       const pairAddress = (await publicClient.readContract({
@@ -292,13 +308,13 @@ export const punchswapQuoteTool = {
         tokenIn: {
           symbol: tokenInInfo.symbol,
           name: tokenInInfo.name,
-          address: tokenInInfo.contractAddress,
+          address: (tokenInInfo as any).contractAddress || null,
           amount: amountIn,
         },
         tokenOut: {
           symbol: tokenOutInfo.symbol,
           name: tokenOutInfo.name,
-          address: tokenOutInfo.contractAddress,
+          address: (tokenOutInfo as any).contractAddress || null,
           amount: formattedAmountOut,
         },
         exchangeRate: `1 ${tokenInInfo.symbol} = ${exchangeRate.toFixed(6)} ${
@@ -433,74 +449,50 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
   inputSchema: swapSchema,
   handler: async (params: SwapSchema) => {
     try {
-      const {
-        flowEVMAccount,
-        tokenIn,
-        tokenOut,
-        amountIn,
-        slippageTolerance,
-        deadline,
-      } = params;
+      const { flowEVMAccount, tokenIn, tokenOut, amountIn } = params;
+      const deadline =
+        params.deadline || Math.floor(Date.now() / 1000) + 60 * 20; // 20 minutes from now
+      const slippageTolerance = params.slippageTolerance || 10; // Default to 10%
+
+      // Validate slippage tolerance
+      if (slippageTolerance < 0.1 || slippageTolerance > 50) {
+        return createTextResponse(
+          `Invalid slippage tolerance: ${slippageTolerance}. Must be between 0.1% and 50%.`
+        );
+      }
+
       const publicClient = getPublicClient();
 
-      // Find tokenIn info
-      let tokenInInfo;
-
-      // Special case for FLOW (native token)
-      if (tokenIn === "FLOW") {
-        // For FLOW (native token), we don't assign a contract address
-        tokenInInfo = {
-          symbol: "FLOW",
-          name: "Flow Token",
-          decimals: 18,
-        };
-      } else {
-        // Regular ERC20 token lookup
-        for (const [key, info] of Object.entries(ERC20_TOKENS)) {
-          if (
-            key === tokenIn ||
-            info.symbol === tokenIn ||
-            info.name === tokenIn ||
-            info.contractAddress === tokenIn
-          ) {
-            tokenInInfo = info;
-            break;
-          }
-        }
+      // Validate address
+      if (!isAddress(flowEVMAccount)) {
+        return createTextResponse(
+          `Invalid Flow EVM account address: ${flowEVMAccount}. Must be a valid 0x format address.`
+        );
       }
+
+      // Validate tokens using the new validation functions
+      if (!isValidToken(tokenIn)) {
+        return createTextResponse(
+          `Invalid input token: ${tokenIn}. Supported tokens: FLOW, WFLOW, TRUMP, HotCocoa, Gwendolion, Pawderick, Catseye, USDF`
+        );
+      }
+
+      if (!isValidToken(tokenOut)) {
+        return createTextResponse(
+          `Invalid output token: ${tokenOut}. Supported tokens: FLOW, WFLOW, TRUMP, HotCocoa, Gwendolion, Pawderick, Catseye, USDF`
+        );
+      }
+
+      // Get token info using the new function
+      const tokenInInfo = getTokenInfo(tokenIn);
+      const tokenOutInfo = getTokenInfo(tokenOut);
 
       if (!tokenInInfo) {
-        return createTextResponse("Invalid input token");
-      }
-
-      // Find tokenOut info
-      let tokenOutInfo;
-
-      // Special case for FLOW (native token)
-      if (tokenOut === "FLOW") {
-        // For FLOW (native token), we don't assign a contract address
-        tokenOutInfo = {
-          symbol: "FLOW",
-          name: "Flow Token",
-          decimals: 18,
-        };
-      } else {
-        // Regular ERC20 token lookup
-        for (const [key, info] of Object.entries(ERC20_TOKENS)) {
-          if (
-            key === tokenOut ||
-            info.symbol === tokenOut ||
-            info.name === tokenOut ||
-            info.contractAddress === tokenOut
-          ) {
-            tokenOutInfo = info;
-            break;
-          }
-        }
+        return createTextResponse(`Invalid input token: ${tokenIn}`);
       }
 
       if (!tokenOutInfo) {
-        return createTextResponse("Invalid output token");
+        return createTextResponse(`Invalid output token: ${tokenOut}`);
       }
 
       // Convert amountIn to wei using viem's parseUnits
@@ -522,10 +514,10 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
       // For FLOW, we use WFLOW address
       const tokenInAddressForPair = isETHIn
         ? WFLOW_ADDRESS
-        : (tokenInInfo.contractAddress as Address);
+        : ((tokenInInfo as any).contractAddress as Address);
       const tokenOutAddressForPair = isETHOut
         ? WFLOW_ADDRESS
-        : (tokenOutInfo.contractAddress as Address);
+        : ((tokenOutInfo as any).contractAddress as Address);
 
       // Get the pair address from the factory
       const pairAddress = (await publicClient.readContract({

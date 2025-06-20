@@ -18,26 +18,26 @@ import { getFlowHistoryPriceTool } from "./getFlowHistoryPrice/index.js";
 
 // biome-ignore lint/suspicious/noExplicitAny: Any is fine here because all tools validate their input schemas.
 export const createTools = (): ToolRegistration<any>[] => {
-	return [
-		flowBalanceTool,
-		tokenBalanceTool,
-		coaAccountTool,
-		getContractTool,
-		accountInfoTool,
-		childAccountTool,
-		// queryTool,
-		getTokenPriceTool,
-		getTrendingPoolsTool,
-		getPoolsByTokenTool,
-		getTokenInfoTool,
-		getTokenPriceHistoryTool,
-		punchswapQuoteTool,
-		punchswapSwapTool,
-		getErc20TokensTool,
-		transferErc20TokenTool,
-		getEVMTransactionTool,
-		getFlowHistoryPriceTool
-	];
+  return [
+    flowBalanceTool,
+    tokenBalanceTool,
+    coaAccountTool,
+    getContractTool,
+    accountInfoTool,
+    childAccountTool,
+    // queryTool,
+    getTokenPriceTool,
+    getTrendingPoolsTool,
+    getPoolsByTokenTool,
+    getTokenInfoTool,
+    getTokenPriceHistoryTool,
+    punchswapQuoteTool,
+    punchswapSwapTool,
+    getErc20TokensTool,
+    transferErc20TokenTool,
+    getEVMTransactionTool,
+    getFlowHistoryPriceTool,
+  ];
 };
 
 export default createTools;
