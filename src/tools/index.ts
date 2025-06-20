@@ -16,28 +16,38 @@ import { getErc20TokensTool, transferErc20TokenTool } from "./erc20/index.js";
 import { getEVMTransactionTool } from "./flowscan/index.js";
 import { getFlowHistoryPriceTool } from "./getFlowHistoryPrice/index.js";
 
+// Union type for both tool registration types
+type AnyToolRegistration =
+  | ToolRegistration<any>
+  | {
+      name: string;
+      description: string;
+      inputSchema: any;
+      handler: (args: any) => any | Promise<any>;
+    };
+
 // biome-ignore lint/suspicious/noExplicitAny: Any is fine here because all tools validate their input schemas.
-export const createTools = (): ToolRegistration<any>[] => {
-	return [
-		flowBalanceTool,
-		tokenBalanceTool,
-		coaAccountTool,
-		getContractTool,
-		accountInfoTool,
-		childAccountTool,
-		// queryTool,
-		getTokenPriceTool,
-		getTrendingPoolsTool,
-		getPoolsByTokenTool,
-		getTokenInfoTool,
-		getTokenPriceHistoryTool,
-		punchswapQuoteTool,
-		punchswapSwapTool,
-		getErc20TokensTool,
-		transferErc20TokenTool,
-		getEVMTransactionTool,
-		getFlowHistoryPriceTool
-	];
+export const createTools = (): AnyToolRegistration[] => {
+  return [
+    flowBalanceTool,
+    tokenBalanceTool,
+    coaAccountTool,
+    getContractTool,
+    accountInfoTool,
+    childAccountTool,
+    // queryTool,
+    getTokenPriceTool,
+    getTrendingPoolsTool,
+    getPoolsByTokenTool,
+    getTokenInfoTool,
+    getTokenPriceHistoryTool,
+    punchswapQuoteTool,
+    punchswapSwapTool,
+    getErc20TokensTool,
+    transferErc20TokenTool,
+    getEVMTransactionTool,
+    getFlowHistoryPriceTool,
+  ];
 };
 
 export default createTools;

@@ -1,180 +1,181 @@
-import { type Address, isAddress, encodeFunctionData, parseEther, formatEther, parseUnits } from 'viem';
+import {
+  type Address,
+  isAddress,
+  encodeFunctionData,
+  parseEther,
+  formatEther,
+  parseUnits,
+} from "viem";
 import type { ToolRegistration } from "@/types/tools.js";
-import { bigint, z } from 'zod';
+import { bigint, z } from "zod";
 import { createTextResponse } from "@/types/tools.js";
-import { getPublicClient } from '../../utils/evm/viem';
-import { ERC20_TOKENS } from '../../utils/evm/supportedErc20Tokens';
+import { getPublicClient } from "../../utils/evm/viem";
+import { ERC20_TOKENS } from "../../utils/evm/supportedErc20Tokens";
 
 // Punchswap V2 Factory ABI (minimal for getPair)
 const UniswapV2FactoryABI = [
   {
     inputs: [
-      { name: 'tokenA', type: 'address' },
-      { name: 'tokenB', type: 'address' }
+      { name: "tokenA", type: "address" },
+      { name: "tokenB", type: "address" },
     ],
-    name: 'getPair',
-    outputs: [{ name: 'pair', type: 'address' }],
-    stateMutability: 'view',
-    type: 'function'
-  }
+    name: "getPair",
+    outputs: [{ name: "pair", type: "address" }],
+    stateMutability: "view",
+    type: "function",
+  },
 ] as const;
 
 // Punchswap V2 Pair ABI (minimal for getReserves)
 const UniswapV2PairABI = [
   {
     inputs: [],
-    name: 'getReserves',
+    name: "getReserves",
     outputs: [
-      { name: 'reserve0', type: 'uint112' },
-      { name: 'reserve1', type: 'uint112' },
-      { name: 'blockTimestampLast', type: 'uint32' }
+      { name: "reserve0", type: "uint112" },
+      { name: "reserve1", type: "uint112" },
+      { name: "blockTimestampLast", type: "uint32" },
     ],
-    stateMutability: 'view',
-    type: 'function'
+    stateMutability: "view",
+    type: "function",
   },
   {
     inputs: [],
-    name: 'token0',
-    outputs: [{ name: '', type: 'address' }],
-    stateMutability: 'view',
-    type: 'function'
+    name: "token0",
+    outputs: [{ name: "", type: "address" }],
+    stateMutability: "view",
+    type: "function",
   },
   {
     inputs: [],
-    name: 'token1',
-    outputs: [{ name: '', type: 'address' }],
-    stateMutability: 'view',
-    type: 'function'
-  }
+    name: "token1",
+    outputs: [{ name: "", type: "address" }],
+    stateMutability: "view",
+    type: "function",
+  },
 ] as const;
 
 // Punchswap V2 Factory address
-const PUNCHSWAP_V2_FACTORY_ADDRESS = '0x29372c22459a4e373851798bFd6808e71EA34A71' as Address;
+const PUNCHSWAP_V2_FACTORY_ADDRESS =
+  "0x29372c22459a4e373851798bFd6808e71EA34A71" as Address;
 
 // ExecuteCall ABI for using flowEVMAccount to execute transactions
 const ExecuteCallABI = [
   {
-    "inputs": [
+    inputs: [
       {
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
+        internalType: "address",
+        name: "to",
+        type: "address",
       },
       {
-        "internalType": "uint256",
-        "name": "value",
-        "type": "uint256"
+        internalType: "uint256",
+        name: "value",
+        type: "uint256",
       },
       {
-        "internalType": "bytes",
-        "name": "data",
-        "type": "bytes"
-      }
+        internalType: "bytes",
+        name: "data",
+        type: "bytes",
+      },
     ],
-    "name": "executeCall",
-    "outputs": [
+    name: "executeCall",
+    outputs: [
       {
-        "internalType": "bytes",
-        "name": "result",
-        "type": "bytes"
-      }
+        internalType: "bytes",
+        name: "result",
+        type: "bytes",
+      },
     ],
-    "stateMutability": "payable",
-    "type": "function"
-  }
+    stateMutability: "payable",
+    type: "function",
+  },
 ];
 
-const quoteSchema = z.object({
-  tokenIn: z.string()
-    .refine(input => {
-      // Check if the input matches any token's name, symbol, or contract address
-      return Object.entries(ERC20_TOKENS).some(([key, token]) =>
-        key === input ||
-        token.symbol === input ||
-        token.name === input ||
-        token.contractAddress === input
-      );
-    }, {
-      message: 'Invalid tokenIn. Please provide a valid token name, symbol, or contract address',
-      path: ['tokenIn']
-    })
-    .describe('The input token (name, symbol, or contract address)'),
-  tokenOut: z.string()
-    .refine(input => {
-      // Check if the input matches any token's name, symbol, or contract address
-      return Object.entries(ERC20_TOKENS).some(([key, token]) =>
-        key === input ||
-        token.symbol === input ||
-        token.name === input ||
-        token.contractAddress === input
-      );
-    }, {
-      message: 'Invalid tokenOut. Please provide a valid token name, symbol, or contract address',
-      path: ['tokenOut']
-    })
-    .describe('The output token (name, symbol, or contract address)'),
-  amountIn: z.string()
-    .describe('The amount of input tokens to swap')
-})
+// JSON Schema for quote tool
+const quoteJsonSchema = {
+  type: "object",
+  properties: {
+    tokenIn: {
+      type: "string",
+      description:
+        "The input token (name, symbol, or contract address). Supported tokens: WFLOW, TRUMP, HotCocoa, Gwendolion, Pawderick, Catseye",
+    },
+    tokenOut: {
+      type: "string",
+      description:
+        "The output token (name, symbol, or contract address). Supported tokens: WFLOW, TRUMP, HotCocoa, Gwendolion, Pawderick, Catseye",
+    },
+    amountIn: {
+      type: "string",
+      description: "The amount of input tokens to swap",
+    },
+  },
+  required: ["tokenIn", "tokenOut", "amountIn"],
+};
 
-export type QuoteSchema = z.infer<typeof quoteSchema>;
+// JSON Schema for swap tool
+const swapJsonSchema = {
+  type: "object",
+  properties: {
+    tokenIn: {
+      type: "string",
+      description:
+        "The input token (name, symbol, or contract address). Supported tokens: FLOW, WFLOW, TRUMP, HotCocoa, Gwendolion, Pawderick, Catseye",
+    },
+    tokenOut: {
+      type: "string",
+      description:
+        "The output token (name, symbol, or contract address). Supported tokens: FLOW, WFLOW, TRUMP, HotCocoa, Gwendolion, Pawderick, Catseye",
+    },
+    amountIn: {
+      type: "string",
+      description: "The amount of input tokens to swap",
+    },
+    slippageTolerance: {
+      type: "number",
+      minimum: 0.1,
+      maximum: 50,
+      default: 10,
+      description: "Slippage tolerance in percentage (default: 10%)",
+    },
+    flowEVMAccount: {
+      type: "string",
+      description:
+        "The account that will execute the swap (must be a valid EVM address)",
+    },
+    deadline: {
+      type: "number",
+      default: 0,
+      description: "Transaction deadline in seconds (0 = 20 minutes from now)",
+    },
+  },
+  required: ["tokenIn", "tokenOut", "amountIn", "flowEVMAccount"],
+};
 
-export const swapSchema = z.object({
-  tokenIn: z.string()
-    .refine(input => {
-      // Check if the input is FLOW (native token)
-      if (input === 'FLOW') return true;
+// Type definitions for TypeScript
+export interface QuoteSchema {
+  tokenIn: string;
+  tokenOut: string;
+  amountIn: string;
+}
 
-      // Check if the input matches any token's name, symbol, or contract address
-      return Object.entries(ERC20_TOKENS).some(([key, token]) =>
-        key === input ||
-        token.symbol === input ||
-        token.name === input ||
-        token.contractAddress === input
-      );
-    }, {
-      message: 'Invalid tokenIn. Please provide a valid token name, symbol, or contract address',
-      path: ['tokenIn']
-    })
-    .describe('The input token (name, symbol, or contract address)'),
-  tokenOut: z.string()
-    .refine(input => {
-      // Check if the input is FLOW (native token)
-      if (input === 'FLOW') return true;
+export interface SwapSchema {
+  tokenIn: string;
+  tokenOut: string;
+  amountIn: string;
+  slippageTolerance?: number;
+  flowEVMAccount: string;
+  deadline?: number;
+}
 
-      // Check if the input matches any token's name, symbol, or contract address
-      return Object.entries(ERC20_TOKENS).some(([key, token]) =>
-        key === input ||
-        token.symbol === input ||
-        token.name === input ||
-        token.contractAddress === input
-      );
-    }, {
-      message: 'Invalid tokenOut. Please provide a valid token name, symbol, or contract address',
-      path: ['tokenOut']
-    })
-    .describe('The output token (name, symbol, or contract address)'),
-  amountIn: z.string()
-    .describe('The amount of input tokens to swap'),
-  slippageTolerance: z.number()
-    .min(0.1)
-    .max(50)
-    .default(10)
-    .describe('Slippage tolerance in percentage (default: 10%)'),
-  flowEVMAccount: z.string()
-    .refine(addr => isAddress(addr), {
-      message: 'Invalid account address format',
-      path: ['flowEVMAccount']
-    })
-    .describe('The account that will execute the swap'),
-  deadline: z.number()
-    .default(Math.floor(Date.now() / 1000) + 60 * 20) // 20 minutes from now
-    .describe('Transaction deadline in seconds (default: 20 minutes from now)')
-})
-
-export type SwapSchema = z.infer<typeof swapSchema>;
-
-
+// Custom tool registration type that accepts JSON Schema
+interface JsonSchemaToolRegistration<T> {
+  name: string;
+  description: string;
+  inputSchema: any; // JSON Schema object
+  handler: (args: T) => any | Promise<any>;
+}
 
 // Add a helper function to ensure the value is properly formatted as a hex string
 function toHexString(value: bigint | number): `0x${string}` {
@@ -188,20 +189,22 @@ function toHexString(value: bigint | number): `0x${string}` {
  * @returns A formatted string representation of the amount
  */
 function formatTokenAmount(amount: bigint, decimals: number): string {
-  if (amount === 0n) return '0';
+  if (amount === 0n) return "0";
 
   const amountStr = amount.toString();
 
   // If the amount is less than 10^decimals, we need to pad with leading zeros
   if (amountStr.length <= decimals) {
-    const paddedAmount = amountStr.padStart(decimals + 1, '0');
-    const integerPart = paddedAmount.slice(0, -decimals) || '0';
-    const fractionalPart = paddedAmount.slice(-decimals).replace(/0+$/, '');
+    const paddedAmount = amountStr.padStart(decimals + 1, "0");
+    const integerPart = paddedAmount.slice(0, -decimals) || "0";
+    const fractionalPart = paddedAmount.slice(-decimals).replace(/0+$/, "");
 
     return fractionalPart ? `${integerPart}.${fractionalPart}` : integerPart;
   } else {
     const integerPart = amountStr.slice(0, amountStr.length - decimals);
-    const fractionalPart = amountStr.slice(amountStr.length - decimals).replace(/0+$/, '');
+    const fractionalPart = amountStr
+      .slice(amountStr.length - decimals)
+      .replace(/0+$/, "");
 
     return fractionalPart ? `${integerPart}.${fractionalPart}` : integerPart;
   }
@@ -214,7 +217,11 @@ function formatTokenAmount(amount: bigint, decimals: number): string {
  * @param reserveOut The reserve of the output token
  * @returns The output amount
  */
-function getAmountOut(amountIn: bigint, reserveIn: bigint, reserveOut: bigint): bigint {
+function getAmountOut(
+  amountIn: bigint,
+  reserveIn: bigint,
+  reserveOut: bigint
+): bigint {
   if (amountIn === 0n) return 0n;
   if (reserveIn === 0n || reserveOut === 0n) return 0n;
 
@@ -229,8 +236,8 @@ function getAmountOut(amountIn: bigint, reserveIn: bigint, reserveOut: bigint): 
 /**
  * Tool for getting price quotes from Punchswap V2
  */
-export const punchswapQuoteTool = {
-  name: 'punchswap_quote',
+export const punchswapQuoteTool: JsonSchemaToolRegistration<QuoteSchema> = {
+  name: "punchswap_quote",
   description: `
   Get a price quote from Punchswap V2 for swapping between two tokens.
   Supported tokens: Wrapped Flow(WFLOW), Trump(TRUMP), HotCocoa, Gwendolion, Pawderick, Catseye.
@@ -238,7 +245,7 @@ export const punchswapQuoteTool = {
   The tool will check if a liquidity pair exists and return the current exchange rate.
   NOTE: This is tool for flow EVM chain not flow blockchain.
   `,
-  inputSchema: quoteSchema,
+  inputSchema: quoteJsonSchema,
 
   handler: async (params: QuoteSchema) => {
     try {
@@ -248,37 +255,43 @@ export const punchswapQuoteTool = {
       // Find tokenIn info
       let tokenInInfo;
       for (const [key, info] of Object.entries(ERC20_TOKENS)) {
-        if (key === tokenIn ||
+        if (
+          key === tokenIn ||
           info.symbol === tokenIn ||
           info.name === tokenIn ||
-          info.contractAddress === tokenIn) {
+          info.contractAddress === tokenIn
+        ) {
           tokenInInfo = info;
           break;
         }
       }
 
       if (!tokenInInfo) {
-        return createTextResponse('Invalid input token');
+        return createTextResponse(
+          "Invalid input token. Supported tokens: WFLOW, TRUMP, HotCocoa, Gwendolion, Pawderick, Catseye"
+        );
       }
 
       // Find tokenOut info
       let tokenOutInfo;
 
       // Special case for FLOW (native token)
-      if (tokenOut === 'FLOW') {
+      if (tokenOut === "FLOW") {
         // For FLOW (native token), we don't assign a contract address
         tokenOutInfo = {
-          symbol: 'FLOW',
-          name: 'Flow',
-          decimals: 18
+          symbol: "FLOW",
+          name: "Flow",
+          decimals: 18,
         };
       } else {
         // Regular ERC20 token lookup
         for (const [key, info] of Object.entries(ERC20_TOKENS)) {
-          if (key === tokenOut ||
+          if (
+            key === tokenOut ||
             info.symbol === tokenOut ||
             info.name === tokenOut ||
-            info.contractAddress === tokenOut) {
+            info.contractAddress === tokenOut
+          ) {
             tokenOutInfo = info;
             break;
           }
@@ -286,7 +299,9 @@ export const punchswapQuoteTool = {
       }
 
       if (!tokenOutInfo) {
-        return createTextResponse('Invalid output token');
+        return createTextResponse(
+          "Invalid output token. Supported tokens: WFLOW, TRUMP, HotCocoa, Gwendolion, Pawderick, Catseye"
+        );
       }
 
       // Convert amount to proper decimal representation using viem's parseUnits
@@ -294,49 +309,56 @@ export const punchswapQuoteTool = {
       try {
         amountInWei = parseUnits(amountIn, tokenInInfo.decimals);
       } catch (error) {
-        return createTextResponse('Invalid amount');
+        return createTextResponse("Invalid amount");
       }
 
       // Check if we're dealing with ETH (FLOW in this case)
-      const isETHIn = tokenIn === 'FLOW';
-      const isETHOut = tokenOut === 'FLOW';
+      const isETHIn = tokenIn === "FLOW";
+      const isETHOut = tokenOut === "FLOW";
 
       // For FLOW (native token), we need to use WFLOW for the pair lookup
-      const WFLOW_ADDRESS = ERC20_TOKENS['Wrapped Flow'].contractAddress;
+      const WFLOW_ADDRESS = ERC20_TOKENS["Wrapped Flow"].contractAddress;
 
       // For pair lookup and path creation, we need to use the actual token addresses
       // For FLOW, we use WFLOW address
-      const tokenInAddressForPair = isETHIn ? WFLOW_ADDRESS : (tokenInInfo.contractAddress as Address);
-      const tokenOutAddressForPair = isETHOut ? WFLOW_ADDRESS : (tokenOutInfo.contractAddress as Address);
+      const tokenInAddressForPair = isETHIn
+        ? WFLOW_ADDRESS
+        : (tokenInInfo.contractAddress as Address);
+      const tokenOutAddressForPair = isETHOut
+        ? WFLOW_ADDRESS
+        : (tokenOutInfo.contractAddress as Address);
 
       // Get the pair address from the factory
-      const pairAddress = await publicClient.readContract({
+      const pairAddress = (await publicClient.readContract({
         address: PUNCHSWAP_V2_FACTORY_ADDRESS,
         abi: UniswapV2FactoryABI,
-        functionName: 'getPair',
-        args: [tokenInAddressForPair, tokenOutAddressForPair]
-      }) as Address;
+        functionName: "getPair",
+        args: [tokenInAddressForPair, tokenOutAddressForPair],
+      })) as Address;
 
-      if (pairAddress === '0x0000000000000000000000000000000000000000') {
-        return createTextResponse(`No liquidity pair found for ${tokenInInfo.symbol} and ${tokenOutInfo.symbol}`);
+      if (pairAddress === "0x0000000000000000000000000000000000000000") {
+        return createTextResponse(
+          `No liquidity pair found for ${tokenInInfo.symbol} and ${tokenOutInfo.symbol}`
+        );
       }
 
       // Get token0 and token1 from the pair to determine the order
-      const token0 = await publicClient.readContract({
+      const token0 = (await publicClient.readContract({
         address: pairAddress,
         abi: UniswapV2PairABI,
-        functionName: 'token0'
-      }) as Address;
+        functionName: "token0",
+      })) as Address;
 
       // Get reserves from the pair
-      const [reserve0, reserve1] = await publicClient.readContract({
+      const [reserve0, reserve1] = (await publicClient.readContract({
         address: pairAddress,
         abi: UniswapV2PairABI,
-        functionName: 'getReserves'
-      }) as [bigint, bigint, number];
+        functionName: "getReserves",
+      })) as [bigint, bigint, number];
 
       // Determine which reserve corresponds to which token
-      const isToken0 = tokenInAddressForPair.toLowerCase() === token0.toLowerCase();
+      const isToken0 =
+        tokenInAddressForPair.toLowerCase() === token0.toLowerCase();
       const reserveIn = isToken0 ? reserve0 : reserve1;
       const reserveOut = isToken0 ? reserve1 : reserve0;
 
@@ -344,10 +366,15 @@ export const punchswapQuoteTool = {
       const amountOut = getAmountOut(amountInWei, reserveIn, reserveOut);
 
       // Format the output amount according to decimals
-      const formattedAmountOut = formatTokenAmount(amountOut, tokenOutInfo.decimals);
+      const formattedAmountOut = formatTokenAmount(
+        amountOut,
+        tokenOutInfo.decimals
+      );
 
       // Calculate the exchange rate
-      const exchangeRate = Number(amountOut) / Number(amountInWei) * (10 ** (tokenInInfo.decimals - tokenOutInfo.decimals));
+      const exchangeRate =
+        (Number(amountOut) / Number(amountInWei)) *
+        10 ** (tokenInInfo.decimals - tokenOutInfo.decimals);
 
       // Calculate price impact (simplified)
       const priceImpact = calculatePriceImpact(amountInWei, reserveIn);
@@ -357,28 +384,34 @@ export const punchswapQuoteTool = {
           symbol: tokenInInfo.symbol,
           name: tokenInInfo.name,
           address: tokenInInfo.contractAddress,
-          amount: amountIn
+          amount: amountIn,
         },
         tokenOut: {
           symbol: tokenOutInfo.symbol,
           name: tokenOutInfo.name,
           address: tokenOutInfo.contractAddress,
-          amount: formattedAmountOut
+          amount: formattedAmountOut,
         },
-        exchangeRate: `1 ${tokenInInfo.symbol} = ${exchangeRate.toFixed(6)} ${tokenOutInfo.symbol}`,
+        exchangeRate: `1 ${tokenInInfo.symbol} = ${exchangeRate.toFixed(6)} ${
+          tokenOutInfo.symbol
+        }`,
         swapDetails: {
           pairAddress,
           reserveIn: reserveIn.toString(),
           reserveOut: reserveOut.toString(),
-          priceImpact
-        }
+          priceImpact,
+        },
       };
 
       return createTextResponse(JSON.stringify(result, null, 2));
     } catch (error) {
-      return createTextResponse(`Error getting Punchswap quote: ${error instanceof Error ? error.message : String(error)}`);
+      return createTextResponse(
+        `Error getting Punchswap quote: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
     }
-  }
+  },
 };
 
 /**
@@ -389,7 +422,7 @@ function calculatePriceImpact(amountIn: bigint, reserveIn: bigint): string {
   if (reserveIn === 0n) return "Unknown";
 
   // Calculate price impact as a percentage of the reserve
-  const impact = Number(amountIn * 10000n / reserveIn) / 100;
+  const impact = Number((amountIn * 10000n) / reserveIn) / 100;
 
   if (impact < 0.1) return "Very Low (<0.1%)";
   if (impact < 0.5) return "Low (0.1-0.5%)";
@@ -402,82 +435,84 @@ function calculatePriceImpact(amountIn: bigint, reserveIn: bigint): string {
 const UniswapV2RouterABI = [
   {
     inputs: [
-      { name: 'amountIn', type: 'uint256' },
-      { name: 'amountOutMin', type: 'uint256' },
-      { name: 'path', type: 'address[]' },
-      { name: 'to', type: 'address' },
-      { name: 'deadline', type: 'uint256' }
+      { name: "amountIn", type: "uint256" },
+      { name: "amountOutMin", type: "uint256" },
+      { name: "path", type: "address[]" },
+      { name: "to", type: "address" },
+      { name: "deadline", type: "uint256" },
     ],
-    name: 'swapExactTokensForTokens',
-    outputs: [{ name: 'amounts', type: 'uint256[]' }],
-    stateMutability: 'nonpayable',
-    type: 'function'
+    name: "swapExactTokensForTokens",
+    outputs: [{ name: "amounts", type: "uint256[]" }],
+    stateMutability: "nonpayable",
+    type: "function",
   },
   {
     inputs: [
-      { name: 'amountIn', type: 'uint256' },
-      { name: 'amountOutMin', type: 'uint256' },
-      { name: 'path', type: 'address[]' },
-      { name: 'to', type: 'address' },
-      { name: 'deadline', type: 'uint256' }
+      { name: "amountIn", type: "uint256" },
+      { name: "amountOutMin", type: "uint256" },
+      { name: "path", type: "address[]" },
+      { name: "to", type: "address" },
+      { name: "deadline", type: "uint256" },
     ],
-    name: 'swapExactTokensForETH',
-    outputs: [{ name: 'amounts', type: 'uint256[]' }],
-    stateMutability: 'nonpayable',
-    type: 'function'
+    name: "swapExactTokensForETH",
+    outputs: [{ name: "amounts", type: "uint256[]" }],
+    stateMutability: "nonpayable",
+    type: "function",
   },
   {
     inputs: [
-      { name: 'amountOutMin', type: 'uint256' },
-      { name: 'path', type: 'address[]' },
-      { name: 'to', type: 'address' },
-      { name: 'deadline', type: 'uint256' }
+      { name: "amountOutMin", type: "uint256" },
+      { name: "path", type: "address[]" },
+      { name: "to", type: "address" },
+      { name: "deadline", type: "uint256" },
     ],
-    name: 'swapExactETHForTokens',
-    outputs: [{ name: 'amounts', type: 'uint256[]' }],
-    stateMutability: 'payable',
-    type: 'function'
-  }
+    name: "swapExactETHForTokens",
+    outputs: [{ name: "amounts", type: "uint256[]" }],
+    stateMutability: "payable",
+    type: "function",
+  },
 ] as const;
 
 // ERC20 Approve ABI
 const ERC20ApproveABI = [
   {
     inputs: [
-      { name: 'spender', type: 'address' },
-      { name: 'amount', type: 'uint256' }
+      { name: "spender", type: "address" },
+      { name: "amount", type: "uint256" },
     ],
-    name: 'approve',
-    outputs: [{ name: '', type: 'bool' }],
-    stateMutability: 'nonpayable',
-    type: 'function'
-  }
+    name: "approve",
+    outputs: [{ name: "", type: "bool" }],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
 ] as const;
 
 // Punchswap V2 Router address
-const UNISWAP_V2_ROUTER_ADDRESS = '0xf45AFe28fd5519d5f8C1d4787a4D5f724C0eFa4d' as Address;
+const UNISWAP_V2_ROUTER_ADDRESS =
+  "0xf45AFe28fd5519d5f8C1d4787a4D5f724C0eFa4d" as Address;
 
 // ERC20 Allowance ABI
 const ERC20AllowanceABI = [
   {
     inputs: [
-      { name: 'owner', type: 'address' },
-      { name: 'spender', type: 'address' }
+      { name: "owner", type: "address" },
+      { name: "spender", type: "address" },
     ],
-    name: 'allowance',
-    outputs: [{ name: '', type: 'uint256' }],
-    stateMutability: 'view',
-    type: 'function'
-  }
+    name: "allowance",
+    outputs: [{ name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
 ] as const;
 
-const MAX_ALLOWANCE = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn
+const MAX_ALLOWANCE =
+  0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn;
 
 /**
  * Tool for creating a transaction to swap tokens on Punchswap V2
  */
-export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
-  name: 'punchswap_swap',
+export const punchswapSwapTool: JsonSchemaToolRegistration<SwapSchema> = {
+  name: "punchswap_swap",
   description: `
   Create a transaction to swap tokens on Punchswap V2.
   Supported tokens: Wrapped Flow(WFLOW), Trump(TRUMP), HotCocoa, Gwendolion, Pawderick, Catseye.
@@ -486,31 +521,49 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
   If approval is needed, it will return the approval transaction first.
   NOTE: This is tool for flow EVM chain not flow blockchain.
   `,
-  inputSchema: swapSchema,
+  inputSchema: swapJsonSchema,
   handler: async (params: SwapSchema) => {
-
     try {
-      const { flowEVMAccount, tokenIn, tokenOut, amountIn, slippageTolerance, deadline } = params;
+      const {
+        flowEVMAccount,
+        tokenIn,
+        tokenOut,
+        amountIn,
+        slippageTolerance = 10,
+        deadline = 0,
+      } = params;
+
+      // Validate flowEVMAccount address
+      if (!isAddress(flowEVMAccount)) {
+        return createTextResponse("Invalid flowEVMAccount address format");
+      }
+
+      // Calculate deadline if not provided
+      const actualDeadline =
+        deadline === 0 ? Math.floor(Date.now() / 1000) + 60 * 20 : deadline;
+
       const publicClient = getPublicClient();
 
       // Find tokenIn info
       let tokenInInfo;
 
       // Special case for FLOW (native token)
-      if (tokenIn === 'FLOW') {
+      if (tokenIn === "FLOW") {
         // For FLOW (native token), we don't assign a contract address
         tokenInInfo = {
-          symbol: 'FLOW',
-          name: 'Flow Token',
-          decimals: 18
+          symbol: "FLOW",
+          name: "Flow Token",
+          decimals: 18,
         };
       } else {
         // Regular ERC20 token lookup
         for (const [key, info] of Object.entries(ERC20_TOKENS)) {
-          if (key === tokenIn ||
+          if (
+            key === tokenIn ||
             info.symbol === tokenIn ||
             info.name === tokenIn ||
-            info.contractAddress === tokenIn) {
+            info.contractAddress === tokenIn
+          ) {
             tokenInInfo = info;
             break;
           }
@@ -518,27 +571,31 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
       }
 
       if (!tokenInInfo) {
-        return createTextResponse('Invalid input token');
+        return createTextResponse(
+          "Invalid input token. Supported tokens: FLOW, WFLOW, TRUMP, HotCocoa, Gwendolion, Pawderick, Catseye"
+        );
       }
 
       // Find tokenOut info
       let tokenOutInfo;
 
       // Special case for FLOW (native token)
-      if (tokenOut === 'FLOW') {
+      if (tokenOut === "FLOW") {
         // For FLOW (native token), we don't assign a contract address
         tokenOutInfo = {
-          symbol: 'FLOW',
-          name: 'Flow Token',
-          decimals: 18
+          symbol: "FLOW",
+          name: "Flow Token",
+          decimals: 18,
         };
       } else {
         // Regular ERC20 token lookup
         for (const [key, info] of Object.entries(ERC20_TOKENS)) {
-          if (key === tokenOut ||
+          if (
+            key === tokenOut ||
             info.symbol === tokenOut ||
             info.name === tokenOut ||
-            info.contractAddress === tokenOut) {
+            info.contractAddress === tokenOut
+          ) {
             tokenOutInfo = info;
             break;
           }
@@ -546,7 +603,9 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
       }
 
       if (!tokenOutInfo) {
-        return createTextResponse('Invalid output token');
+        return createTextResponse(
+          "Invalid output token. Supported tokens: FLOW, WFLOW, TRUMP, HotCocoa, Gwendolion, Pawderick, Catseye"
+        );
       }
 
       // Convert amountIn to wei using viem's parseUnits
@@ -554,56 +613,66 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
       try {
         amountInWei = parseUnits(amountIn, tokenInInfo.decimals);
       } catch (error) {
-        return createTextResponse('Invalid amount');
+        return createTextResponse("Invalid amount");
       }
 
       // Check if we're dealing with ETH (FLOW in this case)
-      const isETHIn = tokenIn === 'FLOW';
-      const isETHOut = tokenOut === 'FLOW';
+      const isETHIn = tokenIn === "FLOW";
+      const isETHOut = tokenOut === "FLOW";
 
       // For FLOW (native token), we need to use WFLOW for the pair lookup
-      const WFLOW_ADDRESS = ERC20_TOKENS['Wrapped Flow'].contractAddress;
+      const WFLOW_ADDRESS = ERC20_TOKENS["Wrapped Flow"].contractAddress;
 
       // For pair lookup and path creation, we need to use the actual token addresses
       // For FLOW, we use WFLOW address
-      const tokenInAddressForPair = isETHIn ? WFLOW_ADDRESS : (tokenInInfo.contractAddress as Address);
-      const tokenOutAddressForPair = isETHOut ? WFLOW_ADDRESS : (tokenOutInfo.contractAddress as Address);
+      const tokenInAddressForPair = isETHIn
+        ? WFLOW_ADDRESS
+        : (tokenInInfo.contractAddress as Address);
+      const tokenOutAddressForPair = isETHOut
+        ? WFLOW_ADDRESS
+        : (tokenOutInfo.contractAddress as Address);
 
       // Get the pair address from the factory
-      const pairAddress = await publicClient.readContract({
+      const pairAddress = (await publicClient.readContract({
         address: PUNCHSWAP_V2_FACTORY_ADDRESS,
         abi: UniswapV2FactoryABI,
-        functionName: 'getPair',
-        args: [tokenInAddressForPair, tokenOutAddressForPair]
-      }) as Address;
+        functionName: "getPair",
+        args: [tokenInAddressForPair, tokenOutAddressForPair],
+      })) as Address;
 
-      if (pairAddress === '0x0000000000000000000000000000000000000000') {
-        return createTextResponse(`No liquidity pair found for ${tokenInInfo.symbol} and ${tokenOutInfo.symbol}`);
+      if (pairAddress === "0x0000000000000000000000000000000000000000") {
+        return createTextResponse(
+          `No liquidity pair found for ${tokenInInfo.symbol} and ${tokenOutInfo.symbol}`
+        );
       }
 
       // Get token0 and token1 from the pair to determine the order
-      const token0 = await publicClient.readContract({
+      const token0 = (await publicClient.readContract({
         address: pairAddress,
         abi: UniswapV2PairABI,
-        functionName: 'token0'
-      }) as Address;
+        functionName: "token0",
+      })) as Address;
 
       // Get reserves from the pair
-      const [reserve0, reserve1] = await publicClient.readContract({
+      const [reserve0, reserve1] = (await publicClient.readContract({
         address: pairAddress,
         abi: UniswapV2PairABI,
-        functionName: 'getReserves'
-      }) as [bigint, bigint, number];
+        functionName: "getReserves",
+      })) as [bigint, bigint, number];
 
       // Determine which reserve corresponds to which token
-      const isToken0 = tokenInAddressForPair.toLowerCase() === token0.toLowerCase();
+      const isToken0 =
+        tokenInAddressForPair.toLowerCase() === token0.toLowerCase();
       const reserveIn = isToken0 ? reserve0 : reserve1;
       const reserveOut = isToken0 ? reserve1 : reserve0;
 
       // Calculate the amount out using the Punchswap V2 formula
       const amountOut = getAmountOut(amountInWei, reserveIn, reserveOut);
 
-      const formattedAmountOut = formatTokenAmount(amountOut, tokenOutInfo.decimals);
+      const formattedAmountOut = formatTokenAmount(
+        amountOut,
+        tokenOutInfo.decimals
+      );
 
       // Apply slippage tolerance to get minimum amount out
       const slippageFactor = 1000n - BigInt(Math.floor(slippageTolerance * 10));
@@ -618,13 +687,13 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
         // Swap ETH for Tokens
         const swapData = encodeFunctionData({
           abi: UniswapV2RouterABI,
-          functionName: 'swapExactETHForTokens',
+          functionName: "swapExactETHForTokens",
           args: [
             amountOutMin,
             path,
             flowEVMAccount as `0x${string}`,
-            BigInt(deadline)
-          ]
+            BigInt(actualDeadline),
+          ],
         });
 
         // Create executeCall data to execute the swap through flowEVMAccount
@@ -642,13 +711,13 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
         const transactionRequest = {
           to: UNISWAP_V2_ROUTER_ADDRESS,
           data: swapData,
-          value: '0'
+          value: "0",
         };
-        
+
         const response = {
           transactionRequest: transactionRequest,
           tokenInInfos: {
-            functionName: 'swapExactETHForTokens',
+            functionName: "swapExactETHForTokens",
             in: tokenInInfo,
             out: tokenOutInfo,
             amountIn: amountIn,
@@ -656,43 +725,43 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
             amountInWei: amountInWei.toString(),
             amountOutMin: amountOutMin.toString(),
             path: path,
-            deadline: deadline,
+            deadline: actualDeadline,
             isETHIn: isETHIn,
             isETHOut: isETHOut,
           },
-          type: 'punchswap_swap',
-        }
+          type: "punchswap_swap",
+        };
 
         return createTextResponse(JSON.stringify(response));
       }
 
       // For token to token or token to ETH swaps, we need to check allowance first
       try {
-        const currentAllowance = await publicClient.readContract({
+        const currentAllowance = (await publicClient.readContract({
           address: tokenInAddressForPair,
           abi: ERC20AllowanceABI,
-          functionName: 'allowance',
-          args: [flowEVMAccount as `0x${string}`, UNISWAP_V2_ROUTER_ADDRESS]
-        }) as bigint;
+          functionName: "allowance",
+          args: [flowEVMAccount as `0x${string}`, UNISWAP_V2_ROUTER_ADDRESS],
+        })) as bigint;
 
         // If allowance is insufficient, return an approval transaction
         if (currentAllowance < amountInWei) {
           const approveData = encodeFunctionData({
             abi: ERC20ApproveABI,
-            functionName: 'approve',
-            args: [UNISWAP_V2_ROUTER_ADDRESS, MAX_ALLOWANCE]
+            functionName: "approve",
+            args: [UNISWAP_V2_ROUTER_ADDRESS, MAX_ALLOWANCE],
           });
-          
+
           const approveTransaction = {
             to: tokenInAddressForPair as Address,
             data: approveData,
-            value: '0'
+            value: "0",
           };
 
           const response = {
             transactionRequest: approveTransaction,
             tokenInInfos: {
-              functionName: 'approve',
+              functionName: "approve",
               in: tokenInInfo,
               out: tokenOutInfo,
               amountIn: amountIn,
@@ -700,17 +769,21 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
               amountInWei: amountInWei.toString(),
               amountOutMin: amountOutMin.toString(),
               path: path,
-              deadline: deadline,
+              deadline: actualDeadline,
               isETHIn: isETHIn,
               isETHOut: isETHOut,
             },
-            type: 'punchswap_swap',
-          }
+            type: "punchswap_swap",
+          };
 
           return createTextResponse(JSON.stringify(response));
         }
       } catch (error) {
-        return createTextResponse(`Error checking token allowance: ${error instanceof Error ? error.message : String(error)}`);
+        return createTextResponse(
+          `Error checking token allowance: ${
+            error instanceof Error ? error.message : String(error)
+          }`
+        );
       }
 
       // If we reach here, it means we have sufficient allowance
@@ -719,26 +792,26 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
         // Swap Tokens for ETH
         const swapData = encodeFunctionData({
           abi: UniswapV2RouterABI,
-          functionName: 'swapExactTokensForETH',
+          functionName: "swapExactTokensForETH",
           args: [
             amountInWei,
             amountOutMin,
             path,
             flowEVMAccount as `0x${string}`,
-            BigInt(deadline)
-          ]
+            BigInt(actualDeadline),
+          ],
         });
 
         const swapTransaction = {
           to: UNISWAP_V2_ROUTER_ADDRESS,
           data: swapData,
-          value: '0'
+          value: "0",
         };
 
         const response = {
           transactionRequest: swapTransaction,
           tokenInInfos: {
-            functionName: 'swapExactTokensForETH',
+            functionName: "swapExactTokensForETH",
             in: tokenInInfo,
             out: tokenOutInfo,
             amountIn: amountIn,
@@ -746,38 +819,38 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
             amountInWei: amountInWei.toString(),
             amountOutMin: amountOutMin.toString(),
             path: path,
-            deadline: deadline,
+            deadline: actualDeadline,
             isETHIn: isETHIn,
             isETHOut: isETHOut,
           },
-          type: 'punchswap_swap',
-        }
+          type: "punchswap_swap",
+        };
 
         return createTextResponse(JSON.stringify(response));
       } else {
         // Swap Tokens for Tokens
         const swapData = encodeFunctionData({
           abi: UniswapV2RouterABI,
-          functionName: 'swapExactTokensForTokens',
+          functionName: "swapExactTokensForTokens",
           args: [
             amountInWei,
             amountOutMin,
             path,
             flowEVMAccount as `0x${string}`,
-            BigInt(deadline)
-          ]
+            BigInt(actualDeadline),
+          ],
         });
 
         const swapTransaction = {
           to: UNISWAP_V2_ROUTER_ADDRESS as Address,
           data: swapData,
-          value: '0'
+          value: "0",
         };
 
         const response = {
           transactionRequest: swapTransaction,
           tokenInInfos: {
-            functionName: 'swapExactTokensForTokens',
+            functionName: "swapExactTokensForTokens",
             in: tokenInInfo,
             out: tokenOutInfo,
             amountIn: amountIn,
@@ -785,17 +858,21 @@ export const punchswapSwapTool: ToolRegistration<SwapSchema> = {
             amountInWei: amountInWei.toString(),
             amountOutMin: amountOutMin.toString(),
             path: path,
-            deadline: deadline,
+            deadline: actualDeadline,
             isETHIn: isETHIn,
             isETHOut: isETHOut,
           },
-          type: 'punchswap_swap',
-        }
+          type: "punchswap_swap",
+        };
 
         return createTextResponse(JSON.stringify(response));
       }
     } catch (error) {
-      return createTextResponse(`Error creating swap transaction: ${error instanceof Error ? error.message : String(error)}`);
+      return createTextResponse(
+        `Error creating swap transaction: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
     }
-  }
+  },
 };
