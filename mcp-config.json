@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "noah-business-api": {
+      "command": "node",
+      "args": ["dist/index.js"],
+      "env": {
+        "NOAH_API_KEY": "your_noah_api_key_here",
+        "NOAH_API_URL": "https://api.noah.com"
+      }
+    }
+  }
+} 

@@ -1,22 +1,16 @@
 import type { ToolRegistration } from "@/types/tools";
+import { getNoahApiClient } from "@/utils/noah-api-client";
 import { type GetInternalChannelsSellCountriesSchema, getInternalChannelsSellCountriesSchema } from "./schema";
 
 /**
  * Supported Countries
  */
 export const getInternalChannelsSellCountries = async (args: GetInternalChannelsSellCountriesSchema): Promise<string> => {
-  // TODO: Implement Noah Business API call
-  // Method: GET
-  // Path: /internal/channels/sell/countries
+  const client = getNoahApiClient();
   
-  console.log('Noah API call:', { method: 'GET', path: '/internal/channels/sell/countries', args });
+  const result = await client.get('/internal/channels/sell/countries');
   
-  // This is a placeholder implementation
-  return JSON.stringify({
-    message: "Noah Business API tool not yet implemented",
-    endpoint: "GET /internal/channels/sell/countries",
-    args
-  });
+  return JSON.stringify(result, null, 2);
 };
 
 export const getInternalChannelsSellCountriesTool: ToolRegistration<GetInternalChannelsSellCountriesSchema> = {

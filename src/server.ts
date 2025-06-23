@@ -11,7 +11,10 @@ export function createServer() {
 
   // Register all tools
   const tools = createTools();
+  console.log("Available tools:", tools.map(t => t.name));
+  
   for (const tool of tools) {
+    console.log(`Registering tool: ${tool.name}`);
     server.addTool({
       name: tool.name,
       description: tool.description,

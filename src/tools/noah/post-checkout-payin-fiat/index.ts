@@ -1,22 +1,16 @@
 import type { ToolRegistration } from "@/types/tools";
+import { getNoahApiClient } from "@/utils/noah-api-client";
 import { type PostCheckoutPayinFiatSchema, postCheckoutPayinFiatSchema } from "./schema";
 
 /**
  * Create Fiat Payment
  */
 export const postCheckoutPayinFiat = async (args: PostCheckoutPayinFiatSchema): Promise<string> => {
-  // TODO: Implement Noah Business API call
-  // Method: POST
-  // Path: /checkout/payin/fiat
+  const client = getNoahApiClient();
   
-  console.log('Noah API call:', { method: 'POST', path: '/checkout/payin/fiat', args });
+  const result = await client.post('/checkout/payin/fiat', args);
   
-  // This is a placeholder implementation
-  return JSON.stringify({
-    message: "Noah Business API tool not yet implemented",
-    endpoint: "POST /checkout/payin/fiat",
-    args
-  });
+  return JSON.stringify(result, null, 2);
 };
 
 export const postCheckoutPayinFiatTool: ToolRegistration<PostCheckoutPayinFiatSchema> = {

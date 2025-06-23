@@ -1,22 +1,16 @@
 import type { ToolRegistration } from "@/types/tools";
+import { getNoahApiClient } from "@/utils/noah-api-client";
 import { type PostBeta1RuleSchema, postBeta1RuleSchema } from "./schema";
 
 /**
  * Create a rule
  */
 export const postBeta1Rule = async (args: PostBeta1RuleSchema): Promise<string> => {
-  // TODO: Implement Noah Business API call
-  // Method: POST
-  // Path: /beta1/rule
+  const client = getNoahApiClient();
   
-  console.log('Noah API call:', { method: 'POST', path: '/beta1/rule', args });
+  const result = await client.post('/beta1/rule', args);
   
-  // This is a placeholder implementation
-  return JSON.stringify({
-    message: "Noah Business API tool not yet implemented",
-    endpoint: "POST /beta1/rule",
-    args
-  });
+  return JSON.stringify(result, null, 2);
 };
 
 export const postBeta1RuleTool: ToolRegistration<PostBeta1RuleSchema> = {

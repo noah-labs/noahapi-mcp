@@ -1,22 +1,16 @@
 import type { ToolRegistration } from "@/types/tools";
+import { getNoahApiClient } from "@/utils/noah-api-client";
 import { type PostInternalCheckoutSellSchema, postInternalCheckoutSellSchema } from "./schema";
 
 /**
  * Hosted Checkout Sell (onramp) execution
  */
 export const postInternalCheckoutSell = async (args: PostInternalCheckoutSellSchema): Promise<string> => {
-  // TODO: Implement Noah Business API call
-  // Method: POST
-  // Path: /internal/checkout/sell
+  const client = getNoahApiClient();
   
-  console.log('Noah API call:', { method: 'POST', path: '/internal/checkout/sell', args });
+  const result = await client.post('/internal/checkout/sell', args);
   
-  // This is a placeholder implementation
-  return JSON.stringify({
-    message: "Noah Business API tool not yet implemented",
-    endpoint: "POST /internal/checkout/sell",
-    args
-  });
+  return JSON.stringify(result, null, 2);
 };
 
 export const postInternalCheckoutSellTool: ToolRegistration<PostInternalCheckoutSellSchema> = {

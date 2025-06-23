@@ -1,22 +1,16 @@
 import type { ToolRegistration } from "@/types/tools";
+import { getNoahApiClient } from "@/utils/noah-api-client";
 import { type PostSandboxFiatDepositSimulateSchema, postSandboxFiatDepositSimulateSchema } from "./schema";
 
 /**
  * Create a test fiat-deposit.
  */
 export const postSandboxFiatDepositSimulate = async (args: PostSandboxFiatDepositSimulateSchema): Promise<string> => {
-  // TODO: Implement Noah Business API call
-  // Method: POST
-  // Path: /sandbox/fiat-deposit/simulate
+  const client = getNoahApiClient();
   
-  console.log('Noah API call:', { method: 'POST', path: '/sandbox/fiat-deposit/simulate', args });
+  const result = await client.post('/sandbox/fiat-deposit/simulate', args);
   
-  // This is a placeholder implementation
-  return JSON.stringify({
-    message: "Noah Business API tool not yet implemented",
-    endpoint: "POST /sandbox/fiat-deposit/simulate",
-    args
-  });
+  return JSON.stringify(result, null, 2);
 };
 
 export const postSandboxFiatDepositSimulateTool: ToolRegistration<PostSandboxFiatDepositSimulateSchema> = {

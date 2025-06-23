@@ -1,7 +1,7 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-  entry: ["src/index.ts", "src/bin/flow-mcp.ts"],
+  entry: ["src/index.ts"],
   outDir: "dist",
   sourcemap: true,
   clean: true,
@@ -11,9 +11,6 @@ export default defineConfig({
   bundle: true,
   splitting: true, // Add this for better code splitting
   dts: true, // Generate declaration files
-  loader: {
-    ".cdc": "text",
-  },
   external: [
     "dotenv", // Externalize dotenv to prevent bundling
     "fs", // Externalize fs to use Node.js built-in module
@@ -22,12 +19,7 @@ export default defineConfig({
     "https", // Externalize https to use Node.js built-in module
     "http", // Externalize http to use Node.js built-in module
     // Add other modules you want to externalize
-    "@onflow/fcl",
-    "@onflow/types",
-    "sha3",
-    "elliptic",
     "fastmcp",
-    "yargs",
     "zod",
     "zod-to-json-schema",
   ],

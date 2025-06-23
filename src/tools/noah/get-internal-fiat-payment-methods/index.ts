@@ -1,22 +1,16 @@
 import type { ToolRegistration } from "@/types/tools";
+import { getNoahApiClient } from "@/utils/noah-api-client";
 import { type GetInternalFiatPaymentMethodsSchema, getInternalFiatPaymentMethodsSchema } from "./schema";
 
 /**
  * Payment Methods
  */
 export const getInternalFiatPaymentMethods = async (args: GetInternalFiatPaymentMethodsSchema): Promise<string> => {
-  // TODO: Implement Noah Business API call
-  // Method: GET
-  // Path: /internal/fiat-payment-methods
+  const client = getNoahApiClient();
   
-  console.log('Noah API call:', { method: 'GET', path: '/internal/fiat-payment-methods', args });
+  const result = await client.get('/internal/fiat-payment-methods');
   
-  // This is a placeholder implementation
-  return JSON.stringify({
-    message: "Noah Business API tool not yet implemented",
-    endpoint: "GET /internal/fiat-payment-methods",
-    args
-  });
+  return JSON.stringify(result, null, 2);
 };
 
 export const getInternalFiatPaymentMethodsTool: ToolRegistration<GetInternalFiatPaymentMethodsSchema> = {

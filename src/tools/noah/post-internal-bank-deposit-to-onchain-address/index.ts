@@ -1,22 +1,16 @@
 import type { ToolRegistration } from "@/types/tools";
+import { getNoahApiClient } from "@/utils/noah-api-client";
 import { type PostInternalBankDepositToOnchainAddressSchema, postInternalBankDepositToOnchainAddressSchema } from "./schema";
 
 /**
  * Bank deposit to onchain address
  */
 export const postInternalBankDepositToOnchainAddress = async (args: PostInternalBankDepositToOnchainAddressSchema): Promise<string> => {
-  // TODO: Implement Noah Business API call
-  // Method: POST
-  // Path: /internal/bank-deposit-to-onchain-address
+  const client = getNoahApiClient();
   
-  console.log('Noah API call:', { method: 'POST', path: '/internal/bank-deposit-to-onchain-address', args });
+  const result = await client.post('/internal/bank-deposit-to-onchain-address', args);
   
-  // This is a placeholder implementation
-  return JSON.stringify({
-    message: "Noah Business API tool not yet implemented",
-    endpoint: "POST /internal/bank-deposit-to-onchain-address",
-    args
-  });
+  return JSON.stringify(result, null, 2);
 };
 
 export const postInternalBankDepositToOnchainAddressTool: ToolRegistration<PostInternalBankDepositToOnchainAddressSchema> = {

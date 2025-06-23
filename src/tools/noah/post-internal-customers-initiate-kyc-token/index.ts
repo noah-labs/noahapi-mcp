@@ -1,22 +1,16 @@
 import type { ToolRegistration } from "@/types/tools";
+import { getNoahApiClient } from "@/utils/noah-api-client";
 import { type PostInternalCustomersInitiateKycTokenSchema, postInternalCustomersInitiateKycTokenSchema } from "./schema";
 
 /**
  * Hosted Customer kyc execution
  */
 export const postInternalCustomersInitiateKycToken = async (args: PostInternalCustomersInitiateKycTokenSchema): Promise<string> => {
-  // TODO: Implement Noah Business API call
-  // Method: POST
-  // Path: /internal/customers/initiate-kyc-token
+  const client = getNoahApiClient();
   
-  console.log('Noah API call:', { method: 'POST', path: '/internal/customers/initiate-kyc-token', args });
+  const result = await client.post('/internal/customers/initiate-kyc-token', args);
   
-  // This is a placeholder implementation
-  return JSON.stringify({
-    message: "Noah Business API tool not yet implemented",
-    endpoint: "POST /internal/customers/initiate-kyc-token",
-    args
-  });
+  return JSON.stringify(result, null, 2);
 };
 
 export const postInternalCustomersInitiateKycTokenTool: ToolRegistration<PostInternalCustomersInitiateKycTokenSchema> = {

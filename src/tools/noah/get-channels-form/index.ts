@@ -1,22 +1,16 @@
 import type { ToolRegistration } from "@/types/tools";
+import { getNoahApiClient } from "@/utils/noah-api-client";
 import { type GetChannelsFormSchema, getChannelsFormSchema } from "./schema";
 
 /**
  * Dynamic Form
  */
 export const getChannelsForm = async (args: GetChannelsFormSchema): Promise<string> => {
-  // TODO: Implement Noah Business API call
-  // Method: GET
-  // Path: /channels/{ChannelID}/form
+  const client = getNoahApiClient();
   
-  console.log('Noah API call:', { method: 'GET', path: '/channels/{ChannelID}/form', args });
+  const result = await client.get('/channels/{ChannelID}/form');
   
-  // This is a placeholder implementation
-  return JSON.stringify({
-    message: "Noah Business API tool not yet implemented",
-    endpoint: "GET /channels/{ChannelID}/form",
-    args
-  });
+  return JSON.stringify(result, null, 2);
 };
 
 export const getChannelsFormTool: ToolRegistration<GetChannelsFormSchema> = {

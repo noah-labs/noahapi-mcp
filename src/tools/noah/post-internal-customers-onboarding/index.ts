@@ -1,22 +1,16 @@
 import type { ToolRegistration } from "@/types/tools";
+import { getNoahApiClient } from "@/utils/noah-api-client";
 import { type PostInternalCustomersOnboardingSchema, postInternalCustomersOnboardingSchema } from "./schema";
 
 /**
  * Post Customer Onboarding
  */
 export const postInternalCustomersOnboarding = async (args: PostInternalCustomersOnboardingSchema): Promise<string> => {
-  // TODO: Implement Noah Business API call
-  // Method: POST
-  // Path: /internal/customers/onboarding
+  const client = getNoahApiClient();
   
-  console.log('Noah API call:', { method: 'POST', path: '/internal/customers/onboarding', args });
+  const result = await client.post('/internal/customers/onboarding', args);
   
-  // This is a placeholder implementation
-  return JSON.stringify({
-    message: "Noah Business API tool not yet implemented",
-    endpoint: "POST /internal/customers/onboarding",
-    args
-  });
+  return JSON.stringify(result, null, 2);
 };
 
 export const postInternalCustomersOnboardingTool: ToolRegistration<PostInternalCustomersOnboardingSchema> = {
