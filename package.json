@@ -1,7 +1,7 @@
 {
-  "name": "@outblock/flow-mcp",
+  "name": "noah-business-api-mcp",
   "version": "0.1.11",
-  "description": "Flow blockchain tools for Model Context Protocol (MCP)",
+  "description": "Noah Business API tools for Model Context Protocol (MCP)",
   "author": {
     "name": "Outblock",
     "url": "https://outblock.io",
@@ -28,8 +28,10 @@
     "bun": ">=1.2.0"
   },
   "keywords": [
-    "flow",
-    "blockchain",
+    "noah",
+    "business-api",
+    "crypto",
+    "payments",
     "mcp",
     "model-context-protocol",
     "cli"

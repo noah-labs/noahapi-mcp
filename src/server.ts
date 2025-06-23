@@ -5,7 +5,7 @@ import { createPrompts } from "./prompts";
 export function createServer() {
   // Initialize server
   const server = new FastMCP({
-    name: "flow-mcp",
+    name: "noah-business-api-mcp",
     version: "0.1.11",
   });
 
