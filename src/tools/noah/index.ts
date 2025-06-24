@@ -78,7 +78,7 @@ export const createNoahTools = (): ToolRegistration<any>[] => {
   getPricesTool,
   postSandboxFiatDepositSimulateTool,
   getTransactionsTool,
-  getTransactionsTool,
+  postTransactionsSellTool,
   postTransactionsSellPrepareTool,
   postWorkflowsBankDepositToOnchainAddressTool
   ];

@@ -29,7 +29,7 @@ const devCommand: CommandModule<{}, DevArgs> = {
       demandOption: true,
     },
   },
-  handler: async (argv) => {
+  handler: async (argv: DevArgs) => {
     try {
       await execa({
         stdin: "inherit",
@@ -54,7 +54,7 @@ const inspectCommand: CommandModule<{}, InspectArgs> = {
       demandOption: true,
     },
   },
-  handler: async (argv) => {
+  handler: async (argv: InspectArgs) => {
     try {
       await execa({
         stdout: "inherit",
@@ -78,7 +78,7 @@ const startCommand: CommandModule<{}, StartArgs> = {
       default: false,
     },
   },
-  handler: async (argv) => {
+  handler: async (argv: StartArgs) => {
     try {
       const args = argv.sse ? ["--sse"] : [];
       const __filename = fileURLToPath(import.meta.url);

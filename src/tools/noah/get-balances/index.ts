@@ -1,22 +1,34 @@
 import type { ToolRegistration } from "@/types/tools";
 import { type GetBalancesSchema, getBalancesSchema } from "./schema";
+import { noahClient } from "../../../utils/noah-client";
 
 /**
  * Balances
  */
 export const getBalances = async (args: GetBalancesSchema): Promise<string> => {
-  // TODO: Implement Noah Business API call
-  // Method: GET
-  // Path: /balances
-  
-  console.log('Noah API call:', { method: 'GET', path: '/balances', args });
-  
-  // This is a placeholder implementation
-  return JSON.stringify({
-    message: "Noah Business API tool not yet implemented",
-    endpoint: "GET /balances",
-    args
-  });
+  try {
+    const response = await noahClient.get('/balances', args);
+    
+    if (response.error) {
+      return JSON.stringify({
+        error: true,
+        message: response.error.message,
+        details: response.error.details,
+      }, null, 2);
+    }
+
+    const data = response.data as any;
+    return JSON.stringify({
+      success: true,
+      data: response.data,
+      summary: `Retrieved ${data?.Items?.length || 0} balance(s)`,
+    }, null, 2);
+  } catch (error) {
+    return JSON.stringify({
+      error: true,
+      message: error instanceof Error ? error.message : 'Unknown error occurred',
+    }, null, 2);
+  }
 };
 
 export const getBalancesTool: ToolRegistration<GetBalancesSchema> = {

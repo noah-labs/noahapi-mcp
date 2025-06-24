@@ -1,6 +1,6 @@
 {
   "name": "@outblock/noah-business-api-mcp",
-  "version": "0.1.11",
+  "version": "1.0.0",
   "description": "Noah Business API tools for Model Context Protocol (MCP)",
   "author": {
     "name": "Outblock",
@@ -21,7 +21,9 @@
   },
   "files": [
     "dist",
-    "package.json"
+    "package.json",
+    "README.md",
+    "LICENSE"
   ],
   "engines": {
     "node": ">=20.0.0",
@@ -34,7 +36,9 @@
     "payments",
     "mcp",
     "model-context-protocol",
-    "cli"
+    "claude",
+    "ai",
+    "llm"
   ],
   "scripts": {
     "build": "tsup",
@@ -43,7 +47,8 @@
     "start": "node dist/index.js",
     "start:sse": "node dist/index.js --sse",
     "dev": "bun src/bin/noah-mcp.ts dev src/index.ts",
-    "inspect": "bun src/bin/noah-mcp.ts inspect src/index.ts"
+    "inspect": "bun src/bin/noah-mcp.ts inspect src/index.ts",
+    "prepublishOnly": "npm run build"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
@@ -61,6 +66,6 @@
     "zod": "^3.24.1"
   },
   "optionalDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "4.40.0"
+    "@rollup/rollup-win32-x64-msvc": "4.40.0"
   }
 }
