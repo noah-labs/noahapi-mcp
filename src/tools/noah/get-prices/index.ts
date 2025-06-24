@@ -1,16 +1,22 @@
 import type { ToolRegistration } from "@/types/tools";
-import { getNoahApiClient } from "@/utils/noah-api-client";
 import { type GetPricesSchema, getPricesSchema } from "./schema";
 
 /**
  * Prices
  */
 export const getPrices = async (args: GetPricesSchema): Promise<string> => {
-  const client = getNoahApiClient();
+  // TODO: Implement Noah Business API call
+  // Method: GET
+  // Path: /prices
   
-  const result = await client.get('/prices');
+  console.log('Noah API call:', { method: 'GET', path: '/prices', args });
   
-  return JSON.stringify(result, null, 2);
+  // This is a placeholder implementation
+  return JSON.stringify({
+    message: "Noah Business API tool not yet implemented",
+    endpoint: "GET /prices",
+    args
+  });
 };
 
 export const getPricesTool: ToolRegistration<GetPricesSchema> = {

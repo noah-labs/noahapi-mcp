@@ -1,16 +1,22 @@
 import type { ToolRegistration } from "@/types/tools";
-import { getNoahApiClient } from "@/utils/noah-api-client";
 import { type PutCustomersSchema, putCustomersSchema } from "./schema";
 
 /**
  * Put Customer
  */
 export const putCustomers = async (args: PutCustomersSchema): Promise<string> => {
-  const client = getNoahApiClient();
+  // TODO: Implement Noah Business API call
+  // Method: PUT
+  // Path: /customers/{CustomerID}
   
-  const result = await client.put('/customers/{CustomerID}', args);
+  console.log('Noah API call:', { method: 'PUT', path: '/customers/{CustomerID}', args });
   
-  return JSON.stringify(result, null, 2);
+  // This is a placeholder implementation
+  return JSON.stringify({
+    message: "Noah Business API tool not yet implemented",
+    endpoint: "PUT /customers/{CustomerID}",
+    args
+  });
 };
 
 export const putCustomersTool: ToolRegistration<PutCustomersSchema> = {

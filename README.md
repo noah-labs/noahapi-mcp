@@ -1,54 +1,27 @@
-# @outblock/noah-business-api-mcp
+# @outblock/flow-mcp
 
-Noah Business API tools for Model Context Protocol (MCP). This package provides a set of tools for interacting with the Noah Business API through the Model Context Protocol.
+Flow blockchain tools for Model Context Protocol (MCP). This package provides a set of tools for interacting with the Flow blockchain through the Model Context Protocol.
 
-## Quick Start
-
-### Option 1: Automated Setup (Recommended)
-
-**Windows:**
-```bash
-quick-start.bat
-```
-
-**macOS/Linux:**
-```bash
-chmod +x quick-start.sh
-./quick-start.sh
-```
-
-### Option 2: Manual Setup
-
-1. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
-2. **Build the project:**
-   ```bash
-   npm run build
-   ```
-
-3. **Configure Cursor** (see [Cursor Setup Guide](CURSOR_SETUP.md))
+<a href="https://glama.ai/mcp/servers/@Outblock/flow-mcp">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/@Outblock/flow-mcp/badge" alt="Flow MCP server" />
+</a>
 
 ## Features
 
-- Customer management and onboarding
-- Payment method management
-- Transaction processing
-- Price queries
-- Checkout workflows
-- Fiat payment processing
-- Crypto payment processing
+- Get FLOW balance for any address
+- Get token balance for any Flow token
+- Get COA account information
+- Get contract source code
+- Get detailed account information including storage stats
 
 ## Installation
 
 ```bash
 # Using npm
-npm install @outblock/noah-business-api-mcp
+npm install @outblock/flow-mcp
 
 # Using bun
-bun add @outblock/noah-business-api-mcp
+bun add @outblock/flow-mcp
 ```
 
 ## MCP Configuration
@@ -58,9 +31,9 @@ To use this tool with Claude, add the following to your MCP configuration:
 ```json
 {
   "mcpServers": {
-    "noah-business-api": {
+    "flow": {
       "command": "npx",
-      "args": ["-y", "@outblock/noah-business-api-mcp"]
+      "args": ["-y", "@outblock/flow-mcp"]
     }
   }
 }
@@ -76,54 +49,73 @@ After adding the configuration, restart Claude to load the new MCP server.
 
 ## Tools
 
-### Customer Management
+### Flow Balance
 
-Manage customer information and onboarding:
+Get the FLOW balance for any address:
 
 ```ts
 {
-  name: 'get_customers',
+  name: 'get_flow_balance',
   input: {
-    // Customer query parameters
+    address: string,
+    network?: 'mainnet' | 'testnet'
   }
 }
 ```
 
-### Payment Methods
+### Account Info
 
-Manage payment methods:
+Get detailed account information:
 
 ```ts
 {
-  name: 'get_payment_methods',
+  name: 'get_account_info',
   input: {
-    // Payment method parameters
+    address: string,
+    network?: 'mainnet' | 'testnet'
   }
 }
 ```
 
-### Transactions
+### Token Balance
 
-Process and manage transactions:
+Get balance for any Flow token:
 
 ```ts
 {
-  name: 'get_transactions',
+  name: 'get_token_balance',
   input: {
-    // Transaction parameters
+    address: string,
+    network?: 'mainnet' | 'testnet'
   }
 }
 ```
 
-### Checkout
+### COA Account
 
-Handle checkout workflows:
+Get COA account information:
 
 ```ts
 {
-  name: 'post_checkout_payin_crypto',
+  name: 'get_coa_account',
   input: {
-    // Checkout parameters
+    address: string,
+    network?: 'mainnet' | 'testnet'
+  }
+}
+```
+
+### Get Contract
+
+Get contract source code:
+
+```ts
+{
+  name: 'get_contract',
+  input: {
+    address: string,
+    contractName: string,
+    network?: 'mainnet' | 'testnet'
   }
 }
 ```
@@ -131,14 +123,18 @@ Handle checkout workflows:
 ## 📂 Project Structure
 
 ```text
-noah-business-api-mcp/
+flow-mcp/
 ├── src/
 │   ├── tools/          # MCP tools implementation
-│   │   └── noah/       # Noah Business API tools
+│   │   ├── flowBalance/    # Flow balance tool
+│   │   ├── accountInfo/    # Account info tool
+│   │   ├── tokenBalance/   # Token balance tool
+│   │   ├── coaAccount/     # COA account tool
+│   │   └── getContract/    # Contract source tool
 │   ├── utils/          # Shared utilities
 │   ├── prompts/        # MCP prompts
-│   └── types/          # Type definitions
-├── scripts/            # Build and utility scripts
+│   ├── types/          # Type definitions
+│   └── bin/           # CLI implementation
 ├── biome.json         # Linting configuration
 ├── tsconfig.json      # TypeScript configuration
 └── package.json       # Project dependencies
@@ -150,25 +146,22 @@ This project uses FastMCP for development and testing. FastMCP provides a stream
 
 ```bash
 # Install dependencies
-npm install
+bun install
 
 # Format code
-npm run format
+bun run format
 
 # Run tests
-npm test
+bun test
+
+# Run development server
+bun run dev
+
+# Inspect the server
+bun run inspect
 
 # Build
-npm run build
-
-# Start server
-npm run start
-
-# Start server with SSE
-npm run start:sse
-
-# Update tools (if API spec changes)
-npm run update-tools
+bun run build
 ```
 
 To add your development MCP server to Claude Desktop:
@@ -176,82 +169,82 @@ To add your development MCP server to Claude Desktop:
 1. Build the project:
 
    ```bash
-   npm run build
+   bun run build
    ```
 
 2. Add to your Claude Desktop config:
 
    ```json
+   // You only need the argument if you need to pass arguments to your server
    {
      "mcpServers": {
-       "noah-business-api": {
+       "your-server-name": {
          "command": "node",
-         "args": ["/path/to/your/project/dist/index.js"]
+         "args": ["/path/to/your/project/dist/main.js", "some_argument"]
        }
      }
    }
    ```
 
-## Environment Variables
+### Creating New Tools
 
-Set the following environment variables for Noah Business API access:
+The project includes a script to help create new MCP tools:
 
 ```bash
-NOAH_API_KEY=your_api_key_here
-NOAH_API_URL=https://api.noah.com
+bun run scripts/create-tool.ts <tool-name>
 ```
 
-## Available Tools
+This will:
 
-The MCP server provides access to all Noah Business API endpoints:
+1. Create a new tool directory under `src/tools/<tool-name>`
+2. Generate the basic tool structure including:
+   - index.ts (main implementation)
+   - schema.ts (JSON schema for tool parameters)
+   - test.ts (test file)
+3. Update the tools index file to export the new tool
 
-### Customer Management
-- `get_customers` - Retrieve customer details
-- `post_customers_hosted_onboarding` - Create hosted onboarding session
-- `put_customers` - Update customer information
+Example:
 
-### Payment Methods
-- `get_payment_methods` - List payment methods
-- `get_internal_fiat_payment_methods` - Get internal fiat payment methods
-- `post_internal_fiat_payment_methods` - Create internal fiat payment method
+```bash
+bun run scripts/create-tool.ts weather
+```
 
-### Transactions
-- `get_transactions` - List transactions
-- `post_transactions_sell` - Create sell transaction
-- `post_transactions_sell_prepare` - Prepare sell transaction
+### Commit Message Format
 
-### Checkout
-- `post_checkout_payin_crypto` - Crypto payment checkout
-- `post_checkout_payin_fiat` - Fiat payment checkout
-- `post_checkout_payout_fiat` - Fiat payout checkout
-- `post_checkout_manage` - Manage checkout
+- `feat`: New feature (bumps minor version)
+- `fix`: Bug fix (bumps patch version)
+- `BREAKING CHANGE`: Breaking change (bumps major version)
 
-### Balances & Prices
-- `get_balances` - Get account balances
-- `get_prices` - Get current prices
-- `get_internal_prices` - Get internal prices
+## 📜 Version Management
 
-### Workflows
-- `post_workflows_bank_deposit_to_onchain_address` - Bank deposit workflow
-- `post_hosted_workflows_bank_deposit_to_onchain_address` - Hosted bank deposit workflow
+This project uses [standard-version](https://github.com/conventional-changelog/standard-version) for automated version management. Run `bun run release` to create a new version.
+
+## 📦 Publishing to npm
+
+1. Ensure you're logged in to npm:
+
+   ```bash
+   npm login
+   ```
+
+2. Build the project:
+
+   ```bash
+   bun run build
+   ```
+
+3. Publish the package:
+
+   ```bash
+   npm publish
+   ```
+
+Remember to update the version number using `bun run release` before publishing new versions.
 
 ## License
 
-MIT License - see LICENSE file for details.
+MIT License - see LICENSE for details.
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-## Support
-
-For support, please open an issue on GitHub or contact the Outblock team.
-
-## Documentation
-
-- [Cursor Setup Guide](CURSOR_SETUP.md) - Detailed setup instructions for Cursor
-- [Noah Business API Documentation](https://docs.noah.com) - Official API documentation
+Contributions are welcome! Please feel free to submit a Pull Request.

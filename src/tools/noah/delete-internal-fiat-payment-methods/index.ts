@@ -1,16 +1,22 @@
 import type { ToolRegistration } from "@/types/tools";
-import { getNoahApiClient } from "@/utils/noah-api-client";
 import { type DeleteInternalFiatPaymentMethodsSchema, deleteInternalFiatPaymentMethodsSchema } from "./schema";
 
 /**
  * Delete Fiat Payment Method
  */
 export const deleteInternalFiatPaymentMethods = async (args: DeleteInternalFiatPaymentMethodsSchema): Promise<string> => {
-  const client = getNoahApiClient();
+  // TODO: Implement Noah Business API call
+  // Method: DELETE
+  // Path: /internal/fiat-payment-methods/{ID}
   
-  const result = await client.delete('/internal/fiat-payment-methods/{ID}');
+  console.log('Noah API call:', { method: 'DELETE', path: '/internal/fiat-payment-methods/{ID}', args });
   
-  return JSON.stringify(result, null, 2);
+  // This is a placeholder implementation
+  return JSON.stringify({
+    message: "Noah Business API tool not yet implemented",
+    endpoint: "DELETE /internal/fiat-payment-methods/{ID}",
+    args
+  });
 };
 
 export const deleteInternalFiatPaymentMethodsTool: ToolRegistration<DeleteInternalFiatPaymentMethodsSchema> = {

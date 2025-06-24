@@ -1,16 +1,22 @@
 import type { ToolRegistration } from "@/types/tools";
-import { getNoahApiClient } from "@/utils/noah-api-client";
 import { type PostInternalCheckoutDepositAddressSchema, postInternalCheckoutDepositAddressSchema } from "./schema";
 
 /**
  * Retrieves or creates deposit address for a customer
  */
 export const postInternalCheckoutDepositAddress = async (args: PostInternalCheckoutDepositAddressSchema): Promise<string> => {
-  const client = getNoahApiClient();
+  // TODO: Implement Noah Business API call
+  // Method: POST
+  // Path: /internal/checkout/deposit-address
   
-  const result = await client.post('/internal/checkout/deposit-address', args);
+  console.log('Noah API call:', { method: 'POST', path: '/internal/checkout/deposit-address', args });
   
-  return JSON.stringify(result, null, 2);
+  // This is a placeholder implementation
+  return JSON.stringify({
+    message: "Noah Business API tool not yet implemented",
+    endpoint: "POST /internal/checkout/deposit-address",
+    args
+  });
 };
 
 export const postInternalCheckoutDepositAddressTool: ToolRegistration<PostInternalCheckoutDepositAddressSchema> = {

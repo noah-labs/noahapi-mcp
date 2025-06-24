@@ -1,16 +1,22 @@
 import type { ToolRegistration } from "@/types/tools";
-import { getNoahApiClient } from "@/utils/noah-api-client";
 import { type PostInternalFiatPaymentMethodsAppleSessionSchema, postInternalFiatPaymentMethodsAppleSessionSchema } from "./schema";
 
 /**
  * Create a merchant session with apple
  */
 export const postInternalFiatPaymentMethodsAppleSession = async (args: PostInternalFiatPaymentMethodsAppleSessionSchema): Promise<string> => {
-  const client = getNoahApiClient();
+  // TODO: Implement Noah Business API call
+  // Method: POST
+  // Path: /internal/fiat-payment-methods/apple-session
   
-  const result = await client.post('/internal/fiat-payment-methods/apple-session', args);
+  console.log('Noah API call:', { method: 'POST', path: '/internal/fiat-payment-methods/apple-session', args });
   
-  return JSON.stringify(result, null, 2);
+  // This is a placeholder implementation
+  return JSON.stringify({
+    message: "Noah Business API tool not yet implemented",
+    endpoint: "POST /internal/fiat-payment-methods/apple-session",
+    args
+  });
 };
 
 export const postInternalFiatPaymentMethodsAppleSessionTool: ToolRegistration<PostInternalFiatPaymentMethodsAppleSessionSchema> = {

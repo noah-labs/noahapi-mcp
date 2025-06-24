@@ -1,16 +1,22 @@
 import type { ToolRegistration } from "@/types/tools";
-import { getNoahApiClient } from "@/utils/noah-api-client";
 import { type GetPaymentMethodsSchema, getPaymentMethodsSchema } from "./schema";
 
 /**
  * Payment Methods
  */
 export const getPaymentMethods = async (args: GetPaymentMethodsSchema): Promise<string> => {
-  const client = getNoahApiClient();
+  // TODO: Implement Noah Business API call
+  // Method: GET
+  // Path: /payment-methods
   
-  const result = await client.get('/payment-methods');
+  console.log('Noah API call:', { method: 'GET', path: '/payment-methods', args });
   
-  return JSON.stringify(result, null, 2);
+  // This is a placeholder implementation
+  return JSON.stringify({
+    message: "Noah Business API tool not yet implemented",
+    endpoint: "GET /payment-methods",
+    args
+  });
 };
 
 export const getPaymentMethodsTool: ToolRegistration<GetPaymentMethodsSchema> = {
