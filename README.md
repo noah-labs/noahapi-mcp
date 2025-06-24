@@ -1,27 +1,30 @@
-# @outblock/flow-mcp
+# @outblock/noah-business-api-mcp
 
-Flow blockchain tools for Model Context Protocol (MCP). This package provides a set of tools for interacting with the Flow blockchain through the Model Context Protocol.
+Noah Business API tools for Model Context Protocol (MCP). This package provides a set of tools for interacting with the Noah Business API through the Model Context Protocol.
 
-<a href="https://glama.ai/mcp/servers/@Outblock/flow-mcp">
-  <img width="380" height="200" src="https://glama.ai/mcp/servers/@Outblock/flow-mcp/badge" alt="Flow MCP server" />
+<a href="https://glama.ai/mcp/servers/@Outblock/noah-business-api-mcp">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/@Outblock/noah-business-api-mcp/badge" alt="Noah Business API MCP server" />
 </a>
 
 ## Features
 
-- Get FLOW balance for any address
-- Get token balance for any Flow token
-- Get COA account information
-- Get contract source code
-- Get detailed account information including storage stats
+- Complete Noah Business API integration
+- Balance management
+- Customer management
+- Payment methods
+- Transaction handling
+- Channel management
+- Pricing tools
+- Workflow automation
 
 ## Installation
 
 ```bash
 # Using npm
-npm install @outblock/flow-mcp
+npm install @outblock/noah-business-api-mcp
 
 # Using bun
-bun add @outblock/flow-mcp
+bun add @outblock/noah-business-api-mcp
 ```
 
 ## MCP Configuration
@@ -31,9 +34,9 @@ To use this tool with Claude, add the following to your MCP configuration:
 ```json
 {
   "mcpServers": {
-    "flow": {
+    "noah": {
       "command": "npx",
-      "args": ["-y", "@outblock/flow-mcp"]
+      "args": ["-y", "@outblock/noah-business-api-mcp"]
     }
   }
 }
@@ -49,90 +52,44 @@ After adding the configuration, restart Claude to load the new MCP server.
 
 ## Tools
 
-### Flow Balance
+This package includes a comprehensive set of tools for interacting with the Noah Business API:
 
-Get the FLOW balance for any address:
+### Balance Management
+- Get account balances
 
-```ts
-{
-  name: 'get_flow_balance',
-  input: {
-    address: string,
-    network?: 'mainnet' | 'testnet'
-  }
-}
-```
+### Customer Management
+- Create and update customers
+- Customer onboarding
+- KYC workflows
 
-### Account Info
+### Payment Methods
+- Manage fiat payment methods
+- Dynamic form generation
 
-Get detailed account information:
+### Transactions
+- Create buy/sell transactions
+- Transaction history
+- Transaction preparation
 
-```ts
-{
-  name: 'get_account_info',
-  input: {
-    address: string,
-    network?: 'mainnet' | 'testnet'
-  }
-}
-```
+### Channels
+- Query supported channels
+- Get channel-specific forms
 
-### Token Balance
+### Pricing
+- Real-time pricing information
+- Fee calculations
 
-Get balance for any Flow token:
-
-```ts
-{
-  name: 'get_token_balance',
-  input: {
-    address: string,
-    network?: 'mainnet' | 'testnet'
-  }
-}
-```
-
-### COA Account
-
-Get COA account information:
-
-```ts
-{
-  name: 'get_coa_account',
-  input: {
-    address: string,
-    network?: 'mainnet' | 'testnet'
-  }
-}
-```
-
-### Get Contract
-
-Get contract source code:
-
-```ts
-{
-  name: 'get_contract',
-  input: {
-    address: string,
-    contractName: string,
-    network?: 'mainnet' | 'testnet'
-  }
-}
-```
+### Workflows
+- Bank deposit to onchain address
+- Automated rules
 
 ## 📂 Project Structure
 
 ```text
-flow-mcp/
+noah-business-api-mcp/
 ├── src/
 │   ├── tools/          # MCP tools implementation
-│   │   ├── flowBalance/    # Flow balance tool
-│   │   ├── accountInfo/    # Account info tool
-│   │   ├── tokenBalance/   # Token balance tool
-│   │   ├── coaAccount/     # COA account tool
-│   │   └── getContract/    # Contract source tool
-│   ├── utils/          # Shared utilities
-│   ├── prompts/        # MCP prompts
+│   │   └── noah/       # Noah Business API tools
 │   ├── types/          # Type definitions
 │   └── bin/           # CLI implementation
 ├── biome.json         # Linting configuration
@@ -175,39 +132,15 @@ To add your development MCP server to Claude Desktop:
 2. Add to your Claude Desktop config:
 
    ```json
-   // You only need the argument if you need to pass arguments to your server
    {
      "mcpServers": {
-       "your-server-name": {
+       "noah-dev": {
          "command": "node",
-         "args": ["/path/to/your/project/dist/main.js", "some_argument"]
+         "args": ["/path/to/your/project/dist/index.js"]
        }
      }
    }
    ```
-
-### Creating New Tools
-
-The project includes a script to help create new MCP tools:
-
-```bash
-bun run scripts/create-tool.ts <tool-name>
-```
-
-This will:
-
-1. Create a new tool directory under `src/tools/<tool-name>`
-2. Generate the basic tool structure including:
-   - index.ts (main implementation)
-   - schema.ts (JSON schema for tool parameters)
-   - test.ts (test file)
-3. Update the tools index file to export the new tool
-
-Example:
-
-```bash
-bun run scripts/create-tool.ts weather
-```
 
 ### Commit Message Format
 
