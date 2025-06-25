@@ -32,7 +32,7 @@ class NoahBusinessApiClient {
     };
 
     if (this.apiKey) {
-      this.headers['Api-Signature'] = this.apiKey;
+      this.headers['X-Api-Key'] = this.apiKey;
     }
 
     // Validate configuration
