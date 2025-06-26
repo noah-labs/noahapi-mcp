@@ -211,6 +211,3 @@ coverage/
 
 # Bun
 bun.lockb
-
-# Flow
-imports/

@@ -1,13 +1,15 @@
 import type { ToolRegistration } from "@/types/tools";
-import { type GetPaymentMethodsSchema, getPaymentMethodsSchema } from "./schema";
+import { type GetCustomersByIdSchema, getCustomersByIdSchema } from "./schema";
 import { noahClient } from "../../../utils/noah-client";
 
 /**
- * Payment Methods
+ * Get Customer by ID
  */
-export const getPaymentMethods = async (args: GetPaymentMethodsSchema): Promise<string> => {
+export const getCustomersById = async (args: GetCustomersByIdSchema): Promise<string> => {
   try {
-    const response = await noahClient.get('/payment-methods', args);
+    const { CustomerID } = args;
+    const endpoint = noahClient.replacePath('/customers/{CustomerID}', { CustomerID });
+    const response = await noahClient.get(endpoint);
     
     if (response.error) {
       return JSON.stringify({
@@ -20,7 +22,7 @@ export const getPaymentMethods = async (args: GetPaymentMethodsSchema): Promise<
     return JSON.stringify({
       success: true,
       data: response.data,
-      summary: `Successfully retrieved payment methods for customer ${args.CustomerID}`,
+      summary: `Successfully retrieved customer ${CustomerID}`,
     }, null, 2);
   } catch (error) {
     return JSON.stringify({
@@ -30,14 +32,14 @@ export const getPaymentMethods = async (args: GetPaymentMethodsSchema): Promise<
   }
 };
 
-export const getPaymentMethodsTool: ToolRegistration<GetPaymentMethodsSchema> = {
-  name: "get_payment_methods",
-  description: "Retrieves a list of payment methods for a specific customer.",
-  inputSchema: getPaymentMethodsSchema,
-  handler: async (args: GetPaymentMethodsSchema) => {
+export const getCustomersByIdTool: ToolRegistration<GetCustomersByIdSchema> = {
+  name: "get_customers_by_id",
+  description: "Retrieve details of a specific customer by their CustomerID.",
+  inputSchema: getCustomersByIdSchema,
+  handler: async (args: GetCustomersByIdSchema) => {
     try {
-      const parsedArgs = getPaymentMethodsSchema.parse(args);
-      const result = await getPaymentMethods(parsedArgs);
+      const parsedArgs = getCustomersByIdSchema.parse(args);
+      const result = await getCustomersById(parsedArgs);
       return {
         content: [
           {
@@ -47,7 +49,7 @@ export const getPaymentMethodsTool: ToolRegistration<GetPaymentMethodsSchema> = 
         ],
       };
     } catch (error) {
-      console.error("Error in getPaymentMethodsTool handler:", error);
+      console.error("Error in getCustomersByIdTool handler:", error);
       return {
         content: [
           {
