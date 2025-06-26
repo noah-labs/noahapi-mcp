@@ -1,9 +1,9 @@
-import { getNoahConfig, validateConfig } from './config';
+import { getNoahConfig, validateConfig } from "./config";
 
 interface NoahClientConfig {
   baseUrl?: string;
   apiKey?: string;
-  environment?: 'sandbox' | 'production';
+  environment?: "sandbox" | "production";
 }
 
 interface NoahApiResponse<T = any> {
@@ -20,20 +20,17 @@ class NoahBusinessApiClient {
   private apiKey: string;
   private headers: Record<string, string>;
 
-  constructor(config: NoahClientConfig = {}) {
+  constructor() {
     const defaultConfig = getNoahConfig();
-    
-    this.baseUrl = config.baseUrl || defaultConfig.baseUrl || 'https://api.sandbox.noah.com/v1';
-    this.apiKey = config.apiKey || defaultConfig.apiKey || '';
-    
-    this.headers = {
-      'Content-Type': 'application/json',
-      'User-Agent': 'noah-business-api-mcp/0.1.11',
-    };
 
-    if (this.apiKey) {
-      this.headers['X-Api-Key'] = this.apiKey;
-    }
+    this.baseUrl = defaultConfig.baseUrl || "https://api.sandbox.noah.com/v1";
+    this.apiKey = defaultConfig.apiKey || "";
+
+    this.headers = {
+      "Content-Type": "application/json",
+      "User-Agent": "noah-business-api-mcp/0.1.11",
+      "X-Api-Key": this.apiKey,
+    };
 
     // Validate configuration
     const validation = validateConfig({
@@ -43,7 +40,10 @@ class NoahBusinessApiClient {
     });
 
     if (!validation.valid) {
-      console.warn('Noah API configuration issues:', validation.errors.join(', '));
+      console.warn(
+        "Noah API configuration issues:",
+        validation.errors.join(", "),
+      );
     }
   }
 
@@ -51,7 +51,7 @@ class NoahBusinessApiClient {
     method: string,
     endpoint: string,
     data?: any,
-    customHeaders?: Record<string, string>
+    customHeaders?: Record<string, string>,
   ): Promise<NoahApiResponse<T>> {
     try {
       const url = `${this.baseUrl}${endpoint}`;
@@ -62,12 +62,15 @@ class NoahBusinessApiClient {
         headers,
       };
 
-      if (data && (method === 'POST' || method === 'PUT' || method === 'PATCH')) {
+      if (
+        data &&
+        (method === "POST" || method === "PUT" || method === "PATCH")
+      ) {
         config.body = JSON.stringify(data);
       }
 
       const response = await fetch(url, config);
-      
+
       let responseData;
       try {
         responseData = await response.json();
@@ -89,14 +92,18 @@ class NoahBusinessApiClient {
     } catch (error) {
       return {
         error: {
-          message: error instanceof Error ? error.message : 'Unknown error occurred',
+          message:
+            error instanceof Error ? error.message : "Unknown error occurred",
           details: error,
         },
       };
     }
   }
 
-  async get<T>(endpoint: string, params?: Record<string, any>): Promise<NoahApiResponse<T>> {
+  async get<T>(
+    endpoint: string,
+    params?: Record<string, any>,
+  ): Promise<NoahApiResponse<T>> {
     let url = endpoint;
     if (params) {
       const searchParams = new URLSearchParams();
@@ -109,19 +116,19 @@ class NoahBusinessApiClient {
         url += `?${searchParams.toString()}`;
       }
     }
-    return this.makeRequest<T>('GET', url);
+    return this.makeRequest<T>("GET", url);
   }
 
   async post<T>(endpoint: string, data?: any): Promise<NoahApiResponse<T>> {
-    return this.makeRequest<T>('POST', endpoint, data);
+    return this.makeRequest<T>("POST", endpoint, data);
   }
 
   async put<T>(endpoint: string, data?: any): Promise<NoahApiResponse<T>> {
-    return this.makeRequest<T>('PUT', endpoint, data);
+    return this.makeRequest<T>("PUT", endpoint, data);
   }
 
   async delete<T>(endpoint: string): Promise<NoahApiResponse<T>> {
-    return this.makeRequest<T>('DELETE', endpoint);
+    return this.makeRequest<T>("DELETE", endpoint);
   }
 
   // Helper method to replace path parameters
@@ -136,4 +143,4 @@ class NoahBusinessApiClient {
 
 // Export singleton instance
 export const noahClient = new NoahBusinessApiClient();
-export { NoahBusinessApiClient, type NoahClientConfig, type NoahApiResponse }; 
+export { NoahBusinessApiClient, type NoahClientConfig, type NoahApiResponse };
