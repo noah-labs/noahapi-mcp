@@ -40,10 +40,7 @@ class NoahBusinessApiClient {
     });
 
     if (!validation.valid) {
-      console.warn(
-        "Noah API configuration issues:",
-        validation.errors.join(", "),
-      );
+      console.warn("Noah API configuration issues:", validation.errors.join(", "));
     }
   }
 
@@ -62,10 +59,7 @@ class NoahBusinessApiClient {
         headers,
       };
 
-      if (
-        data &&
-        (method === "POST" || method === "PUT" || method === "PATCH")
-      ) {
+      if (data && (method === "POST" || method === "PUT" || method === "PATCH")) {
         config.body = JSON.stringify(data);
       }
 
@@ -92,18 +86,14 @@ class NoahBusinessApiClient {
     } catch (error) {
       return {
         error: {
-          message:
-            error instanceof Error ? error.message : "Unknown error occurred",
+          message: error instanceof Error ? error.message : "Unknown error occurred",
           details: error,
         },
       };
     }
   }
 
-  async get<T>(
-    endpoint: string,
-    params?: Record<string, any>,
-  ): Promise<NoahApiResponse<T>> {
+  async get<T>(endpoint: string, params?: Record<string, any>): Promise<NoahApiResponse<T>> {
     let url = endpoint;
     if (params) {
       const searchParams = new URLSearchParams();

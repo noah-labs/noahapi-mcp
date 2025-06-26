@@ -1,8 +1,5 @@
 import type { ToolRegistration } from "@/types/tools";
-import {
-  type GetChannelsSellCountriesSchema,
-  getChannelsSellCountriesSchema,
-} from "./schema";
+import { type GetChannelsSellCountriesSchema, getChannelsSellCountriesSchema } from "./schema";
 import { noahClient } from "../../../utils/noah-client";
 
 /**
@@ -44,8 +41,7 @@ export const getChannelsSellCountries = async (): Promise<string> => {
     return JSON.stringify(
       {
         error: true,
-        message:
-          error instanceof Error ? error.message : "Unknown error occurred",
+        message: error instanceof Error ? error.message : "Unknown error occurred",
       },
       null,
       2,
@@ -53,35 +49,34 @@ export const getChannelsSellCountries = async (): Promise<string> => {
   }
 };
 
-export const getChannelsSellCountriesTool: ToolRegistration<GetChannelsSellCountriesSchema> =
-  {
-    name: "get_channels_sell_countries",
-    description:
-      "Retrieve a complete list of countries where sell operations are supported. The response is useful for enabling customers to select their desired Country+FiatCurrency combination for receiving payouts. After making a selection, obtain the channels for the chosen Country+FiatCurrency using GET /channels/sell",
-    inputSchema: getChannelsSellCountriesSchema,
-    handler: async (args: GetChannelsSellCountriesSchema) => {
-      try {
-        getChannelsSellCountriesSchema.parse(args);
-        const result = await getChannelsSellCountries();
-        return {
-          content: [
-            {
-              type: "text",
-              text: result,
-            },
-          ],
-        };
-      } catch (error) {
-        console.error("Error in getChannelsSellCountriesTool handler:", error);
-        return {
-          content: [
-            {
-              type: "text",
-              text: `Error: ${(error as Error).message}`,
-            },
-          ],
-          isError: true,
-        };
-      }
-    },
-  };
+export const getChannelsSellCountriesTool: ToolRegistration<GetChannelsSellCountriesSchema> = {
+  name: "get_channels_sell_countries",
+  description:
+    "Retrieve a complete list of countries where sell operations are supported. The response is useful for enabling customers to select their desired Country+FiatCurrency combination for receiving payouts. After making a selection, obtain the channels for the chosen Country+FiatCurrency using GET /channels/sell",
+  inputSchema: getChannelsSellCountriesSchema,
+  handler: async (args: GetChannelsSellCountriesSchema) => {
+    try {
+      getChannelsSellCountriesSchema.parse(args);
+      const result = await getChannelsSellCountries();
+      return {
+        content: [
+          {
+            type: "text",
+            text: result,
+          },
+        ],
+      };
+    } catch (error) {
+      console.error("Error in getChannelsSellCountriesTool handler:", error);
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Error: ${(error as Error).message}`,
+          },
+        ],
+        isError: true,
+      };
+    }
+  },
+};

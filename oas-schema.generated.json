@@ -523,13 +523,7 @@
             "$ref": "#/components/schemas/ExternalID"
           }
         },
-        "required": [
-          "CryptoAuthorizedAmount",
-          "CryptoCurrency",
-          "FiatAmount",
-          "FormSessionID",
-          "Nonce"
-        ]
+        "required": ["CryptoAuthorizedAmount", "CryptoCurrency", "FiatAmount", "FormSessionID", "Nonce"]
       },
       "BankDepositToOnchainAddressRequest": {
         "type": "object",
@@ -551,13 +545,7 @@
             "description": "The final destination address to which the crypto currency should be transferred."
           }
         },
-        "required": [
-          "CustomerID",
-          "FiatCurrency",
-          "CryptoCurrency",
-          "Network",
-          "DestinationAddress"
-        ]
+        "required": ["CustomerID", "FiatCurrency", "CryptoCurrency", "Network", "DestinationAddress"]
       },
       "BankDepositToOnchainAddressResponse": {
         "type": "object",
@@ -1514,14 +1502,7 @@
             "x-go-type-skip-optional-pointer": true
           }
         },
-        "required": [
-          "ReturnURL",
-          "CustomerID",
-          "CryptoCurrency",
-          "Network",
-          "DestinationAddress",
-          "FiatOptions"
-        ]
+        "required": ["ReturnURL", "CustomerID", "CryptoCurrency", "Network", "DestinationAddress", "FiatOptions"]
       },
       "CustomerHostedOnboardingRequest": {
         "type": "object",
@@ -1863,13 +1844,7 @@
             "$ref": "#/components/schemas/ExternalID"
           }
         },
-        "required": [
-          "Type",
-          "CryptoCurrency",
-          "CryptoAuthorizedAmount",
-          "FiatAmount",
-          "FormSessionID"
-        ]
+        "required": ["Type", "CryptoCurrency", "CryptoAuthorizedAmount", "FiatAmount", "FormSessionID"]
       },
       "Rule": {
         "type": "object",
@@ -2477,14 +2452,7 @@
                     "$ref": "#/components/schemas/Nonce"
                   }
                 },
-                "required": [
-                  "CryptoCurrency",
-                  "CryptoAmount",
-                  "CustomerID",
-                  "ReturnURL",
-                  "LineItems",
-                  "Nonce"
-                ]
+                "required": ["CryptoCurrency", "CryptoAmount", "CustomerID", "ReturnURL", "LineItems", "Nonce"]
               }
             }
           }

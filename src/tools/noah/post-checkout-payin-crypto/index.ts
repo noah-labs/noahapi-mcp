@@ -7,26 +7,38 @@ import { noahClient } from "../../../utils/noah-client";
  */
 export const postCheckoutPayinCrypto = async (args: PostCheckoutPayinCryptoSchema): Promise<string> => {
   try {
-    const response = await noahClient.post('/checkout/payin/crypto', args);
-    
+    const response = await noahClient.post("/checkout/payin/crypto", args);
+
     if (response.error) {
-      return JSON.stringify({
-        error: true,
-        message: response.error.message,
-        details: response.error.details,
-      }, null, 2);
+      return JSON.stringify(
+        {
+          error: true,
+          message: response.error.message,
+          details: response.error.details,
+        },
+        null,
+        2,
+      );
     }
 
-    return JSON.stringify({
-      success: true,
-      data: response.data,
-      summary: `Successfully created crypto payin checkout session`,
-    }, null, 2);
+    return JSON.stringify(
+      {
+        success: true,
+        data: response.data,
+        summary: `Successfully created crypto payin checkout session`,
+      },
+      null,
+      2,
+    );
   } catch (error) {
-    return JSON.stringify({
-      error: true,
-      message: error instanceof Error ? error.message : 'Unknown error occurred',
-    }, null, 2);
+    return JSON.stringify(
+      {
+        error: true,
+        message: error instanceof Error ? error.message : "Unknown error occurred",
+      },
+      null,
+      2,
+    );
   }
 };
 

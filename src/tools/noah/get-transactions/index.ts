@@ -8,27 +8,39 @@ import { noahClient } from "../../../utils/noah-client";
 export const getTransactions = async (args: GetTransactionsSchema): Promise<string> => {
   try {
     const { TransactionID } = args;
-    const endpoint = noahClient.replacePath('/transactions/{TransactionID}', { TransactionID });
+    const endpoint = noahClient.replacePath("/transactions/{TransactionID}", { TransactionID });
     const response = await noahClient.get(endpoint);
-    
+
     if (response.error) {
-      return JSON.stringify({
-        error: true,
-        message: response.error.message,
-        details: response.error.details,
-      }, null, 2);
+      return JSON.stringify(
+        {
+          error: true,
+          message: response.error.message,
+          details: response.error.details,
+        },
+        null,
+        2,
+      );
     }
 
-    return JSON.stringify({
-      success: true,
-      data: response.data,
-      summary: `Successfully retrieved transaction ${TransactionID}`,
-    }, null, 2);
+    return JSON.stringify(
+      {
+        success: true,
+        data: response.data,
+        summary: `Successfully retrieved transaction ${TransactionID}`,
+      },
+      null,
+      2,
+    );
   } catch (error) {
-    return JSON.stringify({
-      error: true,
-      message: error instanceof Error ? error.message : 'Unknown error occurred',
-    }, null, 2);
+    return JSON.stringify(
+      {
+        error: true,
+        message: error instanceof Error ? error.message : "Unknown error occurred",
+      },
+      null,
+      2,
+    );
   }
 };
 
