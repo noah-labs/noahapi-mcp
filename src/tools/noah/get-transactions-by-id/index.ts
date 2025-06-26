@@ -1,11 +1,11 @@
 import type { ToolRegistration } from "@/types/tools";
-import { type GetTransactionsSchema, getTransactionsSchema } from "./schema";
+import { type GetTransactionsByIdSchema, getTransactionsByIdSchema } from "./schema";
 import { noahClient } from "../../../utils/noah-client";
 
 /**
- * Transaction by ID
+ * Get Transaction by ID
  */
-export const getTransactions = async (args: GetTransactionsSchema): Promise<string> => {
+export const getTransactionsById = async (args: GetTransactionsByIdSchema): Promise<string> => {
   try {
     const { TransactionID } = args;
     const endpoint = noahClient.replacePath('/transactions/{TransactionID}', { TransactionID });
@@ -32,14 +32,14 @@ export const getTransactions = async (args: GetTransactionsSchema): Promise<stri
   }
 };
 
-export const getTransactionsTool: ToolRegistration<GetTransactionsSchema> = {
-  name: "get_transactions",
-  description: "Retrieve the details of a single transaction by TransactionID.",
-  inputSchema: getTransactionsSchema,
-  handler: async (args: GetTransactionsSchema) => {
+export const getTransactionsByIdTool: ToolRegistration<GetTransactionsByIdSchema> = {
+  name: "get_transactions_by_id",
+  description: "Retrieve details of a specific transaction by its TransactionID.",
+  inputSchema: getTransactionsByIdSchema,
+  handler: async (args: GetTransactionsByIdSchema) => {
     try {
-      const parsedArgs = getTransactionsSchema.parse(args);
-      const result = await getTransactions(parsedArgs);
+      const parsedArgs = getTransactionsByIdSchema.parse(args);
+      const result = await getTransactionsById(parsedArgs);
       return {
         content: [
           {
@@ -49,7 +49,7 @@ export const getTransactionsTool: ToolRegistration<GetTransactionsSchema> = {
         ],
       };
     } catch (error) {
-      console.error("Error in getTransactionsTool handler:", error);
+      console.error("Error in getTransactionsByIdTool handler:", error);
       return {
         content: [
           {

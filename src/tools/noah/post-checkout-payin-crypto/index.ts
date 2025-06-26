@@ -1,22 +1,33 @@
 import type { ToolRegistration } from "@/types/tools";
 import { type PostCheckoutPayinCryptoSchema, postCheckoutPayinCryptoSchema } from "./schema";
+import { noahClient } from "../../../utils/noah-client";
 
 /**
  * Create Crypto Payin
  */
 export const postCheckoutPayinCrypto = async (args: PostCheckoutPayinCryptoSchema): Promise<string> => {
-  // TODO: Implement Noah Business API call
-  // Method: POST
-  // Path: /checkout/payin/crypto
-  
-  console.log('Noah API call:', { method: 'POST', path: '/checkout/payin/crypto', args });
-  
-  // This is a placeholder implementation
-  return JSON.stringify({
-    message: "Noah Business API tool not yet implemented",
-    endpoint: "POST /checkout/payin/crypto",
-    args
-  });
+  try {
+    const response = await noahClient.post('/checkout/payin/crypto', args);
+    
+    if (response.error) {
+      return JSON.stringify({
+        error: true,
+        message: response.error.message,
+        details: response.error.details,
+      }, null, 2);
+    }
+
+    return JSON.stringify({
+      success: true,
+      data: response.data,
+      summary: `Successfully created crypto payin checkout session`,
+    }, null, 2);
+  } catch (error) {
+    return JSON.stringify({
+      error: true,
+      message: error instanceof Error ? error.message : 'Unknown error occurred',
+    }, null, 2);
+  }
 };
 
 export const postCheckoutPayinCryptoTool: ToolRegistration<PostCheckoutPayinCryptoSchema> = {

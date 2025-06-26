@@ -1,22 +1,33 @@
 import type { ToolRegistration } from "@/types/tools";
 import { type PostTransactionsSellPrepareSchema, postTransactionsSellPrepareSchema } from "./schema";
+import { noahClient } from "../../../utils/noah-client";
 
 /**
  * Prepare Sell Transaction
  */
 export const postTransactionsSellPrepare = async (args: PostTransactionsSellPrepareSchema): Promise<string> => {
-  // TODO: Implement Noah Business API call
-  // Method: POST
-  // Path: /transactions/sell/prepare
-  
-  console.log('Noah API call:', { method: 'POST', path: '/transactions/sell/prepare', args });
-  
-  // This is a placeholder implementation
-  return JSON.stringify({
-    message: "Noah Business API tool not yet implemented",
-    endpoint: "POST /transactions/sell/prepare",
-    args
-  });
+  try {
+    const response = await noahClient.post('/transactions/sell/prepare', args);
+    
+    if (response.error) {
+      return JSON.stringify({
+        error: true,
+        message: response.error.message,
+        details: response.error.details,
+      }, null, 2);
+    }
+
+    return JSON.stringify({
+      success: true,
+      data: response.data,
+      summary: `Successfully prepared sell transaction`,
+    }, null, 2);
+  } catch (error) {
+    return JSON.stringify({
+      error: true,
+      message: error instanceof Error ? error.message : 'Unknown error occurred',
+    }, null, 2);
+  }
 };
 
 export const postTransactionsSellPrepareTool: ToolRegistration<PostTransactionsSellPrepareSchema> = {
