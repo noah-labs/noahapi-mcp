@@ -7,24 +7,6 @@ Noah Business API tools for Model Context Protocol (MCP). This package provides 
 - Business API key obtained from the Noah Business Dashboard
 - This is a business-only API for onboarded businesses
 
-## Installation
-
-```bash
-bun add @noah-labs/noah-business-api-mcp
-```
-
-## Configuration
-
-Set the following environment variables:
-
-```bash
-# Required: Your Noah Business API key
-export NOAH_API_KEY="your-api-key-here"
-
-# Required: Environment (sandbox or production)
-export NOAH_ENVIRONMENT="sandbox"  # or "production"
-```
-
 ## MCP Configuration
 
 Add to your MCP configuration file:
@@ -51,17 +33,6 @@ Add to your MCP configuration file:
 - **Other IDEs**: Refer to your IDE's MCP documentation
 
 After adding the configuration, restart your MCP client.
-
-## Features
-
-- Balance management
-- Customer management  
-- Payment methods
-- Transaction handling
-- Channel management
-- Pricing tools
-- Workflow automation
-- Checkout sessions
 
 ## Development
 

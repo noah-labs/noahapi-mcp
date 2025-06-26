@@ -6,7 +6,7 @@ export const postTransactionsSellSchema = z.object({
   CryptoAuthorizedAmount: z.string().describe("Maximum amount that can be charged for this transaction."),
   FormSessionID: z.string(),
   Nonce: z.string(),
-  ExternalID: z.string().optional()
+  ExternalID: z.string().optional(),
 });
 
 export type PostTransactionsSellSchema = z.infer<typeof postTransactionsSellSchema>;
