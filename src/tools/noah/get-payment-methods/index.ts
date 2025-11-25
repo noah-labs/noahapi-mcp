@@ -1,50 +1,27 @@
 import type { ToolRegistration } from "@/types/tools";
 import { type GetPaymentMethodsSchema, getPaymentMethodsSchema } from "./schema";
-import { noahClient } from "../../../utils/noah-client";
 
 /**
  * Payment Methods
  */
 export const getPaymentMethods = async (args: GetPaymentMethodsSchema): Promise<string> => {
-  try {
-    const response = await noahClient.get("/payment-methods", args);
+  // TODO: Implement Noah Business API call
+  // Method: GET
+  // Path: /payment-methods
 
-    if (response.error) {
-      return JSON.stringify(
-        {
-          error: true,
-          message: response.error.message,
-          details: response.error.details,
-        },
-        null,
-        2,
-      );
-    }
+  console.log('Noah API call:', { method: 'GET', path: '/payment-methods', args });
 
-    return JSON.stringify(
-      {
-        success: true,
-        data: response.data,
-        summary: `Successfully retrieved payment methods for customer ${args.CustomerID}`,
-      },
-      null,
-      2,
-    );
-  } catch (error) {
-    return JSON.stringify(
-      {
-        error: true,
-        message: error instanceof Error ? error.message : "Unknown error occurred",
-      },
-      null,
-      2,
-    );
-  }
+  // This is a placeholder implementation
+  return JSON.stringify({
+    message: "Noah Business API tool not yet implemented",
+    endpoint: "GET /payment-methods",
+    args
+  });
 };
 
 export const getPaymentMethodsTool: ToolRegistration<GetPaymentMethodsSchema> = {
   name: "get_payment_methods",
-  description: "Retrieves a list of payment methods for a specific customer.",
+  description: "This endpoint retrieves a paginated list of payment methods for a specific customer.",
   inputSchema: getPaymentMethodsSchema,
   handler: async (args: GetPaymentMethodsSchema) => {
     try {

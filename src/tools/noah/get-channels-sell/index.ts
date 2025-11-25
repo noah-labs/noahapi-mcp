@@ -1,58 +1,27 @@
 import type { ToolRegistration } from "@/types/tools";
 import { type GetChannelsSellSchema, getChannelsSellSchema } from "./schema";
-import { noahClient } from "../../../utils/noah-client";
 
 /**
- * Supported Channels
+ * Channels
  */
 export const getChannelsSell = async (args: GetChannelsSellSchema): Promise<string> => {
-  try {
-    const response = await noahClient.get("/channels/sell", args);
+  // TODO: Implement Noah Business API call
+  // Method: GET
+  // Path: /channels/sell
 
-    if (response.error) {
-      return JSON.stringify(
-        {
-          error: true,
-          message: response.error.message,
-          details: response.error.details,
-        },
-        null,
-        2,
-      );
-    }
+  console.log('Noah API call:', { method: 'GET', path: '/channels/sell', args });
 
-    const data = response.data as any;
-    return JSON.stringify(
-      {
-        success: true,
-        data: response.data,
-        summary: `Retrieved ${data?.Items?.length || 0} available channels for selling ${args.CryptoCurrency}`,
-        availableChannels:
-          data?.Items?.map((item: any) => ({
-            id: item.ID,
-            paymentCategory: item.PaymentMethodCategory,
-            country: item.Country,
-            fiatCurrency: item.FiatCurrency,
-          })) || [],
-      },
-      null,
-      2,
-    );
-  } catch (error) {
-    return JSON.stringify(
-      {
-        error: true,
-        message: error instanceof Error ? error.message : "Unknown error occurred",
-      },
-      null,
-      2,
-    );
-  }
+  // This is a placeholder implementation
+  return JSON.stringify({
+    message: "Noah Business API tool not yet implemented",
+    endpoint: "GET /channels/sell",
+    args
+  });
 };
 
 export const getChannelsSellTool: ToolRegistration<GetChannelsSellSchema> = {
   name: "get_channels_sell",
-  description: "List of supported channels for selling crypto into fiat.",
+  description: "This endpoint provides the list of supported channels for selling crypto into fiat. Follow the step-by-step guides:  [Direct Payout to US Business](../recipes/payout/global-payouts-business)  [Direct Payout to Individual Customer](../recipes/payout/global-payouts-individual)",
   inputSchema: getChannelsSellSchema,
   handler: async (args: GetChannelsSellSchema) => {
     try {

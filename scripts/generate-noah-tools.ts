@@ -67,7 +67,10 @@ function escapeDescription(desc: string): string {
     .replace(/\${/g, "\\${");
 }
 
-function generateZodSchema(schema: any, components?: Record<string, any>): string {
+function generateZodSchema(
+  schema: any,
+  components?: Record<string, any>
+): string {
   if (!schema) return "z.unknown()";
 
   // Handle $ref
@@ -101,7 +104,9 @@ function generateZodSchema(schema: any, components?: Record<string, any>): strin
             const propSchema = generateZodSchema(prop, components);
             const isRequired = schema.required?.includes(key);
             const optional = isRequired ? "" : ".optional()";
-            const description = prop.description ? `.describe("${escapeDescription(prop.description)}")` : "";
+            const description = prop.description
+              ? `.describe("${escapeDescription(prop.description)}")`
+              : "";
             return `  ${key}: ${propSchema}${optional}${description}`;
           })
           .join(",\n");
@@ -113,7 +118,10 @@ function generateZodSchema(schema: any, components?: Record<string, any>): strin
   }
 }
 
-function generateParameterSchema(parameters: Parameter[], components?: Record<string, any>): string {
+function generateParameterSchema(
+  parameters: Parameter[],
+  components?: Record<string, any>
+): string {
   if (!parameters || parameters.length === 0) {
     return "z.object({})";
   }
@@ -123,7 +131,9 @@ function generateParameterSchema(parameters: Parameter[], components?: Record<st
     .map((param) => {
       const zodSchema = generateZodSchema(param.schema, components);
       const optional = param.required ? "" : ".optional()";
-      const description = param.description ? `.describe("${escapeDescription(param.description)}")` : "";
+      const description = param.description
+        ? `.describe("${escapeDescription(param.description)}")`
+        : "";
       return `  ${param.name}: ${zodSchema}${optional}${description}`;
     })
     .join(",\n");
@@ -131,7 +141,10 @@ function generateParameterSchema(parameters: Parameter[], components?: Record<st
   return `z.object({\n${props}\n})`;
 }
 
-function generateRequestBodySchema(requestBody: any, components?: Record<string, any>): string {
+function generateRequestBodySchema(
+  requestBody: any,
+  components?: Record<string, any>
+): string {
   if (!requestBody?.content?.["application/json"]?.schema) {
     return "";
   }
@@ -142,13 +155,16 @@ function generateRequestBodySchema(requestBody: any, components?: Record<string,
 
 function generateToolFile(
   endpoint: Endpoint,
-  spec: OpenAPISpec,
+  spec: OpenAPISpec
 ): { schemaContent: string; indexContent: string; toolName: string } {
   const toolName = sanitizeToolName(endpoint.path, endpoint.method);
   const pascalToolName = toPascalCase(toolName);
 
   // Generate parameter schema
-  const paramSchema = generateParameterSchema(endpoint.parameters || [], spec.components?.schemas);
+  const paramSchema = generateParameterSchema(
+    endpoint.parameters || [],
+    spec.components?.schemas
+  );
 
   // Generate request body schema if present
   const requestBodySchema = endpoint.requestBody
@@ -181,7 +197,9 @@ function generateToolFile(
 
 export const ${toCamelCase(toolName)}Schema = ${combinedSchema};
 
-export type ${pascalToolName}Schema = z.infer<typeof ${toCamelCase(toolName)}Schema>;
+export type ${pascalToolName}Schema = z.infer<typeof ${toCamelCase(
+    toolName
+  )}Schema>;
 `;
 
   const cleanDescription = (desc: string) => {
@@ -196,26 +214,36 @@ export type ${pascalToolName}Schema = z.infer<typeof ${toCamelCase(toolName)}Sch
   };
 
   const toolDescription = cleanDescription(
-    endpoint.description || endpoint.summary || `${endpoint.method.toUpperCase()} ${endpoint.path}`,
+    endpoint.description ||
+      endpoint.summary ||
+      `${endpoint.method.toUpperCase()} ${endpoint.path}`
   );
   const functionComment = cleanDescription(
-    endpoint.summary || endpoint.description || `${endpoint.method.toUpperCase()} ${endpoint.path}`,
+    endpoint.summary ||
+      endpoint.description ||
+      `${endpoint.method.toUpperCase()} ${endpoint.path}`
   );
 
   // Generate the main tool file
   const indexContent = `import type { ToolRegistration } from "@/types/tools";
-import { type ${pascalToolName}Schema, ${toCamelCase(toolName)}Schema } from "./schema";
+import { type ${pascalToolName}Schema, ${toCamelCase(
+    toolName
+  )}Schema } from "./schema";
 
 /**
  * ${functionComment}
  */
-export const ${toCamelCase(toolName)} = async (args: ${pascalToolName}Schema): Promise<string> => {
+export const ${toCamelCase(
+    toolName
+  )} = async (args: ${pascalToolName}Schema): Promise<string> => {
   // TODO: Implement Noah Business API call
   // Method: ${endpoint.method.toUpperCase()}
   // Path: ${endpoint.path}
-  
-  console.log('Noah API call:', { method: '${endpoint.method.toUpperCase()}', path: '${endpoint.path}', args });
-  
+
+  console.log('Noah API call:', { method: '${endpoint.method.toUpperCase()}', path: '${
+    endpoint.path
+  }', args });
+
   // This is a placeholder implementation
   return JSON.stringify({
     message: "Noah Business API tool not yet implemented",
@@ -224,7 +252,9 @@ export const ${toCamelCase(toolName)} = async (args: ${pascalToolName}Schema): P
   });
 };
 
-export const ${toCamelCase(toolName)}Tool: ToolRegistration<${pascalToolName}Schema> = {
+export const ${toCamelCase(
+    toolName
+  )}Tool: ToolRegistration<${pascalToolName}Schema> = {
   name: "${toolName.replace(/-/g, "_")}",
   description: "${toolDescription}",
   inputSchema: ${toCamelCase(toolName)}Schema,
@@ -260,7 +290,7 @@ export const ${toCamelCase(toolName)}Tool: ToolRegistration<${pascalToolName}Sch
 }
 
 function main() {
-  const specPath = join(process.cwd(), "noah-business-api.generated.json");
+  const specPath = join(process.cwd(), "oas-schema.generated.json");
   const toolsDir = join(process.cwd(), "src", "tools", "noah");
 
   // Read the OpenAPI spec
@@ -278,7 +308,9 @@ function main() {
   // Parse all endpoints
   for (const [path, methods] of Object.entries(spec.paths)) {
     for (const [method, details] of Object.entries(methods)) {
-      if (["get", "post", "put", "delete", "patch"].includes(method.toLowerCase())) {
+      if (
+        ["get", "post", "put", "delete", "patch"].includes(method.toLowerCase())
+      ) {
         endpoints.push({
           path,
           method: method.toLowerCase(),
@@ -292,7 +324,10 @@ function main() {
 
   // Generate tools for each endpoint
   for (const endpoint of endpoints) {
-    const { schemaContent, indexContent, toolName } = generateToolFile(endpoint, spec);
+    const { schemaContent, indexContent, toolName } = generateToolFile(
+      endpoint,
+      spec
+    );
 
     // Create directory for this tool
     const toolDir = join(toolsDir, toolName);
@@ -311,9 +346,15 @@ function main() {
   }
 
   // Generate index file for all Noah tools
-  const imports = toolNames.map((name) => `import { ${toCamelCase(name)}Tool } from "./${name}/index.js";`).join("\n");
+  const imports = toolNames
+    .map(
+      (name) => `import { ${toCamelCase(name)}Tool } from "./${name}/index.js";`
+    )
+    .join("\n");
 
-  const exports = toolNames.map((name) => `  ${toCamelCase(name)}Tool`).join(",\n");
+  const exports = toolNames
+    .map((name) => `  ${toCamelCase(name)}Tool`)
+    .join(",\n");
 
   const indexFileContent = `${imports}
 import type { ToolRegistration } from "../../types/tools.js";
@@ -330,7 +371,9 @@ export default createNoahTools;
 
   writeFileSync(join(toolsDir, "index.ts"), indexFileContent);
 
-  console.log(`\nGenerated ${toolNames.length} Noah Business API tools in ${toolsDir}`);
+  console.log(
+    `\nGenerated ${toolNames.length} Noah Business API tools in ${toolsDir}`
+  );
   console.log("Tools generated:", toolNames.join(", "));
 }
 

@@ -1,52 +1,27 @@
 import type { ToolRegistration } from "@/types/tools";
 import { type GetTransactionsSchema, getTransactionsSchema } from "./schema";
-import { noahClient } from "../../../utils/noah-client";
 
 /**
  * Transaction by ID
  */
 export const getTransactions = async (args: GetTransactionsSchema): Promise<string> => {
-  try {
-    const { TransactionID } = args;
-    const endpoint = noahClient.replacePath("/transactions/{TransactionID}", { TransactionID });
-    const response = await noahClient.get(endpoint);
+  // TODO: Implement Noah Business API call
+  // Method: GET
+  // Path: /transactions/{TransactionID}
 
-    if (response.error) {
-      return JSON.stringify(
-        {
-          error: true,
-          message: response.error.message,
-          details: response.error.details,
-        },
-        null,
-        2,
-      );
-    }
+  console.log('Noah API call:', { method: 'GET', path: '/transactions/{TransactionID}', args });
 
-    return JSON.stringify(
-      {
-        success: true,
-        data: response.data,
-        summary: `Successfully retrieved transaction ${TransactionID}`,
-      },
-      null,
-      2,
-    );
-  } catch (error) {
-    return JSON.stringify(
-      {
-        error: true,
-        message: error instanceof Error ? error.message : "Unknown error occurred",
-      },
-      null,
-      2,
-    );
-  }
+  // This is a placeholder implementation
+  return JSON.stringify({
+    message: "Noah Business API tool not yet implemented",
+    endpoint: "GET /transactions/{TransactionID}",
+    args
+  });
 };
 
 export const getTransactionsTool: ToolRegistration<GetTransactionsSchema> = {
   name: "get_transactions",
-  description: "Retrieve the details of a single transaction by TransactionID.",
+  description: "This endpoint retrieves the details of a single transaction by TransactionID.",
   inputSchema: getTransactionsSchema,
   handler: async (args: GetTransactionsSchema) => {
     try {

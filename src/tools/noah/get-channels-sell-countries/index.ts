@@ -1,63 +1,32 @@
 import type { ToolRegistration } from "@/types/tools";
 import { type GetChannelsSellCountriesSchema, getChannelsSellCountriesSchema } from "./schema";
-import { noahClient } from "../../../utils/noah-client";
 
 /**
- * Supported Countries
+ * Countries
  */
-export const getChannelsSellCountries = async (): Promise<string> => {
-  try {
-    const response = await noahClient.get("/channels/sell/countries");
+export const getChannelsSellCountries = async (args: GetChannelsSellCountriesSchema): Promise<string> => {
+  // TODO: Implement Noah Business API call
+  // Method: GET
+  // Path: /channels/sell/countries
 
-    if (response.error) {
-      return JSON.stringify(
-        {
-          error: true,
-          message: response.error.message,
-          details: response.error.details,
-        },
-        null,
-        2,
-      );
-    }
+  console.log('Noah API call:', { method: 'GET', path: '/channels/sell/countries', args });
 
-    const data = response.data as any;
-    const dataArray = Array.isArray(data) ? data : [];
-    return JSON.stringify(
-      {
-        success: true,
-        data: response.data,
-        summary: `Retrieved ${dataArray.length} supported countries for sell operations`,
-        countries: dataArray.map((country: any) => ({
-          code: country.Code,
-          name: country.Name,
-          supportedCurrencies: country.SupportedCurrencies,
-        })),
-      },
-      null,
-      2,
-    );
-  } catch (error) {
-    return JSON.stringify(
-      {
-        error: true,
-        message: error instanceof Error ? error.message : "Unknown error occurred",
-      },
-      null,
-      2,
-    );
-  }
+  // This is a placeholder implementation
+  return JSON.stringify({
+    message: "Noah Business API tool not yet implemented",
+    endpoint: "GET /channels/sell/countries",
+    args
+  });
 };
 
 export const getChannelsSellCountriesTool: ToolRegistration<GetChannelsSellCountriesSchema> = {
   name: "get_channels_sell_countries",
-  description:
-    "Retrieve a complete list of countries where sell operations are supported. The response is useful for enabling customers to select their desired Country+FiatCurrency combination for receiving payouts. After making a selection, obtain the channels for the chosen Country+FiatCurrency using GET /channels/sell",
+  description: "This endpoint retrieves the complete list of countries where Sell operations are supported. The response is useful for enabling customers to select their desired Country+FiatCurrency combination for receiving payouts. After making a selection, obtain the channels for the chosen Country+FiatCurrency using GET /channels/sell. Follow the step-by-step guides:  [Direct Payout to US Business](../recipes/payout/global-payouts-business)  [Direct Payout to Individual Customer](../recipes/payout/global-payouts-individual)",
   inputSchema: getChannelsSellCountriesSchema,
   handler: async (args: GetChannelsSellCountriesSchema) => {
     try {
-      getChannelsSellCountriesSchema.parse(args);
-      const result = await getChannelsSellCountries();
+      const parsedArgs = getChannelsSellCountriesSchema.parse(args);
+      const result = await getChannelsSellCountries(parsedArgs);
       return {
         content: [
           {

@@ -1,7 +1,9 @@
 import { z } from "zod";
 
 export const getCustomersSchema = z.object({
-  CustomerID: z.string(),
+  PageSize: z.number().optional(),
+  PageToken: z.string().optional(),
+  SortDirection: z.enum(["ASC", "DESC"]).optional()
 });
 
 export type GetCustomersSchema = z.infer<typeof getCustomersSchema>;

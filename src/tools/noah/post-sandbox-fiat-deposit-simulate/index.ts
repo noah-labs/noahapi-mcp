@@ -1,51 +1,27 @@
 import type { ToolRegistration } from "@/types/tools";
 import { type PostSandboxFiatDepositSimulateSchema, postSandboxFiatDepositSimulateSchema } from "./schema";
-import { noahClient } from "../../../utils/noah-client";
 
 /**
- * Create a test fiat-deposit.
+ * Simulate Fiat Deposit
  */
 export const postSandboxFiatDepositSimulate = async (args: PostSandboxFiatDepositSimulateSchema): Promise<string> => {
-  try {
-    const response = await noahClient.post("/sandbox/fiat-deposit/simulate", args);
+  // TODO: Implement Noah Business API call
+  // Method: POST
+  // Path: /sandbox/fiat-deposit/simulate
 
-    if (response.error) {
-      return JSON.stringify(
-        {
-          error: true,
-          message: response.error.message,
-          details: response.error.details,
-        },
-        null,
-        2,
-      );
-    }
+  console.log('Noah API call:', { method: 'POST', path: '/sandbox/fiat-deposit/simulate', args });
 
-    return JSON.stringify(
-      {
-        success: true,
-        data: response.data,
-        summary: `Successfully simulated fiat deposit`,
-      },
-      null,
-      2,
-    );
-  } catch (error) {
-    return JSON.stringify(
-      {
-        error: true,
-        message: error instanceof Error ? error.message : "Unknown error occurred",
-      },
-      null,
-      2,
-    );
-  }
+  // This is a placeholder implementation
+  return JSON.stringify({
+    message: "Noah Business API tool not yet implemented",
+    endpoint: "POST /sandbox/fiat-deposit/simulate",
+    args
+  });
 };
 
 export const postSandboxFiatDepositSimulateTool: ToolRegistration<PostSandboxFiatDepositSimulateSchema> = {
   name: "post_sandbox_fiat_deposit_simulate",
-  description:
-    "Only available in sandbox environment. A fiat deposit will be created towards a fiat payment method. This could trigger webhooks, worklows or rules that you have previously setup.",
+  description: "This endpoint creates a simulated fiat deposit in the sandbox environment for testing purposes. The solution requires a FiatAmount, CustomerID reference, and payment method specifications to trigger configured workflows, rules, and webhook integrations. Use the endpoint to test automated processes and validate business logic without real money transfers, supporting various fiat currencies and deposit scenarios. Follow the step-by-step guides:  [Bank Onramp via USD Virtual Account](../recipes/payin/bank-onramp-us)  [Bank Onramp via EUR Virtual Account](../recipes/payin/bank-onramp-eu)",
   inputSchema: postSandboxFiatDepositSimulateSchema,
   handler: async (args: PostSandboxFiatDepositSimulateSchema) => {
     try {
