@@ -1,10 +1,47 @@
 import { z } from "zod";
 
 export const putCustomersSchema = z.object({
-
   CustomerID: z.string()
-,
-.unknown(
-});
+}).and(z.union([z.object({
+  Type: z.enum(["Individual"]),
+  FullName: z.object({
+  FirstName: z.string().describe("user's first name"),
+  LastName: z.string().describe("user's last name (family name)"),
+  MiddleName: z.string().optional().describe("user's middle name")
+}),
+  DateOfBirth: z.string(),
+  Email: z.string().optional().describe("Customer's email address."),
+  PhoneNumber: z.string().optional(),
+  Identities: z.array(z.object({
+  IssuingCountry: z.string().describe("Issuing country of the identity, ISO 3166-1 alpha-2 country code."),
+  IDNumber: z.string(),
+  IssuedDate: z.string().optional(),
+  ExpiryDate: z.string().optional(),
+  IDType: z.string()
+})),
+  PrimaryResidence: z.object({
+  Street: z.string().describe("Street: the primary name of an address's street."),
+  Street2: z.string().optional().describe("Street2: the secondary name of an address's street."),
+  City: z.string().describe("City: name of an address's city or town."),
+  PostCode: z.string().describe("PostCode: the address's postcode"),
+  State: z.string().describe("State: the address's state / province / county. For USA and Canada, state code in ISO 3166-2 code (e.g. CA) is required."),
+  Country: z.string()
+})
+}), z.object({
+  Type: z.enum(["Business"]),
+  RegisteredName: z.string().describe("Name of the business."),
+  Email: z.string().optional().describe("Email address of the business."),
+  RegistrationNumber: z.string().describe("Registration number of the business."),
+  RegistrationCountry: z.string(),
+  RegisteredAddress: z.object({
+  Street: z.string().describe("Street: the primary name of an address's street."),
+  Street2: z.string().optional().describe("Street2: the secondary name of an address's street."),
+  City: z.string().describe("City: name of an address's city or town."),
+  PostCode: z.string().describe("PostCode: the address's postcode"),
+  State: z.string().describe("State: the address's state / province / county. For USA and Canada, state code in ISO 3166-2 code (e.g. CA) is required."),
+  Country: z.string()
+}),
+  IncorporationDate: z.string()
+})]));
 
 export type PutCustomersSchema = z.infer<typeof putCustomersSchema>;
