@@ -9,19 +9,20 @@ export const postCheckoutPayoutFiat = async (args: PostCheckoutPayoutFiatSchema)
   // Method: POST
   // Path: /checkout/payout/fiat
 
-  console.log('Noah API call:', { method: 'POST', path: '/checkout/payout/fiat', args });
+  console.log("Noah API call:", { method: "POST", path: "/checkout/payout/fiat", args });
 
   // This is a placeholder implementation
   return JSON.stringify({
     message: "Noah Business API tool not yet implemented",
     endpoint: "POST /checkout/payout/fiat",
-    args
+    args,
   });
 };
 
 export const postCheckoutPayoutFiatTool: ToolRegistration<PostCheckoutPayoutFiatSchema> = {
   name: "post_checkout_payout_fiat",
-  description: "This endpoint initiates Noah's Hosted Fiat Payout Session flow. The solution establishes an end-to-end checkout experience where customers convert cryptocurrency to fiat through a hosted interface, with Noah handling KYC verification, payment method selection, and transaction monitoring. Use the endpoint to retrieve a response consisting of a URL, which you pass to your customer so that they can complete their payout through a hosted session. If customer details are filled out, a new customer will be created. Otherwise, the provided CustomerID should refer to an existing customer. Follow the step-by-step guide: [Hosted Fiat Payout](../recipes/payout/hosted-checkout)",
+  description:
+    "This endpoint initiates Noah's Hosted Fiat Payout Session flow. The solution establishes an end-to-end checkout experience where customers convert cryptocurrency to fiat through a hosted interface, with Noah handling KYC verification, payment method selection, and transaction monitoring. Use the endpoint to retrieve a response consisting of a URL, which you pass to your customer so that they can complete their payout through a hosted session. If customer details are filled out, a new customer will be created. Otherwise, the provided CustomerID should refer to an existing customer. Follow the step-by-step guide: [Hosted Fiat Payout](../recipes/payout/hosted-checkout)",
   inputSchema: postCheckoutPayoutFiatSchema,
   handler: async (args: PostCheckoutPayoutFiatSchema) => {
     try {

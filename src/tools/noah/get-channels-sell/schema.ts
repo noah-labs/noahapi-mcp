@@ -8,7 +8,7 @@ export const getChannelsSellSchema = z.object({
   CustomerID: z.string().optional(),
   PaymentMethodID: z.string().optional(),
   PageSize: z.number().optional(),
-  PageToken: z.string().optional()
+  PageToken: z.string().optional(),
 });
 
 export type GetChannelsSellSchema = z.infer<typeof getChannelsSellSchema>;

@@ -340,12 +340,7 @@
             "example": "0x71C7656EC7ab88b098defB751B7401B5f6d8976F"
           }
         },
-        "required": [
-          "AmountConditions",
-          "CryptoCurrency",
-          "Network",
-          "DestinationAddress"
-        ]
+        "required": ["AmountConditions", "CryptoCurrency", "Network", "DestinationAddress"]
       },
       "AmountCondition": {
         "type": "object",
@@ -476,12 +471,7 @@
             "x-go-type-skip-optional-pointer": true
           }
         },
-        "required": [
-          "PaymentMethodCategory",
-          "PaymentMethodType",
-          "Rate",
-          "UpdatedAt"
-        ]
+        "required": ["PaymentMethodCategory", "PaymentMethodType", "Rate", "UpdatedAt"]
       },
       "FeeBreakdownItem": {
         "type": "object",
@@ -554,13 +544,7 @@
             "$ref": "#/components/schemas/ExternalID"
           }
         },
-        "required": [
-          "CryptoAuthorizedAmount",
-          "CryptoCurrency",
-          "FiatAmount",
-          "FormSessionID",
-          "Nonce"
-        ]
+        "required": ["CryptoAuthorizedAmount", "CryptoCurrency", "FiatAmount", "FormSessionID", "Nonce"]
       },
       "BankDepositToOnchainAddressRequest": {
         "type": "object",
@@ -582,13 +566,7 @@
             "description": "The final destination address to which the crypto currency should be transferred."
           }
         },
-        "required": [
-          "CustomerID",
-          "FiatCurrency",
-          "CryptoCurrency",
-          "Network",
-          "DestinationAddress"
-        ]
+        "required": ["CustomerID", "FiatCurrency", "CryptoCurrency", "Network", "DestinationAddress"]
       },
       "BankDepositToOnchainAddressResponse": {
         "type": "object",
@@ -650,13 +628,7 @@
             "$ref": "#/components/schemas/ExternalID"
           }
         },
-        "required": [
-          "Trigger",
-          "CustomerID",
-          "CryptoCurrency",
-          "FiatAmount",
-          "FormSessionID"
-        ]
+        "required": ["Trigger", "CustomerID", "CryptoCurrency", "FiatAmount", "FormSessionID"]
       },
       "OnchainDepositToPaymentMethodResponse": {
         "type": "object",
@@ -815,12 +787,7 @@
             "$ref": "#/components/schemas/FormSessionID"
           }
         },
-        "required": [
-          "FormSessionID",
-          "TotalFee",
-          "CryptoAmountEstimate",
-          "CryptoAuthorizedAmount"
-        ]
+        "required": ["FormSessionID", "TotalFee", "CryptoAmountEstimate", "CryptoAuthorizedAmount"]
       },
       "GetCustomersResponse": {
         "type": "object",
@@ -1050,14 +1017,7 @@
             "$ref": "#/components/schemas/TransactionAdjustment"
           }
         },
-        "required": [
-          "ID",
-          "Network",
-          "Created",
-          "Status",
-          "Direction",
-          "CryptoCurrency"
-        ]
+        "required": ["ID", "Network", "Created", "Status", "Direction", "CryptoCurrency"]
       },
       "TransactionBreakdownItem": {
         "type": "object",
@@ -1218,13 +1178,7 @@
             "maxProperties": 10
           }
         },
-        "required": [
-          "Type",
-          "CustomerID",
-          "Created",
-          "RegisteredName",
-          "Verification"
-        ]
+        "required": ["Type", "CustomerID", "Created", "RegisteredName", "Verification"]
       },
       "FiatPayment": {
         "type": "object",
@@ -1662,13 +1616,7 @@
             "$ref": "#/components/schemas/StreetAddress"
           }
         },
-        "required": [
-          "Type",
-          "FullName",
-          "DateOfBirth",
-          "Identities",
-          "PrimaryResidence"
-        ]
+        "required": ["Type", "FullName", "DateOfBirth", "Identities", "PrimaryResidence"]
       },
       "BusinessCustomerInput": {
         "type": "object",
@@ -1797,14 +1745,7 @@
           "SourceOfFunds": {
             "type": "string",
             "description": "What will be the source of incoming funds to your account?",
-            "enum": [
-              "Revenue",
-              "Investments",
-              "LoansCredits",
-              "TradingIncome",
-              "CryptoMining",
-              "ClientFunds"
-            ]
+            "enum": ["Revenue", "Investments", "LoansCredits", "TradingIncome", "CryptoMining", "ClientFunds"]
           },
           "FinancialsUsd": {
             "$ref": "#/components/schemas/BusinessFinancialsInput"
@@ -1972,25 +1913,12 @@
           "SourceOfIncome": {
             "type": "string",
             "description": "What's your main source of income?",
-            "enum": [
-              "Salary",
-              "Pension",
-              "Investment",
-              "Property",
-              "FriendsAndFamily",
-              "Benefits"
-            ]
+            "enum": ["Salary", "Pension", "Investment", "Property", "FriendsAndFamily", "Benefits"]
           },
           "EmploymentStatus": {
             "type": "string",
             "description": "What's your employment status?",
-            "enum": [
-              "Employed",
-              "Unemployed",
-              "Retired",
-              "Student",
-              "SelfEmployed"
-            ]
+            "enum": ["Employed", "Unemployed", "Retired", "Student", "SelfEmployed"]
           },
           "WorkIndustry": {
             "type": "string",
@@ -2019,13 +1947,7 @@
           "TransactionFrequency": {
             "type": "string",
             "description": "What's your expected frequency of transactions?",
-            "enum": [
-              "OncePerYear",
-              "OnceEveryFewMonths",
-              "AFewTimesPerMonth",
-              "OncePerWeek",
-              "MoreThanOncePerWeek"
-            ]
+            "enum": ["OncePerYear", "OnceEveryFewMonths", "AFewTimesPerMonth", "OncePerWeek", "MoreThanOncePerWeek"]
           }
         },
         "required": ["Type"]
@@ -2303,14 +2225,7 @@
             "maxProperties": 10
           }
         },
-        "required": [
-          "ReturnURL",
-          "CustomerID",
-          "CryptoCurrency",
-          "Network",
-          "DestinationAddress",
-          "FiatOptions"
-        ]
+        "required": ["ReturnURL", "CustomerID", "CryptoCurrency", "Network", "DestinationAddress", "FiatOptions"]
       },
       "OnchainDepositToPaymentMethodHostedRequest": {
         "type": "object",
@@ -2346,13 +2261,7 @@
             "maxProperties": 10
           }
         },
-        "required": [
-          "ReturnURL",
-          "CustomerID",
-          "ChannelID",
-          "CryptoCurrency",
-          "Network"
-        ]
+        "required": ["ReturnURL", "CustomerID", "ChannelID", "CryptoCurrency", "Network"]
       },
       "CustomerFormRequest": {
         "type": "object",
@@ -2672,13 +2581,7 @@
             "description": "Address generated for the deposit trigger."
           }
         },
-        "required": [
-          "Type",
-          "Amount",
-          "CryptoCurrency",
-          "DepositAddress",
-          "RefundAddress"
-        ]
+        "required": ["Type", "Amount", "CryptoCurrency", "DepositAddress", "RefundAddress"]
       },
       "DepositSourceTrigger": {
         "type": "object",
@@ -2785,13 +2688,7 @@
             "$ref": "#/components/schemas/ExternalID"
           }
         },
-        "required": [
-          "Type",
-          "CryptoCurrency",
-          "CryptoAuthorizedAmount",
-          "FiatAmount",
-          "FormSessionID"
-        ]
+        "required": ["Type", "CryptoCurrency", "CryptoAuthorizedAmount", "FiatAmount", "FormSessionID"]
       },
       "Rule": {
         "type": "object",
@@ -3515,14 +3412,7 @@
                     "$ref": "#/components/schemas/Nonce"
                   }
                 },
-                "required": [
-                  "CryptoCurrency",
-                  "CryptoAmount",
-                  "CustomerID",
-                  "ReturnURL",
-                  "LineItems",
-                  "Nonce"
-                ]
+                "required": ["CryptoCurrency", "CryptoAmount", "CustomerID", "ReturnURL", "LineItems", "Nonce"]
               }
             }
           }

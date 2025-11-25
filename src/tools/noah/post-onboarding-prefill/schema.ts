@@ -13,16 +13,18 @@ export const postOnboardingPrefillSchema = z.object({
   RegistrationNumber: z.string().optional().describe("Registration number of the business."),
   TaxID: z.string().optional().describe("Tax ID of the business."),
   // Individual fields
-  FullName: z.object({
-    FirstName: z.string().describe("user's first name"),
-    LastName: z.string().describe("user's last name (family name)"),
-    MiddleName: z.string().optional().describe("user's middle name")
-  }).optional(),
+  FullName: z
+    .object({
+      FirstName: z.string().describe("user's first name"),
+      LastName: z.string().describe("user's last name (family name)"),
+      MiddleName: z.string().optional().describe("user's middle name"),
+    })
+    .optional(),
   DateOfBirth: z.string().optional(),
   Email: z.string().optional().describe("Customer's email address."),
   PhoneNumber: z.string().optional(),
   Citizenship: z.string().optional(),
-  TaxResidenceCountry: z.string().optional()
+  TaxResidenceCountry: z.string().optional(),
   // Note: This is a simplified schema. Add more fields as needed from the full OpenAPI spec.
 });
 

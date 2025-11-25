@@ -9,19 +9,20 @@ export const getPrices = async (args: GetPricesSchema): Promise<string> => {
   // Method: GET
   // Path: /prices
 
-  console.log('Noah API call:', { method: 'GET', path: '/prices', args });
+  console.log("Noah API call:", { method: "GET", path: "/prices", args });
 
   // This is a placeholder implementation
   return JSON.stringify({
     message: "Noah Business API tool not yet implemented",
     endpoint: "GET /prices",
-    args
+    args,
   });
 };
 
 export const getPricesTool: ToolRegistration<GetPricesSchema> = {
   name: "get_prices",
-  description: "This endpoint lets you retrieve real-time information about a conversion between two supported currencies, including the rate before and after the Noah Fee is applied. During a Noah Hosted Checkout session, real-time /prices data is used to calculate the fees and thus the final amount a customer will pay. If neither SourceAmount or DestinationAmount is defined, the fee is not available.",
+  description:
+    "This endpoint lets you retrieve real-time information about a conversion between two supported currencies, including the rate before and after the Noah Fee is applied. During a Noah Hosted Checkout session, real-time /prices data is used to calculate the fees and thus the final amount a customer will pay. If neither SourceAmount or DestinationAmount is defined, the fee is not available.",
   inputSchema: getPricesSchema,
   handler: async (args: GetPricesSchema) => {
     try {

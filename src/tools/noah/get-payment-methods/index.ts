@@ -9,13 +9,13 @@ export const getPaymentMethods = async (args: GetPaymentMethodsSchema): Promise<
   // Method: GET
   // Path: /payment-methods
 
-  console.log('Noah API call:', { method: 'GET', path: '/payment-methods', args });
+  console.log("Noah API call:", { method: "GET", path: "/payment-methods", args });
 
   // This is a placeholder implementation
   return JSON.stringify({
     message: "Noah Business API tool not yet implemented",
     endpoint: "GET /payment-methods",
-    args
+    args,
   });
 };
 
