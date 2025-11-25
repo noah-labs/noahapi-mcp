@@ -9,19 +9,20 @@ export const getChannelsSellCountries = async (args: GetChannelsSellCountriesSch
   // Method: GET
   // Path: /channels/sell/countries
 
-  console.log('Noah API call:', { method: 'GET', path: '/channels/sell/countries', args });
+  console.log("Noah API call:", { method: "GET", path: "/channels/sell/countries", args });
 
   // This is a placeholder implementation
   return JSON.stringify({
     message: "Noah Business API tool not yet implemented",
     endpoint: "GET /channels/sell/countries",
-    args
+    args,
   });
 };
 
 export const getChannelsSellCountriesTool: ToolRegistration<GetChannelsSellCountriesSchema> = {
   name: "get_channels_sell_countries",
-  description: "This endpoint retrieves the complete list of countries where Sell operations are supported. The response is useful for enabling customers to select their desired Country+FiatCurrency combination for receiving payouts. After making a selection, obtain the channels for the chosen Country+FiatCurrency using GET /channels/sell. Follow the step-by-step guides:  [Direct Payout to US Business](../recipes/payout/global-payouts-business)  [Direct Payout to Individual Customer](../recipes/payout/global-payouts-individual)",
+  description:
+    "This endpoint retrieves the complete list of countries where Sell operations are supported. The response is useful for enabling customers to select their desired Country+FiatCurrency combination for receiving payouts. After making a selection, obtain the channels for the chosen Country+FiatCurrency using GET /channels/sell. Follow the step-by-step guides:  [Direct Payout to US Business](../recipes/payout/global-payouts-business)  [Direct Payout to Individual Customer](../recipes/payout/global-payouts-individual)",
   inputSchema: getChannelsSellCountriesSchema,
   handler: async (args: GetChannelsSellCountriesSchema) => {
     try {

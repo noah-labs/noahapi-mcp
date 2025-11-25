@@ -1,6 +1,6 @@
 {
   "name": "@noah-labs/noah-business-api-mcp",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Noah Business API tools for Model Context Protocol (MCP)",
   "author": {
     "name": "noah-labs",
@@ -47,6 +47,7 @@
     "start:sse": "node dist/index.js --sse",
     "dev": "bun src/bin/noah-mcp.ts dev src/index.ts",
     "inspect": "bun src/bin/noah-mcp.ts inspect src/index.ts",
+    "generate": "bun run scripts/generate-noah-tools.ts && bun run scripts/fix-union-schemas.ts",
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {

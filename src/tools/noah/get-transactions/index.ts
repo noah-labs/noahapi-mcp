@@ -9,13 +9,13 @@ export const getTransactions = async (args: GetTransactionsSchema): Promise<stri
   // Method: GET
   // Path: /transactions/{TransactionID}
 
-  console.log('Noah API call:', { method: 'GET', path: '/transactions/{TransactionID}', args });
+  console.log("Noah API call:", { method: "GET", path: "/transactions/{TransactionID}", args });
 
   // This is a placeholder implementation
   return JSON.stringify({
     message: "Noah Business API tool not yet implemented",
     endpoint: "GET /transactions/{TransactionID}",
-    args
+    args,
   });
 };
 
