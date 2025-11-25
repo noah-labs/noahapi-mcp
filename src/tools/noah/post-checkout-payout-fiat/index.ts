@@ -1,51 +1,27 @@
 import type { ToolRegistration } from "@/types/tools";
 import { type PostCheckoutPayoutFiatSchema, postCheckoutPayoutFiatSchema } from "./schema";
-import { noahClient } from "../../../utils/noah-client";
 
 /**
- * Create Fiat Payout
+ * Create Fiat Payout Session
  */
 export const postCheckoutPayoutFiat = async (args: PostCheckoutPayoutFiatSchema): Promise<string> => {
-  try {
-    const response = await noahClient.post("/checkout/payout/fiat", args);
+  // TODO: Implement Noah Business API call
+  // Method: POST
+  // Path: /checkout/payout/fiat
 
-    if (response.error) {
-      return JSON.stringify(
-        {
-          error: true,
-          message: response.error.message,
-          details: response.error.details,
-        },
-        null,
-        2,
-      );
-    }
+  console.log('Noah API call:', { method: 'POST', path: '/checkout/payout/fiat', args });
 
-    return JSON.stringify(
-      {
-        success: true,
-        data: response.data,
-        summary: `Successfully created fiat payout checkout session`,
-      },
-      null,
-      2,
-    );
-  } catch (error) {
-    return JSON.stringify(
-      {
-        error: true,
-        message: error instanceof Error ? error.message : "Unknown error occurred",
-      },
-      null,
-      2,
-    );
-  }
+  // This is a placeholder implementation
+  return JSON.stringify({
+    message: "Noah Business API tool not yet implemented",
+    endpoint: "POST /checkout/payout/fiat",
+    args
+  });
 };
 
 export const postCheckoutPayoutFiatTool: ToolRegistration<PostCheckoutPayoutFiatSchema> = {
   name: "post_checkout_payout_fiat",
-  description:
-    "Create a Hosted Checkout session to make fiat payout to your customer using the NOAH Hosted Checkout page.",
+  description: "This endpoint initiates Noah's Hosted Fiat Payout Session flow. The solution establishes an end-to-end checkout experience where customers convert cryptocurrency to fiat through a hosted interface, with Noah handling KYC verification, payment method selection, and transaction monitoring. Use the endpoint to retrieve a response consisting of a URL, which you pass to your customer so that they can complete their payout through a hosted session. If customer details are filled out, a new customer will be created. Otherwise, the provided CustomerID should refer to an existing customer. Follow the step-by-step guide: [Hosted Fiat Payout](../recipes/payout/hosted-checkout)",
   inputSchema: postCheckoutPayoutFiatSchema,
   handler: async (args: PostCheckoutPayoutFiatSchema) => {
     try {

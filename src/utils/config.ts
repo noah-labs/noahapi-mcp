@@ -9,12 +9,18 @@ export function getNoahConfig(): NoahConfig {
     apiKey: process.env.NOAH_API_KEY,
     baseUrl:
       process.env.NOAH_API_BASE_URL ||
-      (process.env.NOAH_ENVIRONMENT === "production" ? "https://api.noah.com/v1" : "https://api.sandbox.noah.com/v1"),
-    environment: (process.env.NOAH_ENVIRONMENT as "sandbox" | "production") || "sandbox",
+      (process.env.NOAH_ENVIRONMENT === "production"
+        ? "https://api.noah.com/v1"
+        : "https://api.sandbox.noah.com/v1"),
+    environment:
+      (process.env.NOAH_ENVIRONMENT as "sandbox" | "production") || "sandbox",
   };
 }
 
-export function validateConfig(config: NoahConfig): { valid: boolean; errors: string[] } {
+export function validateConfig(config: NoahConfig): {
+  valid: boolean;
+  errors: string[];
+} {
   const errors: string[] = [];
 
   if (!config.apiKey) {
