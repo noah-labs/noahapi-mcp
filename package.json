@@ -1,6 +1,6 @@
 {
   "name": "@noah-labs/noah-business-api-mcp",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Noah Business API tools for Model Context Protocol (MCP)",
   "author": {
     "name": "noah-labs",
@@ -18,12 +18,27 @@
   "bin": {
     "noah-mcp": "dist/bin/noah-mcp.js"
   },
-  "files": ["dist", "package.json", "README.md", "LICENSE"],
+  "files": [
+    "dist",
+    "package.json",
+    "README.md",
+    "LICENSE"
+  ],
   "engines": {
     "node": ">=20.0.0",
     "bun": ">=1.2.0"
   },
-  "keywords": ["noah", "business-api", "crypto", "payments", "mcp", "model-context-protocol", "claude", "ai", "llm"],
+  "keywords": [
+    "noah",
+    "business-api",
+    "crypto",
+    "payments",
+    "mcp",
+    "model-context-protocol",
+    "claude",
+    "ai",
+    "llm"
+  ],
   "scripts": {
     "build": "tsup",
     "test": "bun test",
