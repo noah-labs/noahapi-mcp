@@ -6,7 +6,7 @@ export const postTransactionsSellPrepareSchema = z.object({
   CryptoCurrency: z.string().describe("Cryptocurrency to sell."),
   CustomerID: z.string().optional(),
   FiatAmount: z.string().describe("Amount sent to customer's payment method."),
-  Form: z.record(z.unknown()).optional(),
+  Form: z.record(z.string(), z.unknown()).optional(),
   DelayedSell: z
     .boolean()
     .optional()

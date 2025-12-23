@@ -19,10 +19,10 @@ export function createServer() {
       execute: async (args, context) => {
         try {
           const result = await tool.handler(args);
-          if (typeof result.content[0].text === "string") {
+          if (result.content[0].type === "text") {
             return result.content[0].text;
           }
-          return JSON.stringify(result.content[0].text);
+          return JSON.stringify(result.content[0]);
         } catch (err) {
           console.error("Error in tool execution:", err);
           return "Internal server error in tool execution.";
@@ -51,9 +51,9 @@ export function createServer() {
 export function startServer(server: FastMCP, useSSE: boolean) {
   if (useSSE) {
     server.start({
-      transportType: "sse",
-      sse: {
-        endpoint: "/sse",
+      transportType: "httpStream",
+      httpStream: {
+        endpoint: "/noah-mcp",
         port: 8080,
       },
     });
