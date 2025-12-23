@@ -119,7 +119,7 @@ function generateZodSchema(schema: any, components?: Record<string, any>): strin
           .join(",\n");
         return `z.object({\n${props}\n})`;
       }
-      return "z.record(z.unknown())";
+      return "z.record(z.string(), z.unknown())";
     default:
       return "z.unknown()";
   }
