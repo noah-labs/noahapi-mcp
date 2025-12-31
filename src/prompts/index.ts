@@ -13,7 +13,7 @@ export const promptSchema = z.object({
       }),
     )
     .optional(),
-  handler: z.function().args(z.any()).returns(z.any()),
+  handler: z._function().input(z.any()).output(z.any()),
 });
 
 export type PromptSchema = z.infer<typeof promptSchema>;

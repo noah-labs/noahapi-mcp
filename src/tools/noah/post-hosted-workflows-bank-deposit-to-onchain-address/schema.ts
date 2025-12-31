@@ -16,7 +16,7 @@ export const postHostedWorkflowsBankDepositToOnchainAddressSchema = z.object({
     )
     .describe("List of fiat options to be supported by the customer."),
   Metadata: z
-    .record(z.unknown())
+    .record(z.string(), z.unknown())
     .optional()
     .describe("Custom user defined key value pairs used for storing additional information."),
 });
