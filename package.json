@@ -1,6 +1,6 @@
 {
   "name": "@noah-labs/noah-business-api-mcp",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Noah Business API tools for Model Context Protocol (MCP)",
   "author": {
     "name": "noah-labs",
@@ -9,7 +9,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/outblock/noah-business-api-mcp.git"
+    "url": "git+https://github.com/noah-labs/noahapi-mcp.git"
   },
   "type": "module",
   "main": "dist/index.js",
