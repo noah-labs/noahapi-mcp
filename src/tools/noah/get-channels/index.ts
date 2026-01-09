@@ -1,22 +1,47 @@
 import type { ToolRegistration } from "@/types/tools";
 import { type GetChannelsSchema, getChannelsSchema } from "./schema";
+import { noahClient } from "../../../utils/noah-client";
 
 /**
  * Get Channel by ID
  */
 export const getChannels = async (args: GetChannelsSchema): Promise<string> => {
-  // TODO: Implement Noah Business API call
-  // Method: GET
-  // Path: /channels/{ChannelID}
+  try {
+    const { ChannelID, ...queryParams } = args;
+    const endpoint = noahClient.replacePath("/channels/{ChannelID}", { ChannelID });
+    const response = await noahClient.get(endpoint, queryParams);
 
-  console.log("Noah API call:", { method: "GET", path: "/channels/{ChannelID}", args });
+    if (response.error) {
+      return JSON.stringify(
+        {
+          error: true,
+          message: response.error.message,
+          details: response.error.details,
+        },
+        null,
+        2,
+      );
+    }
 
-  // This is a placeholder implementation
-  return JSON.stringify({
-    message: "Noah Business API tool not yet implemented",
-    endpoint: "GET /channels/{ChannelID}",
-    args,
-  });
+    return JSON.stringify(
+      {
+        success: true,
+        data: response.data,
+        summary: `Successfully retrieved channel ${ChannelID}`,
+      },
+      null,
+      2,
+    );
+  } catch (error) {
+    return JSON.stringify(
+      {
+        error: true,
+        message: error instanceof Error ? error.message : "Unknown error occurred",
+      },
+      null,
+      2,
+    );
+  }
 };
 
 export const getChannelsTool: ToolRegistration<GetChannelsSchema> = {

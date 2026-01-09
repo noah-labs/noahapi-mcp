@@ -1,22 +1,45 @@
 import type { ToolRegistration } from "@/types/tools";
 import { type GetChannelsSellCountriesSchema, getChannelsSellCountriesSchema } from "./schema";
+import { noahClient } from "../../../utils/noah-client";
 
 /**
- * Countries
+ * Get Sell Channels Countries
  */
 export const getChannelsSellCountries = async (args: GetChannelsSellCountriesSchema): Promise<string> => {
-  // TODO: Implement Noah Business API call
-  // Method: GET
-  // Path: /channels/sell/countries
+  try {
+    const response = await noahClient.get("/channels/sell/countries", args);
 
-  console.log("Noah API call:", { method: "GET", path: "/channels/sell/countries", args });
+    if (response.error) {
+      return JSON.stringify(
+        {
+          error: true,
+          message: response.error.message,
+          details: response.error.details,
+        },
+        null,
+        2,
+      );
+    }
 
-  // This is a placeholder implementation
-  return JSON.stringify({
-    message: "Noah Business API tool not yet implemented",
-    endpoint: "GET /channels/sell/countries",
-    args,
-  });
+    return JSON.stringify(
+      {
+        success: true,
+        data: response.data,
+        summary: "Successfully retrieved sell channels countries",
+      },
+      null,
+      2,
+    );
+  } catch (error) {
+    return JSON.stringify(
+      {
+        error: true,
+        message: error instanceof Error ? error.message : "Unknown error occurred",
+      },
+      null,
+      2,
+    );
+  }
 };
 
 export const getChannelsSellCountriesTool: ToolRegistration<GetChannelsSellCountriesSchema> = {
