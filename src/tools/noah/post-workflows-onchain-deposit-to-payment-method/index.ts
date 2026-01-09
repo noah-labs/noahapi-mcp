@@ -3,6 +3,7 @@ import {
   type PostWorkflowsOnchainDepositToPaymentMethodSchema,
   postWorkflowsOnchainDepositToPaymentMethodSchema,
 } from "./schema";
+import { noahClient } from "../../../utils/noah-client";
 
 /**
  * Onchain Deposit to Fiat Payout
@@ -10,20 +11,41 @@ import {
 export const postWorkflowsOnchainDepositToPaymentMethod = async (
   args: PostWorkflowsOnchainDepositToPaymentMethodSchema,
 ): Promise<string> => {
-  // TODO: Implement Noah Business API call
-  // Method: POST
-  // Path: /workflows/onchain-deposit-to-payment-method
+  try {
+    const response = await noahClient.post("/workflows/onchain-deposit-to-payment-method", args);
 
-  console.log("Noah API call:", { method: "POST", path: "/workflows/onchain-deposit-to-payment-method", args });
+    if (response.error) {
+      return JSON.stringify(
+        {
+          error: true,
+          message: response.error.message,
+          details: response.error.details,
+        },
+        null,
+        2,
+      );
+    }
 
-  // This is a placeholder implementation
-  return JSON.stringify({
-    message: "Noah Business API tool not yet implemented",
-    endpoint: "POST /workflows/onchain-deposit-to-payment-method",
-    args,
-  });
+    return JSON.stringify(
+      {
+        success: true,
+        data: response.data,
+        summary: "Successfully executed /workflows/onchain-deposit-to-payment-method",
+      },
+      null,
+      2,
+    );
+  } catch (error) {
+    return JSON.stringify(
+      {
+        error: true,
+        message: error instanceof Error ? error.message : "Unknown error occurred",
+      },
+      null,
+      2,
+    );
+  }
 };
-
 export const postWorkflowsOnchainDepositToPaymentMethodTool: ToolRegistration<PostWorkflowsOnchainDepositToPaymentMethodSchema> =
   {
     name: "post_workflows_onchain_deposit_to_payment_method",
