@@ -10,7 +10,6 @@
       "ReturnURL": {
         "type": "string",
         "format": "uri",
-        "description": "The URL to which the user is redirected at the end of the Hosted Checkout session. We will include the CheckoutSessionID, ExternalID and Status of the session, ie `?CheckoutSessionID={CheckoutSessionID}&ExternalID={ExternalID}&Status={Status}`",
         "minLength": 10,
         "maxLength": 1000
       },
@@ -290,7 +289,7 @@
           },
           "Network": {
             "$ref": "#/components/schemas/Network",
-            "description": "Account-based network (prod/sandbox):\n * Celo/CeloTestSepolia\n * Ethereum/EthereumTestSepolia\n * Gnosis/GnosisTestChiado\n * PolygonPos/PolygonTestAmoy\n * Solana/SolanaDevnet",
+            "description": "Account-based network (prod/sandbox):\n * Base/BaseTestSepolia\n * Celo/CeloTestSepolia\n * Ethereum/EthereumTestSepolia\n * FlowEvm/FlowEvmTest\n * Gnosis/GnosisTestChiado\n * PolygonPos/PolygonTestAmoy\n * Solana/SolanaDevnet",
             "example": "Ethereum"
           }
         },
@@ -308,7 +307,7 @@
           },
           "Network": {
             "$ref": "#/components/schemas/Network",
-            "description": "Account-based network (prod/sandbox):\n * Celo/CeloTestSepolia\n * Ethereum/EthereumTestSepolia\n * FlowEvm/FlowEvmTest\n * Gnosis/GnosisTestChiado\n * PolygonPos/PolygonTestAmoy\n * Solana/SolanaDevnet",
+            "description": "Account-based network (prod/sandbox):\n * Celo/CeloTestSepolia\n * Ethereum/EthereumTestSepolia\n * Base/BaseTestSepolia\n * FlowEvm/FlowEvmTest\n * Gnosis/GnosisTestChiado\n * PolygonPos/PolygonTestAmoy\n * Solana/SolanaDevnet",
             "example": "Ethereum"
           }
         },
@@ -331,7 +330,7 @@
           },
           "Network": {
             "$ref": "#/components/schemas/Network",
-            "description": "Account-based network (prod/sandbox):\n * Celo/CeloTestSepolia\n * Ethereum/EthereumTestSepolia\n * Gnosis/GnosisTestChiado\n * PolygonPos/PolygonTestAmoy\n * Solana/SolanaDevnet",
+            "description": "Account-based network (prod/sandbox):\n * Base/BaseTestSepolia\n * Celo/CeloTestSepolia\n * Ethereum/EthereumTestSepolia\n * FlowEvm/FlowEvmTest\n * Gnosis/GnosisTestChiado\n * PolygonPos/PolygonTestAmoy\n * Solana/SolanaDevnet",
             "example": "Ethereum"
           },
           "DestinationAddress": {
@@ -544,7 +543,13 @@
             "$ref": "#/components/schemas/ExternalID"
           }
         },
-        "required": ["CryptoAuthorizedAmount", "CryptoCurrency", "FiatAmount", "FormSessionID", "Nonce"]
+        "required": [
+          "CryptoAuthorizedAmount",
+          "CryptoCurrency",
+          "FiatAmount",
+          "FormSessionID",
+          "Nonce"
+        ]
       },
       "BankDepositToOnchainAddressRequest": {
         "type": "object",
@@ -566,7 +571,13 @@
             "description": "The final destination address to which the crypto currency should be transferred."
           }
         },
-        "required": ["CustomerID", "FiatCurrency", "CryptoCurrency", "Network", "DestinationAddress"]
+        "required": [
+          "CustomerID",
+          "FiatCurrency",
+          "CryptoCurrency",
+          "Network",
+          "DestinationAddress"
+        ]
       },
       "BankDepositToOnchainAddressResponse": {
         "type": "object",
@@ -823,7 +834,7 @@
       },
       "CryptoCurrencyCode": {
         "type": "string",
-        "description": "Cryptocurrency (prod/sandbox):\n * BTC/BTC_TEST\n * USDC/USDC_TEST\n",
+        "description": "Cryptocurrency:\n\n| Environment | BTC | ETH | USDC |\n|------------|-----|-------|------|\n| Sandbox | BTC_TEST | ETH_TEST_SEPOLIA | USDC_TEST |\n| Production | BTC | ETH | USDC |\n",
         "example": "BTC"
       },
       "FiatCurrencyCode": {
@@ -840,6 +851,19 @@
         },
         "description": "Fiat option for a customer to be onboarded with.",
         "required": ["FiatCurrencyCode"]
+      },
+      "CryptoOption": {
+        "type": "object",
+        "properties": {
+          "CryptoCurrency": {
+            "$ref": "#/components/schemas/CryptoCurrencyCode"
+          },
+          "Network": {
+            "$ref": "#/components/schemas/Network"
+          }
+        },
+        "description": "Crypto-network pair option for a customer to choose from. The system will try each option in order until one succeeds.",
+        "required": ["CryptoCurrency", "Network"]
       },
       "CountryCode": {
         "type": "string",
@@ -876,7 +900,7 @@
       },
       "Network": {
         "type": "string",
-        "description": "Payments network (prod/sandbox):\n * Bitcoin/BitcoinTest\n * Celo/CeloTestSepolia\n * FlowEvm/FlowEvmTest\n * Gnosis/GnosisTestChiado\n * Lightning/LightningTest\n * Ethereum/EthereumTestSepolia\n * PolygonPos/PolygonTestAmoy\n * Solana/SolanaDevnet\n * OffNetwork/OffNetwork\n",
+        "description": "Payments network (prod/sandbox):\n * Base/BaseTestSepolia\n * Bitcoin/BitcoinTest\n * Celo/CeloTestSepolia\n * Ethereum/EthereumTestSepolia\n * FlowEvm/FlowEvmTest\n * Gnosis/GnosisTestChiado\n * PolygonPos/PolygonTestAmoy\n * Solana/SolanaDevnet\n * OffNetwork/OffNetwork\n",
         "example": "Bitcoin"
       },
       "Nonce": {
@@ -959,8 +983,7 @@
             "description": "NOAH's unique identifier for the transaction."
           },
           "PublicID": {
-            "type": "string",
-            "description": "The public blockchain transaction id or hash. This identifier is only available for transactions that are broadcast to a public network as well as some private networks where available, e.g. Lightning"
+            "$ref": "#/components/schemas/PublicID"
           },
           "Network": {
             "$ref": "#/components/schemas/Network"
@@ -1015,9 +1038,43 @@
           "AdjustmentFor": {
             "description": "Identifies a transaction that this transaction adjusts and details about the adjustment.",
             "$ref": "#/components/schemas/TransactionAdjustment"
+          },
+          "Refunds": {
+            "type": "array",
+            "description": "Refund attempts associated with this transaction.",
+            "items": {
+              "$ref": "#/components/schemas/TransactionRefund"
+            },
+            "x-go-type-skip-optional-pointer": true
           }
         },
         "required": ["ID", "Network", "Created", "Status", "Direction", "CryptoCurrency"]
+      },
+      "TransactionRefund": {
+        "type": "object",
+        "properties": {
+          "RefundID": {
+            "type": "string",
+            "description": "Identifier of the refund payment."
+          },
+          "RefundedAmount": {
+            "$ref": "#/components/schemas/PositiveDecimal",
+            "description": "Amount requested to refund. May be equal, less or greater than the original amount. It could be greater if the AssetID from refund is different from the AssetID from the original transaction."
+          },
+          "Currency": {
+            "$ref": "#/components/schemas/AssetID",
+            "description": "Currency of the refund payment."
+          },
+          "RequestTime": {
+            "$ref": "#/components/schemas/DateTime",
+            "description": "Timestamp when the refund was requested."
+          },
+          "Status": {
+            "$ref": "#/components/schemas/TransactionStatus",
+            "description": "Status of the refund."
+          }
+        },
+        "required": ["RefundID", "RefundedAmount", "Currency", "RequestTime", "Status"]
       },
       "TransactionBreakdownItem": {
         "type": "object",
@@ -1627,7 +1684,9 @@
           },
           "RegisteredName": {
             "type": "string",
-            "description": "Name of the business."
+            "description": "Name of the business.",
+            "minLength": 1,
+            "maxLength": 100
           },
           "Email": {
             "type": "string",
@@ -1636,7 +1695,12 @@
           },
           "RegistrationNumber": {
             "type": "string",
-            "description": "Registration number of the business."
+            "description": "Registration number of the business.",
+            "minLength": 1,
+            "maxLength": 40
+          },
+          "EntityType": {
+            "$ref": "#/components/schemas/EntityEnum"
           },
           "RegistrationCountry": {
             "$ref": "#/components/schemas/CountryCode"
@@ -1654,7 +1718,8 @@
           "RegistrationCountry",
           "RegisteredAddress",
           "IncorporationDate",
-          "RegisteredName"
+          "RegisteredName",
+          "EntityType"
         ]
       },
       "BusinessCustomerPrefill": {
@@ -1745,7 +1810,14 @@
           "SourceOfFunds": {
             "type": "string",
             "description": "What will be the source of incoming funds to your account?",
-            "enum": ["Revenue", "Investments", "LoansCredits", "TradingIncome", "CryptoMining", "ClientFunds"]
+            "enum": [
+              "Revenue",
+              "Investments",
+              "LoansCredits",
+              "TradingIncome",
+              "CryptoMining",
+              "ClientFunds"
+            ]
           },
           "FinancialsUsd": {
             "$ref": "#/components/schemas/BusinessFinancialsInput"
@@ -1871,7 +1943,7 @@
             }
           }
         },
-        "required": ["Type"]
+        "required": ["Type", "RegistrationCountry"]
       },
       "IndividualCustomerPrefill": {
         "type": "object",
@@ -1947,7 +2019,13 @@
           "TransactionFrequency": {
             "type": "string",
             "description": "What's your expected frequency of transactions?",
-            "enum": ["OncePerYear", "OnceEveryFewMonths", "AFewTimesPerMonth", "OncePerWeek", "MoreThanOncePerWeek"]
+            "enum": [
+              "OncePerYear",
+              "OnceEveryFewMonths",
+              "AFewTimesPerMonth",
+              "OncePerWeek",
+              "MoreThanOncePerWeek"
+            ]
           }
         },
         "required": ["Type"]
@@ -2031,7 +2109,7 @@
             "maximum": 100
           }
         },
-        "required": ["ID"]
+        "required": ["ID", "RegistrationCountry"]
       },
       "IndividualFinancialsInput": {
         "type": "object",
@@ -2158,7 +2236,8 @@
             "$ref": "#/components/schemas/CustomerID"
           },
           "ReturnURL": {
-            "$ref": "#/components/schemas/ReturnURL"
+            "$ref": "#/components/schemas/ReturnURL",
+            "description": "The URL to which the user is redirected at the end of the Hosted Checkout session. We will include the CheckoutSessionID, ExternalID and Status of the session, ie `?CheckoutSessionID={CheckoutSessionID}&ExternalID={ExternalID}&Status={Status}`"
           },
           "LineItems": {
             "$ref": "#/components/schemas/LineItems"
@@ -2216,6 +2295,14 @@
             "description": "List of fiat options to be supported by the customer.",
             "x-go-type-skip-optional-pointer": true
           },
+          "CryptoOptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CryptoOption"
+            },
+            "description": "List of cryptocurrency-network pair options for the customer to choose from. The system will try each option in order until one succeeds. If not provided, CryptoCurrency and Network must be specified.",
+            "x-go-type-skip-optional-pointer": true
+          },
           "Metadata": {
             "type": "object",
             "description": "Custom user defined key value pairs used for storing additional information.",
@@ -2225,7 +2312,7 @@
             "maxProperties": 10
           }
         },
-        "required": ["ReturnURL", "CustomerID", "CryptoCurrency", "Network", "DestinationAddress", "FiatOptions"]
+        "required": ["ReturnURL", "CustomerID", "DestinationAddress", "FiatOptions"]
       },
       "OnchainDepositToPaymentMethodHostedRequest": {
         "type": "object",
@@ -2322,6 +2409,11 @@
           },
           "Form": {
             "$ref": "#/components/schemas/FormInput"
+          },
+          "CustomerType": {
+            "type": "string",
+            "enum": ["Individual", "Business"],
+            "description": "Type of customer to onboard. Defaults to Individual if not provided."
           }
         },
         "required": ["ReturnURL", "FiatOptions"]
@@ -2688,7 +2780,13 @@
             "$ref": "#/components/schemas/ExternalID"
           }
         },
-        "required": ["Type", "CryptoCurrency", "CryptoAuthorizedAmount", "FiatAmount", "FormSessionID"]
+        "required": [
+          "Type",
+          "CryptoCurrency",
+          "CryptoAuthorizedAmount",
+          "FiatAmount",
+          "FormSessionID"
+        ]
       },
       "Rule": {
         "type": "object",
@@ -2725,6 +2823,10 @@
           },
           "FiatCurrency": {
             "$ref": "#/components/schemas/FiatCurrencyCode"
+          },
+          "Reference": {
+            "type": "string",
+            "description": "Optional reference of the deposit for testing purposes."
           }
         },
         "required": ["PaymentMethodID", "FiatAmount", "FiatCurrency"]
@@ -2825,6 +2927,236 @@
         "enum": ["Pending", "Failed", "Settled"],
         "description": "Statuses for a FiatDeposit.",
         "example": "Settled"
+      },
+      "Agreement": {
+        "type": "object",
+        "properties": {
+          "Name": {
+            "type": "string",
+            "enum": [
+              "NoahPrivacyPolicy",
+              "NoahTermsOfService",
+              "NoahEsignAgreement",
+              "LeadBankFundTransfer",
+              "LeadBankTermsAndConditions",
+              "LeadBankBusinessFundTransfer"
+            ]
+          },
+          "Version": {
+            "type": "integer"
+          },
+          "Accepted": {
+            "type": "boolean",
+            "enum": [true],
+            "description": "Whether the agreement has been accepted."
+          },
+          "AcceptedAt": {
+            "$ref": "#/components/schemas/DateTime",
+            "description": "When the agreement was accepted."
+          }
+        },
+        "required": ["Name", "Version", "Accepted", "AcceptedAt"]
+      },
+      "Description": {
+        "type": "string",
+        "maxLength": 200,
+        "example": "25 Arks"
+      },
+      "Metadata": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "string"
+        },
+        "example": {
+          "customer_name": "John Doe"
+        }
+      },
+      "CancelURL": {
+        "type": "string",
+        "format": "uri",
+        "example": "https://merchant.com/payment/cancel"
+      },
+      "PaymentURL": {
+        "type": "string",
+        "format": "uri",
+        "example": "https://payment.com/payment/1234567890"
+      },
+      "Psp": {
+        "type": "string",
+        "enum": ["CryptoCom"],
+        "example": "CryptoCom"
+      },
+      "PaymentExpiry": {
+        "type": "string",
+        "format": "date-time",
+        "example": "2026-01-01T12:00:00Z",
+        "description": "Time the payment session expires"
+      },
+      "PublicID": {
+        "type": "string",
+        "description": "The public blockchain transaction id or hash. This identifier is only available for transactions that are broadcast to a public network."
+      },
+      "PspRawEvent": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "TransactionID": {
+        "type": "string",
+        "format": "uuid",
+        "example": "123e4567-e89b-12d3-a456-426614174000"
+      },
+      "DestinationNetwork": {
+        "type": "string",
+        "example": "Ethereum",
+        "description": "Network for the payout transaction."
+      },
+      "MerchantID": {
+        "type": "string",
+        "description": "A unique identifier for the merchant in the Business' internal system and in NOAH.",
+        "example": "merchant-123"
+      },
+      "PspToOnchainRequest": {
+        "type": "object",
+        "properties": {
+          "ExternalID": {
+            "$ref": "#/components/schemas/ExternalID"
+          },
+          "Psp": {
+            "$ref": "#/components/schemas/Psp"
+          },
+          "MerchantID": {
+            "$ref": "#/components/schemas/MerchantID"
+          },
+          "Amount": {
+            "$ref": "#/components/schemas/PositiveDecimal"
+          },
+          "Currency": {
+            "$ref": "#/components/schemas/CryptoCurrencyCode"
+          },
+          "Description": {
+            "$ref": "#/components/schemas/Description"
+          },
+          "Metadata": {
+            "$ref": "#/components/schemas/Metadata"
+          },
+          "ReturnURL": {
+            "$ref": "#/components/schemas/ReturnURL",
+            "description": "The URL to which the user is redirected at the end of the Payment session."
+          },
+          "DestinationCryptoCurrency": {
+            "$ref": "#/components/schemas/CryptoCurrencyCode"
+          },
+          "DestinationNetwork": {
+            "$ref": "#/components/schemas/Network"
+          },
+          "DestinationAddress": {
+            "$ref": "#/components/schemas/DestinationAddress"
+          },
+          "Expiry": {
+            "$ref": "#/components/schemas/PaymentExpiry"
+          }
+        },
+        "required": [
+          "Psp",
+          "MerchantID",
+          "Amount",
+          "Currency",
+          "DestinationCryptoCurrency",
+          "DestinationNetwork",
+          "DestinationAddress"
+        ]
+      },
+      "PspToOnchainResponse": {
+        "type": "object",
+        "properties": {
+          "ID": {
+            "type": "string",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "PaymentID": {
+            "type": "string",
+            "description": "The payment ID from the payment service provider.",
+            "example": "d413c708-4b37-4f16-bc3c-7c3056b0a8e3"
+          },
+          "TransactionID": {
+            "$ref": "#/components/schemas/TransactionID"
+          },
+          "PublicID": {
+            "$ref": "#/components/schemas/PublicID",
+            "example": "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+          },
+          "ExternalID": {
+            "$ref": "#/components/schemas/ExternalID"
+          },
+          "Psp": {
+            "$ref": "#/components/schemas/Psp"
+          },
+          "MerchantID": {
+            "$ref": "#/components/schemas/MerchantID"
+          },
+          "PaymentURL": {
+            "$ref": "#/components/schemas/PaymentURL"
+          },
+          "Amount": {
+            "$ref": "#/components/schemas/PositiveDecimal"
+          },
+          "Currency": {
+            "$ref": "#/components/schemas/CryptoCurrencyCode"
+          },
+          "Status": {
+            "$ref": "#/components/schemas/TransactionStatus",
+            "description": "Overall workflow status combining payment and withdrawal statuses."
+          },
+          "PaymentStatus": {
+            "$ref": "#/components/schemas/TransactionStatus",
+            "description": "PSP payment status from the payment service provider."
+          },
+          "WithdrawStatus": {
+            "$ref": "#/components/schemas/TransactionStatus",
+            "description": "Withdrawal status from orchestration execution."
+          },
+          "FiatDepositID": {
+            "type": "string",
+            "description": "Reference to the created FiatDeposit when the payment is captured."
+          },
+          "DestinationCryptoCurrency": {
+            "$ref": "#/components/schemas/CryptoCurrencyCode"
+          },
+          "DestinationNetwork": {
+            "$ref": "#/components/schemas/Network"
+          },
+          "DestinationAddress": {
+            "$ref": "#/components/schemas/DestinationAddress"
+          },
+          "Created": {
+            "$ref": "#/components/schemas/DateTime"
+          },
+          "Updated": {
+            "$ref": "#/components/schemas/DateTime"
+          },
+          "Expiry": {
+            "$ref": "#/components/schemas/PaymentExpiry"
+          },
+          "PspRawEvent": {
+            "$ref": "#/components/schemas/PspRawEvent"
+          }
+        },
+        "required": [
+          "ID",
+          "Psp",
+          "PaymentID",
+          "MerchantID",
+          "PaymentURL",
+          "Amount",
+          "Currency",
+          "Status",
+          "DestinationCryptoCurrency",
+          "DestinationNetwork",
+          "DestinationAddress",
+          "Created",
+          "Updated",
+          "PspRawEvent"
+        ]
       }
     },
     "callbacks": {
@@ -2916,9 +3248,95 @@
     {
       "name": "Onboarding",
       "description": "Resources that are related to Onboarding."
+    },
+    {
+      "name": "PSP Payments",
+      "description": "Resources that are related to PSP Payments."
     }
   ],
   "paths": {
+    "/help/{CustomerID}": {
+      "post": {
+        "summary": "Help Desk Session",
+        "description": "This endpoint creates a help desk session for the customer.",
+        "tags": ["Utilities"],
+        "parameters": [
+          {
+            "name": "CustomerID",
+            "in": "path",
+            "schema": {
+              "$ref": "#/components/schemas/CustomerID"
+            },
+            "required": true
+          },
+          {
+            "description": "Digitally signed JWT.",
+            "in": "header",
+            "name": "Api-Signature",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ReturnURL": {
+                    "$ref": "#/components/schemas/ReturnURL"
+                  }
+                },
+                "required": ["ReturnURL"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Help Desk Session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HostedSessionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Bad request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Client is not authorized to perform this action"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/balances": {
       "get": {
         "summary": "Balances",
@@ -3195,8 +3613,6 @@
             "name": "CryptoCurrency",
             "in": "query",
             "required": true,
-            "example": "BTC",
-            "description": "Cryptocurrency (prod/sandbox):\n * BTC/BTC_TEST\n * USDC/USDC_TEST\n",
             "schema": {
               "$ref": "#/components/schemas/CryptoCurrencyCode"
             }
@@ -3412,7 +3828,14 @@
                     "$ref": "#/components/schemas/Nonce"
                   }
                 },
-                "required": ["CryptoCurrency", "CryptoAmount", "CustomerID", "ReturnURL", "LineItems", "Nonce"]
+                "required": [
+                  "CryptoCurrency",
+                  "CryptoAmount",
+                  "CustomerID",
+                  "ReturnURL",
+                  "LineItems",
+                  "Nonce"
+                ]
               }
             }
           }
@@ -3848,7 +4271,7 @@
         },
         "responses": {
           "200": {
-            "description": "HostedURL successfully created.",
+            "description": "Hosted onboarding session request successful.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3856,6 +4279,9 @@
                 }
               }
             }
+          },
+          "201": {
+            "description": "Customer created"
           },
           "400": {
             "content": {

@@ -10,7 +10,8 @@ export const postOnboardingByIdSchema = z.object({
   FiatOptions: z.array(z.object({
   FiatCurrencyCode: z.string()
 })).describe("List of fiat options to be supported by the customer."),
-  Form: z.record(z.string(), z.unknown()).optional()
+  Form: z.record(z.string(), z.unknown()).optional(),
+  CustomerType: z.enum(["Individual", "Business"]).optional().describe("Type of customer to onboard. Defaults to Individual if not provided.")
 
 });
 
