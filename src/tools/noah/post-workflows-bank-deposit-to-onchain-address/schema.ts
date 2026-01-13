@@ -5,13 +5,9 @@ export const postWorkflowsBankDepositToOnchainAddressSchema = z.object({
   FiatCurrency: z.string(),
   CryptoCurrency: z.string(),
   Network: z.string(),
-  DestinationAddress: z
-    .object({
-      Address: z.string(),
-    })
-    .describe("The final destination address to which the crypto currency should be transferred."),
+  DestinationAddress: z.object({
+  Address: z.string()
+}).describe("The final destination address to which the crypto currency should be transferred.")
 });
 
-export type PostWorkflowsBankDepositToOnchainAddressSchema = z.infer<
-  typeof postWorkflowsBankDepositToOnchainAddressSchema
->;
+export type PostWorkflowsBankDepositToOnchainAddressSchema = z.infer<typeof postWorkflowsBankDepositToOnchainAddressSchema>;

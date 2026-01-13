@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from "fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from "fs";
 import { join } from "path";
 
 interface OpenAPISpec {
@@ -44,6 +44,14 @@ function toKebabCase(str: string): string {
 }
 
 function sanitizeToolName(path: string, method: string): string {
+  // Check if path ends with a parameter like {CustomerID} or {TransactionID}
+  // In that case, add "by-id" suffix to distinguish from the list endpoint
+  const pathParamMatch = path.match(/\/\{([^}]+)\}$/);
+  let suffix = "";
+  if (pathParamMatch) {
+    suffix = "-by-id";
+  }
+
   // Remove path parameters and clean up the path
   const cleanPath = path
     .replace(/\{[^}]+\}/g, "") // Remove path parameters like {CustomerID}
@@ -53,7 +61,7 @@ function sanitizeToolName(path: string, method: string): string {
     .replace(/-+/g, "-") // Replace multiple dashes with single dash
     .replace(/^-|-$/g, ""); // Remove leading/trailing dashes
 
-  return `${method}-${cleanPath}`.toLowerCase();
+  return `${method}-${cleanPath}${suffix}`.toLowerCase();
 }
 
 function escapeDescription(desc: string): string {
@@ -321,20 +329,59 @@ function main() {
       mkdirSync(toolDir, { recursive: true });
     }
 
-    // Write schema file
+    // Write schema file (always update to stay in sync with OAS spec)
     writeFileSync(join(toolDir, "schema.ts"), schemaContent);
 
-    // Write index file
-    writeFileSync(join(toolDir, "index.ts"), indexContent);
+    // Write index file only if it doesn't exist or is still a placeholder
+    const indexPath = join(toolDir, "index.ts");
+    let shouldWriteIndex = true;
+    if (existsSync(indexPath)) {
+      const existingContent = readFileSync(indexPath, "utf-8");
+      // Check if the existing file is a placeholder (contains the TODO marker)
+      if (!existingContent.includes("TODO: Implement Noah Business API call")) {
+        shouldWriteIndex = false;
+        console.log(`Skipping ${toolName}/index.ts (already implemented)`);
+      }
+    }
 
-    toolNames.push(toolName);
-    console.log(`Generated tool: ${toolName}`);
+    if (shouldWriteIndex) {
+      writeFileSync(indexPath, indexContent);
+      console.log(`Generated tool: ${toolName}`);
+    }
+
+    // Only add unique tool names
+    if (!toolNames.includes(toolName)) {
+      toolNames.push(toolName);
+    }
   }
+
+  // Scan for existing tool directories that have implemented tools (not placeholders)
+  // This ensures we don't lose tools that exist but aren't in the current OAS
+  const existingDirs = readdirSync(toolsDir, { withFileTypes: true })
+    .filter((dirent) => dirent.isDirectory())
+    .map((dirent) => dirent.name);
+
+  for (const dirName of existingDirs) {
+    if (!toolNames.includes(dirName)) {
+      const indexPath = join(toolsDir, dirName, "index.ts");
+      if (existsSync(indexPath)) {
+        const content = readFileSync(indexPath, "utf-8");
+        // Include if it's implemented (not a placeholder)
+        if (!content.includes("TODO: Implement Noah Business API call")) {
+          toolNames.push(dirName);
+          console.log(`Including existing tool: ${dirName}`);
+        }
+      }
+    }
+  }
+
+  // Sort tool names for consistent output
+  toolNames.sort();
 
   // Generate index file for all Noah tools
   const imports = toolNames.map((name) => `import { ${toCamelCase(name)}Tool } from "./${name}/index.js";`).join("\n");
 
-  const exports = toolNames.map((name) => `  ${toCamelCase(name)}Tool`).join(",\n");
+  const exports = toolNames.map((name) => `    ${toCamelCase(name)}Tool`).join(",\n");
 
   const indexFileContent = `${imports}
 import type { ToolRegistration } from "../../types/tools.js";
@@ -342,7 +389,7 @@ import type { ToolRegistration } from "../../types/tools.js";
 // biome-ignore lint/suspicious/noExplicitAny: Any is fine here because all tools validate their input schemas.
 export const createNoahTools = (): ToolRegistration<any>[] => {
   return [
-${exports}
+${exports},
   ];
 };
 
