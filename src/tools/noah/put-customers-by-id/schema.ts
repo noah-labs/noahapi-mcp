@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const putCustomersSchema = z.object({
+export const putCustomersByIdSchema = z.object({
   CustomerID: z.string(),
   Type: z.enum(["Individual", "Business"]),
   // Individual fields
@@ -42,4 +42,4 @@ export const putCustomersSchema = z.object({
   IncorporationDate: z.string().optional()
 });
 
-export type PutCustomersSchema = z.infer<typeof putCustomersSchema>;
+export type PutCustomersByIdSchema = z.infer<typeof putCustomersByIdSchema>;
