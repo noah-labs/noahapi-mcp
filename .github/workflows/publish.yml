@@ -24,7 +24,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20.x"
+          node-version: "24.x"
           registry-url: "https://registry.npmjs.org"
 
       - name: Install dependencies
@@ -32,12 +32,6 @@ jobs:
 
       - name: Build
         run: bun run build
-      # - id: changesets
-      #   uses: changesets/action@v1
-      #   with:
-      #     publish: ./scripts/publish.sh
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Publish to NPM
-        run: npm publish --access public --provenance
+        run: npm publish --access public
