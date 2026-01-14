@@ -36,6 +36,7 @@ export const postCheckoutPayinCryptoSchema = z.object({
   RegisteredName: z.string().describe("Name of the business."),
   Email: z.string().optional().describe("Email address of the business."),
   RegistrationNumber: z.string().describe("Registration number of the business."),
+  EntityType: z.enum(["LimitedLiabilityCompany", "PublicCompany", "SoleProprietorship", "Partnership", "Corporation", "Trust", "PrivateFoundation", "Charity", "NonProfitOrganization", "PublicAgency"]),
   RegistrationCountry: z.string(),
   RegisteredAddress: z.object({
   Street: z.string().describe("Street: the primary name of an address's street."),
