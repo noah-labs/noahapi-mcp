@@ -95,6 +95,12 @@
           "FormSchema": {
             "$ref": "#/components/schemas/FormSchema",
             "description": "Form schema which needs to be filled by the customer. If a PaymentMethodID was provided, only the missing fields are displayed in the schema."
+          },
+          "FormMetadata": {
+            "$ref": "#/components/schemas/FormMetadata"
+          },
+          "Issuer": {
+            "$ref": "#/components/schemas/Issuer"
           }
         },
         "required": [
@@ -205,9 +211,41 @@
           },
           "Details": {
             "$ref": "#/components/schemas/PaymentMethodDisplayDetails"
+          },
+          "AccountHolderDetails": {
+            "$ref": "#/components/schemas/AccountHolderDetails"
+          },
+          "IssuerDetails": {
+            "$ref": "#/components/schemas/IssuerDetails"
           }
         },
         "required": ["ID", "PaymentMethodType", "Details"]
+      },
+      "BankToAddressRelatedPaymentMethod": {
+        "type": "object",
+        "properties": {
+          "PaymentMethodID": {
+            "$ref": "#/components/schemas/PaymentMethodID"
+          },
+          "PaymentMethodType": {
+            "$ref": "#/components/schemas/PaymentMethodType"
+          },
+          "Details": {
+            "$ref": "#/components/schemas/BankToAddressFiatPaymentMethodBankDisplay"
+          }
+        },
+        "required": ["PaymentMethodID", "PaymentMethodType", "Details"]
+      },
+      "BankToAddressFiatPaymentMethodBankDisplay": {
+        "type": "object",
+        "properties": {
+          "AccountNumber": {
+            "type": "string"
+          },
+          "BankCode": {
+            "type": "string"
+          }
+        }
       },
       "FiatPaymentMethodBankDisplay": {
         "type": "object",
@@ -414,9 +452,36 @@
           },
           "DisplayDetails": {
             "$ref": "#/components/schemas/PaymentMethodDisplayDetails"
+          },
+          "Capabilities": {
+            "$ref": "#/components/schemas/PaymentMethodCapabilities"
+          },
+          "AccountHolderDetails": {
+            "$ref": "#/components/schemas/AccountHolderDetails"
+          },
+          "IssuerDetails": {
+            "$ref": "#/components/schemas/IssuerDetails"
           }
         },
         "required": ["ID", "PaymentMethodCategory", "DisplayDetails", "Country"]
+      },
+      "PaymentMethodCapabilities": {
+        "type": "object",
+        "properties": {
+          "PayoutFrom": {
+            "type": "boolean",
+            "description": "internally generated, can take money out of the system"
+          },
+          "PayinTo": {
+            "type": "boolean",
+            "description": "user supplied, can add money into the system"
+          },
+          "PayoutTo": {
+            "type": "boolean",
+            "description": "user supplied, can take money out of the system"
+          }
+        },
+        "required": ["PayoutTo", "PayoutFrom", "PayinTo"]
       },
       "GetPaymentMethodsResponse": {
         "type": "object",
@@ -494,6 +559,9 @@
           "ChannelID": {
             "$ref": "#/components/schemas/ChannelID"
           },
+          "FormSessionID": {
+            "$ref": "#/components/schemas/FormSessionID"
+          },
           "PaymentMethodID": {
             "$ref": "#/components/schemas/PaymentMethodID"
           },
@@ -514,6 +582,10 @@
           "DelayedSell": {
             "type": "boolean",
             "description": "When enabled, balance checks are deferred until the final sell request, allowing the order to be prepared now and executed later."
+          },
+          "Version": {
+            "type": "string",
+            "description": "Optional API version."
           }
         },
         "required": ["ChannelID", "CryptoCurrency", "FiatAmount"]
@@ -605,9 +677,19 @@
           },
           "BankAddress": {
             "$ref": "#/components/schemas/StreetAddress"
+          },
+          "Network": {
+            "$ref": "#/components/schemas/Network"
+          },
+          "RelatedPaymentMethods": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BankToAddressRelatedPaymentMethod"
+            },
+            "x-go-type-skip-optional-pointer": true
           }
         },
-        "required": ["PaymentMethodID", "PaymentMethodType", "AccountNumber"]
+        "required": ["PaymentMethodID", "PaymentMethodType", "AccountNumber", "Network"]
       },
       "OnchainDepositToPaymentMethodRequest": {
         "type": "object",
@@ -756,8 +838,22 @@
           "FormSchema": {
             "$ref": "#/components/schemas/FormSchema",
             "description": "Form schema which needs to be filled by the customer. If no customer input is required, this field is omitted."
+          },
+          "FormMetadata": {
+            "$ref": "#/components/schemas/FormMetadata"
           }
         }
+      },
+      "FormMetadata": {
+        "type": "object",
+        "description": "Metadata about a form schema. The ContentHash matches the contentHash in pre-compiled static form schemas, enabling correlation between dynamic and static forms.",
+        "properties": {
+          "ContentHash": {
+            "type": "string",
+            "description": "SHA256 hash of the form schema content. Matches the contentHash field in published static form schema metadata."
+          }
+        },
+        "required": ["ContentHash"]
       },
       "FormInput": {
         "type": "object",
@@ -796,9 +892,37 @@
           },
           "FormSessionID": {
             "$ref": "#/components/schemas/FormSessionID"
+          },
+          "NextStep": {
+            "$ref": "#/components/schemas/FormNextStep"
           }
         },
         "required": ["FormSessionID", "TotalFee", "CryptoAmountEstimate", "CryptoAuthorizedAmount"]
+      },
+      "FormStepID": {
+        "type": "string",
+        "description": "Identifier for a form step.",
+        "enum": ["Vop", "Cob", "PaymentDetails"]
+      },
+      "FormNextStepType": {
+        "type": "string",
+        "description": "UX intent for the next step. Ack: acknowledgement-only step. DataEntry: collect new information.",
+        "enum": ["Ack", "DataEntry"]
+      },
+      "FormNextStep": {
+        "type": "object",
+        "properties": {
+          "StepID": {
+            "$ref": "#/components/schemas/FormStepID"
+          },
+          "StepType": {
+            "$ref": "#/components/schemas/FormNextStepType"
+          },
+          "Schema": {
+            "$ref": "#/components/schemas/FormSchema"
+          }
+        },
+        "required": ["StepID", "StepType", "Schema"]
       },
       "GetCustomersResponse": {
         "type": "object",
@@ -862,13 +986,48 @@
             "$ref": "#/components/schemas/Network"
           }
         },
-        "description": "Crypto-network pair option for a customer to choose from. The system will try each option in order until one succeeds.",
+        "description": "Crypto-network pair option for a customer to choose from.",
         "required": ["CryptoCurrency", "Network"]
+      },
+      "CryptoOptionsAutoSelect": {
+        "type": "string",
+        "description": "Strategy for automatically selecting a crypto option, removing the need for the customer to choose. 'Order' selects the first available option from the provided list.",
+        "enum": ["Order"]
+      },
+      "CryptoOptionsConfig": {
+        "type": "object",
+        "properties": {
+          "AutoSelect": {
+            "$ref": "#/components/schemas/CryptoOptionsAutoSelect"
+          }
+        },
+        "description": "Configuration for crypto options behavior in the hosted UI."
+      },
+      "BankToAddressUI": {
+        "type": "object",
+        "properties": {
+          "CryptoOptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CryptoOption"
+            },
+            "description": "List of cryptocurrency-network pair options for the customer to choose from. The system will try each option in order until one succeeds.",
+            "x-go-type-skip-optional-pointer": true
+          },
+          "CryptoOptionsConfig": {
+            "$ref": "#/components/schemas/CryptoOptionsConfig"
+          }
+        },
+        "description": "UI configuration for the bank-to-address hosted workflow.",
+        "required": ["CryptoOptions"]
       },
       "CountryCode": {
         "type": "string",
         "description": "ISO 3166-1 alpha-2 country code.",
         "example": "US"
+      },
+      "Issuer": {
+        "type": "string"
       },
       "AssetID": {
         "type": "string",
@@ -915,6 +1074,11 @@
         "description": "Categorizes one or more `PaymentMethodType`s into broader groups. Useful for listing channels, displaying payment methods:\n * Bank\n * Card\n * Identifier\n",
         "example": "Bank"
       },
+      "PaymentMethodCapability": {
+        "type": "string",
+        "description": "Capability filter for payment methods:\n * PayoutFrom - Methods used to send money out of the system (system-generated)\n * PayoutTo - Methods used to send money out of the system (user-supplied)\n * PayinTo - Methods used to submit money into the system (user-supplied, excludes system-generated methods like virtual accounts)",
+        "enum": ["PayoutFrom", "PayinTo", "PayoutTo"]
+      },
       "ProcessingTier": {
         "type": "string",
         "description": "Processing tier for a payment method, this may affect the settlement time of the transaction. \n * Standard: it's the payment processor method standard option, for BankACH it means ACH next day settlement.\n * Priority: it's the payment processor method priority option, for BankACH it means ACH same day settlement.",
@@ -922,7 +1086,7 @@
       },
       "PaymentMethodType": {
         "type": "string",
-        "description": "Specific type of payment method:\n * BankSepa\n * BankLocal\n * BankFedwire\n * TokenizedCard\n * IdentifierPix\n",
+        "description": "Specific type of payment method:\n * BankAch\n * BankFedNow\n * BankFedwire\n * BankLocal\n * BankSepa\n * BankSortCode\n * BankSwift\n * IdentifierAlias\n * IdentifierMerchantID\n * IdentifierMobileMoney\n * IdentifierPix\n * IdentifierQr\n * TokenizedCard\n",
         "example": "BankLocal"
       },
       "Address": {
@@ -1350,6 +1514,26 @@
         },
         "required": ["Street", "City", "PostCode", "State", "Country"]
       },
+      "AccountHolderDetails": {
+        "type": "object",
+        "description": "Details of the account holder associated with the payment method.",
+        "properties": {
+          "Name": {
+            "$ref": "#/components/schemas/FullName",
+            "description": "Name of the account holder."
+          }
+        }
+      },
+      "IssuerDetails": {
+        "type": "object",
+        "description": "Details of the issuer of the payment method (e.g. the bank for bank transfers).",
+        "properties": {
+          "Name": {
+            "type": "string",
+            "description": "Name of the issuer (e.g. the bank or financial institution)."
+          }
+        }
+      },
       "CustomerIdentity": {
         "type": "object",
         "properties": {
@@ -1603,6 +1787,7 @@
           "NationalIDCard",
           "Passport",
           "UtilityBill",
+          "SourceOfFunds",
           "ResidencePermit",
           "ForeignerID",
           "MemorandumAndArticles",
@@ -2030,6 +2215,66 @@
         },
         "required": ["Type"]
       },
+      "IndividualCustomerHighRiskPrefill": {
+        "type": "object",
+        "properties": {
+          "Type": {
+            "type": "string",
+            "enum": ["IndividualCustomerHighRiskPrefill"]
+          },
+          "MainVirtualAccountPurpose": {
+            "type": "array",
+            "description": "What is the primary purpose of using the virtual account? (select all that apply)",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "enum": [
+                "ReceivingEmployerPayments",
+                "ReceivingCustomerPayments",
+                "ReceivingFamilyFriendPayments",
+                "InvestmentRelatedPayments",
+                "Other"
+              ]
+            }
+          },
+          "CustomerPaymentsAdvertisement": {
+            "type": "string",
+            "description": "If receiving payments from customers, specify how your services are advertised."
+          },
+          "ExpectedCounterpartyCount": {
+            "type": "string",
+            "description": "How many different counterparties do you expect to send funds into your vIBAN each month?",
+            "enum": ["UpTo5", "UpTo10", "UpTo15", "Above15"]
+          },
+          "ExpectedCounterpartyCountries": {
+            "type": "array",
+            "description": "Please list the main expected counterparty countries",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/components/schemas/CountryCode"
+            }
+          },
+          "ExpectedTransactionCount": {
+            "type": "string",
+            "description": "Expected number of incoming transactions per month",
+            "enum": ["UpTo5", "UpTo10", "UpTo20", "Above20"]
+          },
+          "ExpectedTransactionValue": {
+            "type": "string",
+            "description": "Expected average transaction amount (EUR/USD equivalent)",
+            "enum": ["UpTo100", "UpTo500", "UpTo2k", "Above2k"]
+          }
+        },
+        "required": [
+          "Type",
+          "MainVirtualAccountPurpose",
+          "ExpectedCounterpartyCount",
+          "ExpectedCounterpartyCountries",
+          "ExpectedTransactionCount",
+          "ExpectedTransactionValue"
+        ]
+      },
       "EntityEnum": {
         "type": "string",
         "description": "Entity type for business entities",
@@ -2279,10 +2524,14 @@
             "$ref": "#/components/schemas/ReturnURL"
           },
           "CryptoCurrency": {
-            "$ref": "#/components/schemas/CryptoCurrencyCode"
+            "$ref": "#/components/schemas/CryptoCurrencyCode",
+            "deprecated": true,
+            "description": "Deprecated: Use UI.CryptoOptions instead. Will be removed in a future version."
           },
           "Network": {
-            "$ref": "#/components/schemas/Network"
+            "$ref": "#/components/schemas/Network",
+            "deprecated": true,
+            "description": "Deprecated: Use UI.CryptoOptions instead. Will be removed in a future version."
           },
           "DestinationAddress": {
             "$ref": "#/components/schemas/DestinationAddress"
@@ -2295,13 +2544,8 @@
             "description": "List of fiat options to be supported by the customer.",
             "x-go-type-skip-optional-pointer": true
           },
-          "CryptoOptions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CryptoOption"
-            },
-            "description": "List of cryptocurrency-network pair options for the customer to choose from. The system will try each option in order until one succeeds. If not provided, CryptoCurrency and Network must be specified.",
-            "x-go-type-skip-optional-pointer": true
+          "UI": {
+            "$ref": "#/components/schemas/BankToAddressUI"
           },
           "Metadata": {
             "type": "object",
@@ -2381,9 +2625,31 @@
           "FormSchema": {
             "$ref": "#/components/schemas/FormSchema",
             "description": "[JSONForm](https://jsonforms.io/) schema for the verification fields. If unable to provide, a hosted session is provided via the HostedURL."
+          },
+          "OnboardingStatus": {
+            "$ref": "#/components/schemas/OnboardingStatus",
+            "description": "Indicates the current status of the onboarding process."
+          },
+          "MissingSteps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Verification step types that are still incomplete (e.g. IDENTITY, SELFIE, QUESTIONNAIRE). Only present when OnboardingStatus is ReviewNotStarted and the applicant has not yet submitted all required data."
           }
         },
         "required": ["HostedURL"]
+      },
+      "OnboardingStatus": {
+        "type": "string",
+        "enum": [
+          "ReviewNotStarted",
+          "ReviewPending",
+          "DocumentInvalid",
+          "AgreementsRequired",
+          "Rejected"
+        ],
+        "description": "Indicates the current status of the onboarding process.\n\n* `ReviewNotStarted` - Onboarding has not started check missing steps.\n* `ReviewPending` - KYC review is in progress; no action is required from the business, you should wait webhook for status change.\n* `DocumentInvalid` - A document was rejected and resubmission is required.\n* `AgreementsRequired` - Required agreements have not been accepted.\n* `Rejected` - The customer has been permanently rejected and cannot be onboarded."
       },
       "HostedOnboardingRequest": {
         "type": "object",
@@ -2429,6 +2695,9 @@
           },
           {
             "$ref": "#/components/schemas/IndividualCustomerPrefill"
+          },
+          {
+            "$ref": "#/components/schemas/IndividualCustomerHighRiskPrefill"
           }
         ],
         "discriminator": {
@@ -2436,7 +2705,8 @@
           "mapping": {
             "SumSubToken": "#/components/schemas/SumSubToken",
             "BusinessCustomerPrefill": "#/components/schemas/BusinessCustomerPrefill",
-            "IndividualCustomerPrefill": "#/components/schemas/IndividualCustomerPrefill"
+            "IndividualCustomerPrefill": "#/components/schemas/IndividualCustomerPrefill",
+            "IndividualCustomerHighRiskPrefill": "#/components/schemas/IndividualCustomerHighRiskPrefill"
           }
         }
       },
@@ -2960,10 +3230,12 @@
       "Description": {
         "type": "string",
         "maxLength": 200,
+        "description": "Optional description of the payment.",
         "example": "25 Arks"
       },
       "Metadata": {
         "type": "object",
+        "description": "Optional key-value metadata to store additional information about the payment.",
         "additionalProperties": {
           "type": "string"
         },
@@ -2979,18 +3251,14 @@
       "PaymentURL": {
         "type": "string",
         "format": "uri",
+        "description": "PSP payment page URL returned for the payer to complete the payment.",
         "example": "https://payment.com/payment/1234567890"
       },
       "Psp": {
         "type": "string",
         "enum": ["CryptoCom"],
+        "description": "Payment service provider used for the PSP payment.",
         "example": "CryptoCom"
-      },
-      "PaymentExpiry": {
-        "type": "string",
-        "format": "date-time",
-        "example": "2026-01-01T12:00:00Z",
-        "description": "Time the payment session expires"
       },
       "PublicID": {
         "type": "string",
@@ -2998,40 +3266,68 @@
       },
       "PspRawEvent": {
         "type": "object",
+        "description": "Raw PSP payment payload.",
         "additionalProperties": true
       },
-      "TransactionID": {
+      "WalletAddress": {
         "type": "string",
-        "format": "uuid",
-        "example": "123e4567-e89b-12d3-a456-426614174000"
+        "example": "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+        "description": "Merchant's destination wallet address for the payout."
       },
-      "DestinationNetwork": {
-        "type": "string",
-        "example": "Ethereum",
-        "description": "Network for the payout transaction."
+      "DestinationCryptoCurrency": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CryptoCurrencyCode"
+          }
+        ],
+        "description": "Cryptocurrency that will be paid out to the merchant's destination address."
       },
       "MerchantID": {
-        "type": "string",
-        "description": "A unique identifier for the merchant in the Business' internal system and in NOAH.",
-        "example": "merchant-123"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CustomerID"
+          }
+        ],
+        "description": "A unique ID which identifies the merchant in NOAH and the PSP."
+      },
+      "PricingAmount": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PositiveDecimal"
+          }
+        ],
+        "description": "Amount to be displayed to the payer during the payment process."
+      },
+      "PricingCurrency": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AssetID"
+          }
+        ],
+        "description": "Currency to be displayed to the payer during the payment process."
+      },
+      "PaymentExpiry": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DateTime"
+          }
+        ],
+        "description": "Expiry time of the payment session."
       },
       "PspToOnchainRequest": {
         "type": "object",
         "properties": {
-          "ExternalID": {
-            "$ref": "#/components/schemas/ExternalID"
-          },
           "Psp": {
             "$ref": "#/components/schemas/Psp"
           },
           "MerchantID": {
             "$ref": "#/components/schemas/MerchantID"
           },
-          "Amount": {
-            "$ref": "#/components/schemas/PositiveDecimal"
+          "PricingAmount": {
+            "$ref": "#/components/schemas/PricingAmount"
           },
-          "Currency": {
-            "$ref": "#/components/schemas/CryptoCurrencyCode"
+          "PricingCurrency": {
+            "$ref": "#/components/schemas/PricingCurrency"
           },
           "Description": {
             "$ref": "#/components/schemas/Description"
@@ -3041,26 +3337,39 @@
           },
           "ReturnURL": {
             "$ref": "#/components/schemas/ReturnURL",
-            "description": "The URL to which the user is redirected at the end of the Payment session."
+            "description": "The URL which the payer is redirected to after completing the payment."
           },
           "DestinationCryptoCurrency": {
-            "$ref": "#/components/schemas/CryptoCurrencyCode"
+            "$ref": "#/components/schemas/DestinationCryptoCurrency"
           },
           "DestinationNetwork": {
             "$ref": "#/components/schemas/Network"
           },
           "DestinationAddress": {
-            "$ref": "#/components/schemas/DestinationAddress"
+            "$ref": "#/components/schemas/WalletAddress"
           },
           "Expiry": {
             "$ref": "#/components/schemas/PaymentExpiry"
+          },
+          "ExternalID": {
+            "$ref": "#/components/schemas/ExternalID"
+          },
+          "MerchantDisplayName": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 100,
+            "description": "Custom Merchant name displayed to the customer during checkout. Length must be between 3 and 100 characters. The following characters are not allowed: =, +, @, |, \".",
+            "example": "Noah's Store"
+          },
+          "Nonce": {
+            "$ref": "#/components/schemas/Nonce"
           }
         },
         "required": [
           "Psp",
           "MerchantID",
-          "Amount",
-          "Currency",
+          "PricingAmount",
+          "PricingCurrency",
           "DestinationCryptoCurrency",
           "DestinationNetwork",
           "DestinationAddress"
@@ -3069,17 +3378,29 @@
       "PspToOnchainResponse": {
         "type": "object",
         "properties": {
+          "Psp": {
+            "$ref": "#/components/schemas/Psp"
+          },
+          "MerchantID": {
+            "$ref": "#/components/schemas/MerchantID"
+          },
           "ID": {
             "type": "string",
+            "description": "The unique identifier for the psp to onchain payment workflow",
             "example": "123e4567-e89b-12d3-a456-426614174000"
           },
           "PaymentID": {
             "type": "string",
-            "description": "The payment ID from the payment service provider.",
+            "description": "The payment identifier returned by the payment service provider.",
             "example": "d413c708-4b37-4f16-bc3c-7c3056b0a8e3"
           },
-          "TransactionID": {
-            "$ref": "#/components/schemas/TransactionID"
+          "FiatDepositID": {
+            "type": "string",
+            "description": "Reference to the fiat deposit that was created for the payment."
+          },
+          "WithdrawOrderID": {
+            "type": "string",
+            "description": "Reference to the orchestration withdrawal that pays out to the merchant's destination address."
           },
           "PublicID": {
             "$ref": "#/components/schemas/PublicID",
@@ -3088,51 +3409,55 @@
           "ExternalID": {
             "$ref": "#/components/schemas/ExternalID"
           },
-          "Psp": {
-            "$ref": "#/components/schemas/Psp"
+          "Status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TransactionStatus"
+              }
+            ],
+            "description": "Combined workflow status derived from the payment and withdrawal statuses."
           },
-          "MerchantID": {
-            "$ref": "#/components/schemas/MerchantID"
+          "PaymentStatus": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TransactionStatus"
+              }
+            ],
+            "description": "PSP payment status from the payment service provider."
+          },
+          "WithdrawStatus": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TransactionStatus"
+              }
+            ],
+            "description": "Withdrawal status from the orchestration execution."
           },
           "PaymentURL": {
             "$ref": "#/components/schemas/PaymentURL"
           },
-          "Amount": {
-            "$ref": "#/components/schemas/PositiveDecimal"
+          "PricingAmount": {
+            "$ref": "#/components/schemas/PricingAmount"
           },
-          "Currency": {
-            "$ref": "#/components/schemas/CryptoCurrencyCode"
-          },
-          "Status": {
-            "$ref": "#/components/schemas/TransactionStatus",
-            "description": "Overall workflow status combining payment and withdrawal statuses."
-          },
-          "PaymentStatus": {
-            "$ref": "#/components/schemas/TransactionStatus",
-            "description": "PSP payment status from the payment service provider."
-          },
-          "WithdrawStatus": {
-            "$ref": "#/components/schemas/TransactionStatus",
-            "description": "Withdrawal status from orchestration execution."
-          },
-          "FiatDepositID": {
-            "type": "string",
-            "description": "Reference to the created FiatDeposit when the payment is captured."
+          "PricingCurrency": {
+            "$ref": "#/components/schemas/PricingCurrency"
           },
           "DestinationCryptoCurrency": {
-            "$ref": "#/components/schemas/CryptoCurrencyCode"
+            "$ref": "#/components/schemas/DestinationCryptoCurrency"
           },
           "DestinationNetwork": {
             "$ref": "#/components/schemas/Network"
           },
           "DestinationAddress": {
-            "$ref": "#/components/schemas/DestinationAddress"
+            "$ref": "#/components/schemas/WalletAddress"
           },
           "Created": {
-            "$ref": "#/components/schemas/DateTime"
+            "$ref": "#/components/schemas/DateTime",
+            "description": "Timestamp when the PSP payment record was created in Noah."
           },
           "Updated": {
-            "$ref": "#/components/schemas/DateTime"
+            "$ref": "#/components/schemas/DateTime",
+            "description": "Timestamp when the PSP payment record was last updated in Noah."
           },
           "Expiry": {
             "$ref": "#/components/schemas/PaymentExpiry"
@@ -3147,8 +3472,8 @@
           "PaymentID",
           "MerchantID",
           "PaymentURL",
-          "Amount",
-          "Currency",
+          "PricingAmount",
+          "PricingCurrency",
           "Status",
           "DestinationCryptoCurrency",
           "DestinationNetwork",
@@ -3206,40 +3531,12 @@
   },
   "tags": [
     {
-      "name": "Balances",
-      "description": "Resources that are related to Balances."
+      "name": "Payin",
+      "description": "Resources that are related to Payin."
     },
     {
-      "name": "Sandbox",
-      "description": "Resources that are related to Sandbox."
-    },
-    {
-      "name": "Channels",
-      "description": "Resources that are related to Channels."
-    },
-    {
-      "name": "Hosted Sessions",
-      "description": "Resources that are related to our Hosted Checkout product."
-    },
-    {
-      "name": "Customers",
-      "description": "Resources that are related to Customers."
-    },
-    {
-      "name": "Payment Methods",
-      "description": "Resources that are related to Payment Methods."
-    },
-    {
-      "name": "Prices",
-      "description": "Resources that are related to Prices."
-    },
-    {
-      "name": "Orchestration",
-      "description": "Resources that are related to Orchestration."
-    },
-    {
-      "name": "Workflows",
-      "description": "Resources that are related to Workflows."
+      "name": "Payout",
+      "description": "Resources that are related to Payout."
     },
     {
       "name": "Transactions",
@@ -3899,248 +4196,11 @@
         ]
       }
     },
-    "/checkout/payin/fiat": {
-      "post": {
-        "summary": "Create Fiat Payin Session",
-        "description": "This endpoint initiates Noah’s hosted checkout session for fiat currency payments.\n\nThe solution creates a hosted session where customers make fiat currency payments through Noah’s hosted checkout interface, accepting parameters, including customer details. If customer details are filled out, a new customer will be created. Otherwise, the provided `CustomerID` should refer to an existing customer.\n\nUse the endpoint to retrieve a response consisting of a checkout URL, which you pass to your customer so that they can complete their fiat payment through a hosted session.\n\nThe hosted flow handles the complete payment process with real-time status updates via Webhooks.",
-        "tags": ["Payin"],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "PaymentMethodCategory": {
-                    "$ref": "#/components/schemas/PaymentMethodCategory"
-                  },
-                  "FiatCurrency": {
-                    "$ref": "#/components/schemas/FiatCurrencyCode"
-                  },
-                  "CryptoCurrency": {
-                    "$ref": "#/components/schemas/CryptoCurrencyCode"
-                  },
-                  "FiatAmount": {
-                    "$ref": "#/components/schemas/PositiveDecimal"
-                  },
-                  "ReturnURL": {
-                    "$ref": "#/components/schemas/ReturnURL"
-                  },
-                  "ExternalID": {
-                    "$ref": "#/components/schemas/ExternalID"
-                  },
-                  "CustomerID": {
-                    "$ref": "#/components/schemas/CustomerID",
-                    "description": "Identifies the customer in business' system"
-                  },
-                  "Customer": {
-                    "$ref": "#/components/schemas/CustomerInput"
-                  },
-                  "LineItems": {
-                    "$ref": "#/components/schemas/LineItems",
-                    "description": "List of line items that your customer is purchasing using this Hosted Checkout Session. This is used for display purposes for the customer during Checkout as well as remediation of disputed payments. We do not make any calculations using this data."
-                  },
-                  "Nonce": {
-                    "$ref": "#/components/schemas/Nonce"
-                  }
-                },
-                "required": [
-                  "PaymentMethodCategory",
-                  "CryptoCurrency",
-                  "FiatCurrency",
-                  "FiatAmount",
-                  "CustomerID",
-                  "ReturnURL",
-                  "LineItems",
-                  "Nonce"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Checkout request created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CheckoutSessionResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "description": "Bad request"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "description": "Client is not authorized to perform this action"
-          },
-          "500": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "description": "Internal server error"
-          }
-        },
-        "callbacks": {
-          "Status Update": {
-            "$ref": "#/components/callbacks/PaymentCallback"
-          }
-        },
-        "parameters": [
-          {
-            "description": "Digitally signed JWT.",
-            "in": "header",
-            "name": "Api-Signature",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ]
-      }
-    },
-    "/checkout/payout/fiat": {
-      "post": {
-        "summary": "Create Fiat Payout Session",
-        "description": "This endpoint initiates Noah's Hosted Fiat Payout Session flow.\n\nThe solution establishes an end-to-end checkout experience where customers convert cryptocurrency to fiat through a hosted interface, with Noah handling KYC verification, payment method selection, and transaction monitoring.\n\nUse the endpoint to retrieve a response consisting of a URL, which you pass to your customer so that they can complete their payout through a hosted session. If customer details are filled out, a new customer will be created. Otherwise, the provided `CustomerID` should refer to an existing customer.\n\nFollow the step-by-step guide: [Hosted Fiat Payout](../recipes/payout/hosted-checkout)",
-        "tags": ["Payout"],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "CryptoCurrency": {
-                    "$ref": "#/components/schemas/CryptoCurrencyCode"
-                  },
-                  "FiatCurrency": {
-                    "$ref": "#/components/schemas/FiatCurrencyCode"
-                  },
-                  "FiatAmount": {
-                    "$ref": "#/components/schemas/PositiveDecimal"
-                  },
-                  "CryptoAuthorizedAmount": {
-                    "$ref": "#/components/schemas/PositiveDecimal",
-                    "description": "Maximum amount that can be charged for this transaction."
-                  },
-                  "ReturnURL": {
-                    "$ref": "#/components/schemas/ReturnURL"
-                  },
-                  "ExternalID": {
-                    "$ref": "#/components/schemas/ExternalID"
-                  },
-                  "CustomerID": {
-                    "$ref": "#/components/schemas/CustomerID",
-                    "description": "Identifies the customer in business' system"
-                  },
-                  "Customer": {
-                    "$ref": "#/components/schemas/CustomerInput"
-                  },
-                  "LineItems": {
-                    "$ref": "#/components/schemas/LineItems",
-                    "description": "List of line items that your customer is getting paid for using this Hosted Checkout Session. This is used for display purposes for the customer during Checkout as well as remediation of disputed payments."
-                  },
-                  "Nonce": {
-                    "$ref": "#/components/schemas/Nonce"
-                  }
-                },
-                "required": [
-                  "CryptoCurrency",
-                  "FiatCurrency",
-                  "FiatAmount",
-                  "CryptoAuthorizedAmount",
-                  "CustomerID",
-                  "ReturnURL",
-                  "LineItems",
-                  "Nonce"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Checkout request created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CheckoutSessionResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "description": "Bad request"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "description": "Client is not authorized to perform this action"
-          },
-          "500": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            },
-            "description": "Internal server error"
-          }
-        },
-        "callbacks": {
-          "Status Update": {
-            "$ref": "#/components/callbacks/PaymentCallback"
-          }
-        },
-        "parameters": [
-          {
-            "description": "Digitally signed JWT.",
-            "in": "header",
-            "name": "Api-Signature",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ]
-      }
-    },
     "/customers/{CustomerID}": {
       "get": {
         "summary": "Customer by ID",
         "description": "This endpoint retrieves the details of a specific customer by their `CustomerID`.",
-        "tags": ["Utilities"],
+        "tags": ["Onboarding"],
         "parameters": [
           {
             "name": "CustomerID",
@@ -4239,7 +4299,7 @@
     "/onboarding/{CustomerID}": {
       "post": {
         "summary": "Create Onboarding Session",
-        "description": "This endpoint initiates [Noah's Standard Model onboarding flow](../getting-started/kyc#standard-model). Through this solution, Noah establishes direct contractual relationships with your end customers, handling all KYB/KYC verification and Tems and Conditions acceptance on your behalf.\n\nUse the endpoint to retrieve a response consisting of a URL, which you pass to your customer so that they can enter their details in a Hosted Onboarding session.\n\nFollow the step-by-step guide: [Hosted Onboarding Recipe](../recipes/onboarding/hosted-onboarding)\n\nNote: Customers needing to process USD payments must make use of Hosted Onboarding, rather than using [Reliance Onboarding](../api-reference/create-update-customer).",
+        "description": "This endpoint initiates [Noah's Standard Model onboarding flow](../getting-started/kyc#standard-model). Through this solution, Noah establishes direct contractual relationships with your end customers, handling all KYB/KYC verification and Terms and Conditions acceptance on your behalf.\n\nUse the endpoint to retrieve a response consisting of a URL, which you pass to your customer so that they can enter their details in a Hosted Onboarding session.\n\nFollow the step-by-step guide: [Hosted Onboarding Recipe](../recipes/onboarding/hosted-onboarding)\n\n:::info\nAdditional KYC applications for users who have already completed KYC will be rejected. Duplicate applications are flagged as a fraud prevention measure. If a user has already completed KYC, do not initiate another KYC session. Instead, retrieve the user's existing verification status. For details, see [KYC Platform](../api-concepts/kyc).\n:::\n\nNote: Customers needing to process USD payments must make use of Hosted Onboarding, rather than using [Reliance Onboarding](../api-reference/create-update-customer).",
         "tags": ["Onboarding"],
         "parameters": [
           {
@@ -4271,7 +4331,7 @@
         },
         "responses": {
           "200": {
-            "description": "Hosted onboarding session request successful.",
+            "description": "Hosted onboarding session request successful. The `OnboardingStatus` field indicates an action is required to complete the onboarding.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4351,7 +4411,20 @@
         },
         "responses": {
           "200": {
-            "description": "Data processed"
+            "description": "Data processed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "RequestExtension": {
+                      "$ref": "#/components/schemas/RequestExtension",
+                      "description": "Request extensions for any errors that were encountered during the prefill process."
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "content": {
@@ -4593,7 +4666,7 @@
     "/hosted-workflows/bank-deposit-to-onchain-address": {
       "post": {
         "summary": "Convert Fiat to Crypto Session",
-        "description": "This endpoint initiates Noah’s hosted onboarding session for automated fiat-to-crypto workflows.\n\nThe solution creates a hosted session where customers can set up a workflow that automatically converts incoming fiat currency from bank deposits into cryptocurrency and sends the acquired crypto to a specified wallet address on the specified network. The workflow triggers automatically and indefinitely whenever a bank transfer is made to the designated bank account.\n\nUse the endpoint to retrieve a response consisting of a URL, which you pass to your customer so that they can configure their automated conversion workflow through a hosted session. Deposited amounts are traded for the specified cryptocurrency at current market prices after application of fees.\n\n**Notes**:\n\n * On-chain operations are irreversible, and market prices may fluctuate significantly, impacting the final payout amount.\n * Although this workflow should continue working with the original FormSession, Noah cannot guarantee FormSession longevity. For this reason, generate a new FormSession each time you present the customer with the onchain deposit address.\n * If the customer reuses the onchain address after the FormSession becomes invalid, the transfer will fail but funds will not be lost.",
+        "description": "This endpoint initiates Noah's hosted session for automated fiat-to-crypto workflows.\n\nThe solution creates a hosted session where customers can set up a workflow that automatically converts incoming fiat currency from bank deposits into cryptocurrency and sends the acquired crypto to a specified wallet address on the specified network. The workflow triggers automatically whenever a bank transfer is made to the designated bank account.\n\nUse the endpoint to retrieve a response consisting of a URL, which you pass to your customer so that they can configure their automated conversion workflow through a hosted session. Deposited amounts are traded for the specified cryptocurrency at current market prices after application of fees.\n\n**Notes**:\n\n * On-chain operations are irreversible, and market prices may fluctuate significantly, impacting the final payout amount.\n * Although this workflow should continue working with the original FormSession, Noah cannot guarantee FormSession longevity. For this reason, generate a new FormSession each time you present the customer with the onchain deposit address.\n * If the customer reuses the onchain address after the FormSession becomes invalid, the transfer will fail but funds will not be lost.",
         "tags": ["Payin"],
         "requestBody": {
           "required": true,
@@ -4601,6 +4674,75 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/BankDepositToOnchainAddressHostedRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "HostedURL successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HostedSessionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Bad request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Client is not authorized to perform this action"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Internal server error"
+          }
+        },
+        "parameters": [
+          {
+            "description": "Digitally signed JWT.",
+            "in": "header",
+            "name": "Api-Signature",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/hosted-workflows/onchain-deposit-to-payment-method": {
+      "post": {
+        "summary": "Convert Crypto to Fiat Session",
+        "description": "This endpoint initiates Noah's hosted session for automated crypto-to-fiat workflows.\n\nThe solution creates a hosted session where customers can set up a workflow that automatically converts incoming cryptocurrency from onchain deposits into fiat currency and sends the acquired fiat to their payment method. The workflow triggers automatically when cryptocurrency is deposited to the designated onchain address.\n\nUse the endpoint to retrieve a response consisting of a URL, which you pass to your customer so that they can configure their automated conversion workflow through a hosted session. Deposited amounts are traded for the specified fiat currency at current market prices after application of fees.\n\n**Notes**:\n\n * On-chain operations are irreversible, and market prices may fluctuate significantly, impacting the final payout amount.\n * Although this workflow should continue working with the original FormSession, Noah cannot guarantee FormSession longevity. For this reason, generate a new FormSession each time you present the customer with the onchain deposit address.\n * If the customer reuses the onchain address after the FormSession becomes invalid, the transfer will fail but funds will not be lost.",
+        "tags": ["Payout"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OnchainDepositToPaymentMethodHostedRequest"
               }
             }
           }
@@ -4836,6 +4978,14 @@
             }
           },
           {
+            "name": "Capability",
+            "in": "query",
+            "description": "Filter payment methods by capability",
+            "schema": {
+              "$ref": "#/components/schemas/PaymentMethodCapability"
+            }
+          },
+          {
             "description": "Digitally signed JWT.",
             "in": "header",
             "name": "Api-Signature",
@@ -4892,7 +5042,7 @@
       "get": {
         "summary": "Customers",
         "description": "This endpoint retrieves a paginated list of customers for the Business User's account.",
-        "tags": ["Utilities"],
+        "tags": ["Onboarding"],
         "parameters": [
           {
             "name": "PageSize",
@@ -5055,7 +5205,7 @@
       "get": {
         "summary": "Transactions",
         "description": "This endpoint retrieves a paginated list of transaction history for the Business User's account.",
-        "tags": ["Utilities"],
+        "tags": ["Transactions"],
         "parameters": [
           {
             "name": "PageSize",
@@ -5147,7 +5297,7 @@
       "get": {
         "summary": "Transaction by ID",
         "description": "This endpoint retrieves the details of a single transaction by `TransactionID`.",
-        "tags": ["Utilities"],
+        "tags": ["Transactions"],
         "parameters": [
           {
             "name": "TransactionID",

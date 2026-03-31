@@ -19,6 +19,7 @@ import { postCheckoutPayoutFiatTool } from "./post-checkout-payout-fiat/index.js
 import { postCustomersHostedOnboardingTool } from "./post-customers-hosted-onboarding/index.js";
 import { postHelpByIdTool } from "./post-help-by-id/index.js";
 import { postHostedWorkflowsBankDepositToOnchainAddressTool } from "./post-hosted-workflows-bank-deposit-to-onchain-address/index.js";
+import { postHostedWorkflowsOnchainDepositToPaymentMethodTool } from "./post-hosted-workflows-onchain-deposit-to-payment-method/index.js";
 import { postOnboardingTool } from "./post-onboarding/index.js";
 import { postOnboardingByIdTool } from "./post-onboarding-by-id/index.js";
 import { postOnboardingPrefillTool } from "./post-onboarding-prefill/index.js";
@@ -55,6 +56,7 @@ export const createNoahTools = (): ToolRegistration<any>[] => {
     postCustomersHostedOnboardingTool,
     postHelpByIdTool,
     postHostedWorkflowsBankDepositToOnchainAddressTool,
+    postHostedWorkflowsOnchainDepositToPaymentMethodTool,
     postOnboardingTool,
     postOnboardingByIdTool,
     postOnboardingPrefillTool,

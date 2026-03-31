@@ -2,12 +2,14 @@ import { z } from "zod";
 
 export const postTransactionsSellPrepareSchema = z.object({
   ChannelID: z.string(),
+  FormSessionID: z.string().optional(),
   PaymentMethodID: z.string().optional(),
   CryptoCurrency: z.string().describe("Cryptocurrency to sell."),
   CustomerID: z.string().optional(),
   FiatAmount: z.string().describe("Amount sent to customer's payment method."),
   Form: z.record(z.string(), z.unknown()).optional(),
-  DelayedSell: z.boolean().optional().describe("When enabled, balance checks are deferred until the final sell request, allowing the order to be prepared now and executed later.")
+  DelayedSell: z.boolean().optional().describe("When enabled, balance checks are deferred until the final sell request, allowing the order to be prepared now and executed later."),
+  Version: z.string().optional().describe("Optional API version.")
 });
 
 export type PostTransactionsSellPrepareSchema = z.infer<typeof postTransactionsSellPrepareSchema>;
