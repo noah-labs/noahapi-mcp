@@ -13,10 +13,6 @@ Generates MCP tool files from `oas-schema.generated.json`. Creates:
 - Tool handlers (placeholder implementations)
 - Tool registrations
 
-The docs OAS is a subset of the implemented Business API. Generate keeps
-implemented tools that are missing from the spec, except paths listed as
-`retiredPaths` in this script (for example `POST /checkout/manage`).
-
 **Note**: This script generates union schemas (e.g., `z.union([...])`) for endpoints with multiple request body variants, which are not compatible with the MCP SDK's requirement for `type: "object"` at the root level.
 
 ### `fix-union-schemas.ts`

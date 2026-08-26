@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, rmSync } from "fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from "fs";
 import { join } from "path";
 
 interface OpenAPISpec {
@@ -355,35 +355,23 @@ function main() {
     }
   }
 
-  // Docs OAS is a subset of implemented tools (e.g. GET /channels is omitted).
-  // Keep extra implemented handlers, but drop ones whose API path was retired.
-  const retiredPaths = new Set(["/checkout/manage"]);
-
+  // Scan for existing tool directories that have implemented tools (not placeholders)
+  // This ensures we don't lose tools that exist but aren't in the current OAS
   const existingDirs = readdirSync(toolsDir, { withFileTypes: true })
     .filter((dirent) => dirent.isDirectory())
     .map((dirent) => dirent.name);
 
   for (const dirName of existingDirs) {
-    if (toolNames.includes(dirName)) {
-      continue;
-    }
-
-    const toolDir = join(toolsDir, dirName);
-    const indexPath = join(toolDir, "index.ts");
-    const content = existsSync(indexPath) ? readFileSync(indexPath, "utf-8") : "";
-    const pathMatch = content.match(/\/\/ Path: (\S+)/) ?? content.match(/noahClient\.(?:get|post|put|delete|patch)\("([^"]+)"/);
-    const apiPath = pathMatch?.[1];
-    const isPlaceholder = content.includes("TODO: Implement Noah Business API call");
-
-    if (apiPath && retiredPaths.has(apiPath)) {
-      rmSync(toolDir, { recursive: true, force: true });
-      console.log(`Removing retired tool: ${dirName} (${apiPath})`);
-      continue;
-    }
-
-    if (!isPlaceholder && content) {
-      toolNames.push(dirName);
-      console.log(`Including existing tool: ${dirName}`);
+    if (!toolNames.includes(dirName)) {
+      const indexPath = join(toolsDir, dirName, "index.ts");
+      if (existsSync(indexPath)) {
+        const content = readFileSync(indexPath, "utf-8");
+        // Include if it's implemented (not a placeholder)
+        if (!content.includes("TODO: Implement Noah Business API call")) {
+          toolNames.push(dirName);
+          console.log(`Including existing tool: ${dirName}`);
+        }
+      }
     }
   }
 
