@@ -12,7 +12,6 @@ import { getPricesTool } from "./get-prices/index.js";
 import { getTransactionsTool } from "./get-transactions/index.js";
 import { getTransactionsByIdTool } from "./get-transactions-by-id/index.js";
 import { postBeta1RuleTool } from "./post-beta1-rule/index.js";
-import { postCheckoutManageTool } from "./post-checkout-manage/index.js";
 import { postCheckoutPayinCryptoTool } from "./post-checkout-payin-crypto/index.js";
 import { postCheckoutPayinFiatTool } from "./post-checkout-payin-fiat/index.js";
 import { postCheckoutPayoutFiatTool } from "./post-checkout-payout-fiat/index.js";
@@ -49,7 +48,6 @@ export const createNoahTools = (): ToolRegistration<any>[] => {
     getTransactionsTool,
     getTransactionsByIdTool,
     postBeta1RuleTool,
-    postCheckoutManageTool,
     postCheckoutPayinCryptoTool,
     postCheckoutPayinFiatTool,
     postCheckoutPayoutFiatTool,
